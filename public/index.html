@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Marketing Intelligence Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 AI Marketing Intelligence Tool</h1>
+            <p>Generate foundational intelligence for content marketing strategy</p>
+            <button onclick="testAPI()" class="test-api-btn" style="margin-top: 10px; padding: 8px 16px; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer;">Test API Connection</button>
+        </header>
+
+        <div class="form-container">
+            <form id="onboardingForm">
+                <div class="section">
+                    <h2>Universal Questions</h2>
+                    
+                    <div class="form-group">
+                        <label for="launchDate">What is your product/business launch date?</label>
+                        <input type="date" id="launchDate" name="launchDate" required>
+                        <p class="help-text">This can be a past date (if you've already launched) or a future date (if you're planning to launch). Even a tentative date helps us create the right content strategy for your business stage.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="targetGeography">What's your target geographic market?</label>
+                        <input type="text" id="targetGeography" name="targetGeography" placeholder="e.g., US and Canada, Global, Europe">
+                        <p class="help-text">Where do your customers come from? Examples: Global, United States, US and Canada, English-speaking countries, California only, India, Europe, Southeast Asia, New York City</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="websiteUrl">What's your website URL?</label>
+                        <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://example.com">
+                        <p class="help-text">Leave this blank if you don't have a website yet - we'll work with that!</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessSpecifics">Tell us anything specific about your business that would help us create better content</label>
+                        <textarea id="businessSpecifics" name="businessSpecifics" rows="4" placeholder="Top 3 competitors, social media handles, unique features..."></textarea>
+                        <p class="help-text">This helps us understand your unique situation. You can mention things like: Top 3 competitors (names or website URLs), Your social media handles (if you have them), Unique features or selling points, Target industries or customer types, Recent milestones or achievements, Challenges you're facing, Anything else that makes your business unique</p>
+                    </div>
+                </div>
+
+                <div class="section" id="categorySpecificSection" style="display: none;">
+                    <h2>Additional Information</h2>
+                    <div id="categoryQuestions"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">Generate Intelligence</button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Generating foundational intelligence...</p>
+        </div>
+
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <h2>🧠 Foundational Intelligence Generated</h2>
+            
+            <div class="result-section">
+                <h3>Raw Onboarding Data</h3>
+                <div class="copy-section">
+                    <pre id="onboardingDataOutput"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('onboardingDataOutput', this)">📋 Copy Onboarding Data</button>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h3>AI Foundational Intelligence</h3>
+                <div class="copy-section">
+                    <pre id="intelligenceOutput"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('intelligenceOutput', this)">📋 Copy Intelligence Data</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="next-btn" onclick="generateQueries()">🔍 Generate Search Queries</button>
+                <button class="reset-btn" onclick="resetForm()">🔄 Start Over</button>
+            </div>
+        </div>
+
+        <div class="queries-container" id="queriesContainer" style="display: none;">
+            <h2>🔍 Generated Search Queries</h2>
+            
+            <div class="query-section">
+                <h3>Competitor Discovery Queries</h3>
+                <div class="copy-section">
+                    <pre id="competitorQueriesOutput"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('competitorQueriesOutput', this)">📋 Copy Competitor Queries</button>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <h3>Keyword Intelligence Queries</h3>
+                <div class="copy-section">
+                    <pre id="keywordQueriesOutput"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('keywordQueriesOutput', this)">📋 Copy Keyword Queries</button>
+                </div>
+            </div>
+
+            <div class="query-section">
+                <h3>Content Discovery Queries</h3>
+                <div class="copy-section">
+                    <pre id="contentQueriesOutput"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('contentQueriesOutput', this)">📋 Copy Content Queries</button>
+                </div>
+            </div>
+
+            <div class="test-search-section">
+                <h3>🔎 Test Search Query</h3>
+                <div class="search-test">
+                    <input type="text" id="testQuery" placeholder="Paste a query here to test it">
+                    <button onclick="executeTestSearch()" class="test-btn">Execute Search</button>
+                </div>
+                <div class="search-results" id="searchResults" style="display: none;">
+                    <h4>Search Results:</h4>
+                    <div class="copy-section">
+                        <pre id="searchResultsOutput"></pre>
+                        <button class="copy-btn" onclick="copyToClipboard('searchResultsOutput', this)">📋 Copy Search Results</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="reset-btn" onclick="resetForm()">🔄 Start Over</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
