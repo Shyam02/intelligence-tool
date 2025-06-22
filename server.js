@@ -425,11 +425,11 @@ app.post('/api/generate-queries', async (req, res) => {
   }
 });
 
-// Execute search queries
+// Execute search queries - FIXED TO USE REAL WEB SEARCH
 app.post('/api/execute-search', async (req, res) => {
   try {
     const { query } = req.body;
-    console.log('Received search request for query:', query);
+    console.log('🔍 Search request received for query:', query);
     
     if (!query || query.trim() === '') {
       return res.status(400).json({ error: 'Query is required' });
@@ -439,66 +439,129 @@ app.post('/api/execute-search', async (req, res) => {
       return res.status(500).json({ error: 'Claude API key not configured' });
     }
     
-    let searchResults;
     let method = '';
+    let apiCalls = [];
+    let articles = [];
     
     try {
-      // First try with web search tool
-      console.log('Attempting search with web_search tool...');
-      const promptWithTool = `I need you to search the web for this exact query and provide a comprehensive analysis.
-
-Search Query: "${query}"
-
-Please use your web search capabilities to find current information and then provide:
-
-1. Summary of key findings from the search results
-2. Relevant competitors or companies mentioned
-3. Content ideas or trends discovered
-4. Keywords and phrases that appear frequently
-5. Any actionable insights for content marketing
-
-Please provide a detailed analysis based on the actual search results.`;
+      // Use web search tool to get REAL results
+      console.log('🌐 Executing real web search...');
       
-      searchResults = await callClaudeAPI(promptWithTool, true);
-      method = 'web_search_tool';
+      const searchPrompt = `Search the web for: "${query}"
       
-      if (!searchResults || searchResults.trim() === '') {
-        throw new Error('Empty response from web search tool');
+After searching, extract the top 5-8 most relevant articles and format them as a JSON array with this structure:
+[
+  {
+    "id": 1,
+    "title": "Actual article title from search",
+    "url": "https://actual-url.com/article",
+    "preview": "First 150 characters from the actual article content...",
+    "domain": "actual-url.com",
+    "published": "2024-03-15",
+    "selected": false
+  }
+]
+
+Return ONLY the JSON array of real articles from actual search results.`;
+
+      // Use web search tool (true parameter)
+      const searchResult = await callClaudeAPI(searchPrompt, true);
+      
+      apiCalls.push({
+        call: 1,
+        type: 'web_search',
+        query: query,
+        response_length: searchResult.length,
+        timestamp: new Date().toISOString()
+      });
+
+      // Parse articles from search results
+      try {
+        // Extract JSON from Claude's response
+        const jsonMatch = searchResult.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const parsedArticles = JSON.parse(jsonMatch[0]);
+          if (Array.isArray(parsedArticles) && parsedArticles.length > 0) {
+            articles = parsedArticles;
+            method = 'web_search_tool';
+            console.log('✅ Found', articles.length, 'real articles from web search');
+          }
+        }
+      } catch (parseError) {
+        console.log('⚠️ Failed to parse search results, trying alternative parsing');
+        
+        // Try to extract articles manually from the search results
+        const lines = searchResult.split('\n');
+        let articleId = 1;
+        
+        for (const line of lines) {
+          if (line.includes('http') && line.trim().length > 0) {
+            // Extract URL
+            const urlMatch = line.match(/https?:\/\/[^\s]+/);
+            if (urlMatch) {
+              articles.push({
+                id: articleId++,
+                title: line.replace(urlMatch[0], '').trim() || `Search Result ${articleId}`,
+                url: urlMatch[0],
+                preview: `Content from: ${urlMatch[0]}`,
+                domain: new URL(urlMatch[0]).hostname,
+                published: new Date().toISOString().split('T')[0],
+                selected: false
+              });
+            }
+          }
+        }
       }
-      
-    } catch (toolError) {
-      console.log('Web search tool failed, trying fallback approach:', toolError.message);
-      
-      // Fallback: Ask Claude to provide insights without web search
-      const fallbackPrompt = `Based on your knowledge, please analyze this search query and provide insights that would help with content marketing research.
 
-Query: "${query}"
-
-Please provide:
-1. What this query suggests about user intent and target audience
-2. Related keywords and topics someone might search for
-3. Potential competitors or companies likely in this space
-4. Content ideas based on this query theme
-5. Target audience insights and marketing opportunities
-
-Note: This analysis is based on training data knowledge, not real-time search results.`;
-      
-      searchResults = await callClaudeAPI(fallbackPrompt, false);
-      method = 'knowledge_based_fallback';
-      
-      if (!searchResults || searchResults.trim() === '') {
-        throw new Error('Empty response from fallback method');
+      // Fallback if no articles found
+      if (articles.length === 0) {
+        console.log('⚠️ No articles extracted, using minimal fallback');
+        articles = [
+          {
+            id: 1,
+            title: `No search results found for: ${query}`,
+            url: "#",
+            preview: `The web search did not return any results for this query. Try modifying your search terms.`,
+            domain: "no-results",
+            published: new Date().toISOString().split('T')[0],
+            selected: false
+          }
+        ];
+        method = 'no_results';
       }
+
+    } catch (error) {
+      console.log('⚠️ Web search failed:', error.message);
+      
+      // Minimal fallback
+      articles = [
+        {
+          id: 1,
+          title: `Search Error: ${query}`,
+          url: "#",
+          preview: `Web search encountered an error: ${error.message}`,
+          domain: "error",
+          published: new Date().toISOString().split('T')[0],
+          selected: false
+        }
+      ];
+      method = 'search_error';
     }
-    
-    console.log(`Search completed using method: ${method}, result length:`, searchResults.length);
-    
-    const response = { 
+
+    console.log('📤 Sending response with:', {
+      query: query,
+      articles_count: articles.length,
+      method: method,
+      status: 'success'
+    });
+
+    const response = {
       original_query: query,
-      search_analysis: searchResults,
+      articles: articles,
       method_used: method,
       timestamp: new Date().toISOString(),
-      status: 'success'
+      status: 'success',
+      api_calls: apiCalls
     };
     
     res.json(response);
@@ -509,17 +572,11 @@ Note: This analysis is based on training data knowledge, not real-time search re
     const errorResponse = { 
       error: error.message,
       original_query: req.body.query || 'unknown',
+      articles: [],
       status: 'error',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      api_calls: []
     };
-    
-    // Don't expose sensitive error details in production
-    if (process.env.NODE_ENV !== 'production') {
-      errorResponse.debug = {
-        stack: error.stack,
-        details: error.response?.data
-      };
-    }
     
     res.status(500).json(errorResponse);
   }
@@ -531,5 +588,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
