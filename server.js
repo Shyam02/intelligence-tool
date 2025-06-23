@@ -11,11 +11,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Claude API configuration
+// API configuration
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY;
+const BRAVE_API_KEY = process.env.BRAVE_API_KEY;
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const BRAVE_API_URL = 'https://api.search.brave.com/res/v1/web/search';
 
-// Helper function to call Claude API
+// Helper function to call Claude API (for non-search tasks)
 async function callClaudeAPI(prompt, useWebSearch = false) {
   try {
     const tools = useWebSearch ? [
@@ -67,110 +69,82 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
       }
     });
 
-    console.log('First Claude API response:', {
+    console.log('Claude API response:', {
       status: response.status,
       contentLength: response.data.content?.length,
       contentTypes: response.data.content?.map(c => c.type),
       stopReason: response.data.stop_reason
     });
 
-    // Add Claude's response to messages
-    messages.push({
-      role: "assistant",
-      content: response.data.content
-    });
-
-    // Check if Claude wants to use a tool
-    const toolUse = response.data.content?.find(c => c.type === 'tool_use');
-    
-    if (toolUse && toolUse.name === 'web_search') {
-      console.log('Claude wants to search for:', toolUse.input.query);
+    // Handle tool use if Claude wants to use web search
+    if (useWebSearch && response.data.content) {
+      let finalResult = '';
+      let currentMessages = [...messages];
       
-      // Simulate web search results (since we don't have actual web search)
-      // In a real implementation, this would call an actual search API
-      const searchResults = `Search results for "${toolUse.input.query}":
+      // Add Claude's response to conversation
+      currentMessages.push({
+        role: "assistant",
+        content: response.data.content
+      });
 
-Based on search results, here are key findings about artificial intelligence content marketing success stories:
+      // Check if Claude used any tools
+      for (const content of response.data.content) {
+        if (content.type === 'tool_use') {
+          console.log('Claude requested tool use:', content.name, content.input);
+          
+          if (content.name === 'web_search') {
+            // Claude wants to search - we need to let it handle this
+            // Add tool result message
+            currentMessages.push({
+              role: "user",
+              content: [
+                {
+                  type: "tool_result",
+                  tool_use_id: content.id,
+                  content: "Search completed. Please provide the results you found."
+                }
+              ]
+            });
 
-1. **HubSpot's AI Content Strategy**
-   - Implemented AI-powered content personalization
-   - Saw 40% increase in email engagement rates
-   - Used AI for blog topic suggestions and optimization
+            // Make follow-up request
+            const followUpResponse = await axios.post(CLAUDE_API_URL, {
+              model: "claude-3-5-sonnet-20241022",
+              max_tokens: 4000,
+              messages: currentMessages,
+              tools: tools
+            }, {
+              headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': CLAUDE_API_KEY,
+                'anthropic-version': '2023-06-01'
+              }
+            });
 
-2. **Salesforce's Einstein Content**
-   - Leveraged AI to create personalized customer journeys
-   - Achieved 35% improvement in conversion rates
-   - AI-driven content recommendations increased time on site by 28%
-
-3. **Netflix's Content Marketing AI**
-   - Uses AI to create personalized content recommendations
-   - AI-generated thumbnails increased click-through rates by 20%
-   - Content tagging AI improved content discovery by 45%
-
-4. **Spotify's AI-Driven Campaigns**
-   - "Wrapped" campaign uses AI to create personalized content
-   - Generated 60+ million social media shares
-   - AI content personalization led to 25% increase in user engagement
-
-5. **Key Success Factors**:
-   - Personalization at scale using AI algorithms
-   - Data-driven content optimization
-   - AI-powered A/B testing for content formats
-   - Automated content distribution timing
-   - Predictive analytics for content performance
-
-6. **Content Marketing ROI Improvements**:
-   - Companies using AI in content marketing see average 37% increase in ROI
-   - AI content optimization reduces production costs by 30%
-   - Personalized AI content has 74% higher engagement rates
-
-7. **Trending AI Content Marketing Tools**:
-   - GPT-based content generation platforms
-   - AI-powered social media scheduling
-   - Predictive content performance analytics
-   - Automated content personalization engines
-
-These success stories demonstrate that AI in content marketing is most effective when used for personalization, optimization, and data-driven decision making rather than just content generation.`;
-      
-      // Add tool result to messages
-      messages.push({
-        role: "user",
-        content: [
-          {
-            type: "tool_result",
-            tool_use_id: toolUse.id,
-            content: searchResults
+            console.log('Follow-up response received');
+            
+            // Extract text from follow-up response
+            if (followUpResponse.data.content) {
+              for (const followUpContent of followUpResponse.data.content) {
+                if (followUpContent.type === 'text') {
+                  finalResult += followUpContent.text + '\n';
+                }
+              }
+            }
           }
-        ]
-      });
-
-      // Make second API call to get Claude's analysis of the search results
-      console.log('Making second API call for search analysis...');
-      
-      requestBody = {
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 4000,
-        messages: messages,
-        tools: tools
-      };
-
-      response = await axios.post(CLAUDE_API_URL, requestBody, {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': CLAUDE_API_KEY,
-          'anthropic-version': '2023-06-01'
+        } else if (content.type === 'text') {
+          finalResult += content.text + '\n';
         }
-      });
+      }
 
-      console.log('Second Claude API response:', {
-        status: response.status,
-        contentLength: response.data.content?.length,
-        contentTypes: response.data.content?.map(c => c.type),
-        stopReason: response.data.stop_reason
-      });
+      if (!finalResult.trim()) {
+        console.log('No final result from tool use. Raw response:', JSON.stringify(response.data, null, 2));
+        throw new Error('No usable content from Claude after tool use');
+      }
+
+      return finalResult.trim();
     }
 
-    // Extract final result
+    // Extract final result for non-tool requests
     let result = '';
     
     if (response.data.content && response.data.content.length > 0) {
@@ -209,26 +183,98 @@ These success stories demonstrate that AI in content marketing is most effective
   }
 }
 
+// NEW: Brave Search API function
+async function searchBrave(query, count = 8) {
+  try {
+    console.log('🔍 Brave Search request for:', query);
+    
+    if (!BRAVE_API_KEY) {
+      throw new Error('Brave API key not configured');
+    }
+
+    const response = await axios.get(BRAVE_API_URL, {
+      params: {
+        q: query,
+        count: count,
+        country: 'us',
+        spellcheck: 1,
+        search_lang: 'en'
+      },
+      headers: {
+        'Accept': 'application/json',
+        'Accept-Encoding': 'gzip',
+        'X-Subscription-Token': BRAVE_API_KEY
+      }
+    });
+
+    console.log('✅ Brave Search response:', {
+      status: response.status,
+      hasWeb: !!response.data.web,
+      webResultsCount: response.data.web?.results?.length || 0
+    });
+
+    return response.data;
+    
+  } catch (error) {
+    console.error('Brave Search Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
+    
+    if (error.response?.status === 401) {
+      throw new Error('Brave API authentication failed. Check your API key.');
+    } else if (error.response?.status === 429) {
+      throw new Error('Brave API rate limit exceeded. Please try again later.');
+    } else if (error.response?.status === 400) {
+      throw new Error(`Brave API request error: ${error.response?.data?.message || 'Bad request'}`);
+    } else {
+      throw new Error(`Brave Search Error: ${error.response?.data?.message || error.message}`);
+    }
+  }
+}
+
 // Test API key endpoint
 app.get('/api/test', async (req, res) => {
   try {
+    const results = {};
+    
+    // Test Claude API
     if (!CLAUDE_API_KEY) {
-      return res.status(500).json({ error: 'No Claude API key configured' });
+      results.claude = { status: 'error', message: 'No Claude API key configured' };
+    } else if (!CLAUDE_API_KEY.startsWith('sk-ant-')) {
+      results.claude = { status: 'error', message: 'Invalid Claude API key format' };
+    } else {
+      try {
+        const testPrompt = 'Say "Claude API test successful" and nothing else.';
+        const result = await callClaudeAPI(testPrompt, false);
+        results.claude = { status: 'success', message: 'API key working', response: result };
+      } catch (error) {
+        results.claude = { status: 'error', message: 'Claude API test failed: ' + error.message };
+      }
     }
     
-    if (!CLAUDE_API_KEY.startsWith('sk-ant-')) {
-      return res.status(500).json({ error: 'Invalid Claude API key format' });
+    // Test Brave API
+    if (!BRAVE_API_KEY) {
+      results.brave = { status: 'error', message: 'No Brave API key configured' };
+    } else {
+      try {
+        const braveResult = await searchBrave('test search', 2);
+        results.brave = { 
+          status: 'success', 
+          message: 'API key working', 
+          results_found: braveResult.web?.results?.length || 0 
+        };
+      } catch (error) {
+        results.brave = { status: 'error', message: 'Brave API test failed: ' + error.message };
+      }
     }
-    
-    // Simple test call
-    const testPrompt = 'Say "API test successful" and nothing else.';
-    const result = await callClaudeAPI(testPrompt, false);
     
     res.json({ 
-      status: 'success', 
-      message: 'API key is working',
-      response: result,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      tests: results,
+      overall_status: (results.claude.status === 'success' && results.brave.status === 'success') ? 'success' : 'partial'
     });
     
   } catch (error) {
@@ -425,7 +471,7 @@ app.post('/api/generate-queries', async (req, res) => {
   }
 });
 
-// Execute search queries - FIXED TO USE REAL WEB SEARCH
+// Execute search queries - NOW USING BRAVE SEARCH API
 app.post('/api/execute-search', async (req, res) => {
   try {
     const { query } = req.body;
@@ -435,93 +481,62 @@ app.post('/api/execute-search', async (req, res) => {
       return res.status(400).json({ error: 'Query is required' });
     }
     
-    if (!CLAUDE_API_KEY) {
-      return res.status(500).json({ error: 'Claude API key not configured' });
+    if (!BRAVE_API_KEY) {
+      return res.status(500).json({ error: 'Brave API key not configured' });
     }
     
-    let method = '';
+    let method = 'brave_search_api';
     let apiCalls = [];
     let articles = [];
     
     try {
-      // Use web search tool to get REAL results
-      console.log('🌐 Executing real web search...');
+      console.log('🌐 Executing search with Brave Search API...');
       
-      const searchPrompt = `Search the web for: "${query}"
-      
-After searching, extract the top 5-8 most relevant articles and format them as a JSON array with this structure:
-[
-  {
-    "id": 1,
-    "title": "Actual article title from search",
-    "url": "https://actual-url.com/article",
-    "preview": "First 150 characters from the actual article content...",
-    "domain": "actual-url.com",
-    "published": "2024-03-15",
-    "selected": false
-  }
-]
-
-Return ONLY the JSON array of real articles from actual search results.`;
-
-      // Use web search tool (true parameter)
-      const searchResult = await callClaudeAPI(searchPrompt, true);
+      // Call Brave Search API
+      const braveResponse = await searchBrave(query, 10);
       
       apiCalls.push({
         call: 1,
-        type: 'web_search',
+        type: 'brave_search_api',
         query: query,
-        response_length: searchResult.length,
+        results_count: braveResponse.web?.results?.length || 0,
         timestamp: new Date().toISOString()
       });
 
-      // Parse articles from search results
-      try {
-        // Extract JSON from Claude's response
-        const jsonMatch = searchResult.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const parsedArticles = JSON.parse(jsonMatch[0]);
-          if (Array.isArray(parsedArticles) && parsedArticles.length > 0) {
-            articles = parsedArticles;
-            method = 'web_search_tool';
-            console.log('✅ Found', articles.length, 'real articles from web search');
-          }
-        }
-      } catch (parseError) {
-        console.log('⚠️ Failed to parse search results, trying alternative parsing');
+      console.log('📊 Brave search response structure:', {
+        hasWeb: !!braveResponse.web,
+        webResultsCount: braveResponse.web?.results?.length || 0,
+        hasNews: !!braveResponse.news,
+        hasVideos: !!braveResponse.videos
+      });
+
+      // Process web results
+      if (braveResponse.web && braveResponse.web.results) {
+        articles = braveResponse.web.results.map((result, index) => ({
+          id: index + 1,
+          title: result.title || `Result ${index + 1}`,
+          url: result.url || '#',
+          preview: result.description || result.snippet || `Content from ${result.url}`,
+          domain: result.url ? new URL(result.url).hostname : 'unknown',
+          published: result.age || new Date().toISOString().split('T')[0],
+          selected: false,
+          extra_snippets: result.extra_snippets || [],
+          meta_description: result.meta_description || '',
+          thumbnail: result.thumbnail?.src || null
+        }));
         
-        // Try to extract articles manually from the search results
-        const lines = searchResult.split('\n');
-        let articleId = 1;
-        
-        for (const line of lines) {
-          if (line.includes('http') && line.trim().length > 0) {
-            // Extract URL
-            const urlMatch = line.match(/https?:\/\/[^\s]+/);
-            if (urlMatch) {
-              articles.push({
-                id: articleId++,
-                title: line.replace(urlMatch[0], '').trim() || `Search Result ${articleId}`,
-                url: urlMatch[0],
-                preview: `Content from: ${urlMatch[0]}`,
-                domain: new URL(urlMatch[0]).hostname,
-                published: new Date().toISOString().split('T')[0],
-                selected: false
-              });
-            }
-          }
-        }
+        console.log('✅ Successfully processed', articles.length, 'articles from Brave Search');
       }
 
-      // Fallback if no articles found
+      // Fallback if no web results
       if (articles.length === 0) {
-        console.log('⚠️ No articles extracted, using minimal fallback');
+        console.log('⚠️ No web results found in Brave response');
         articles = [
           {
             id: 1,
-            title: `No search results found for: ${query}`,
+            title: `No results found for: ${query}`,
             url: "#",
-            preview: `The web search did not return any results for this query. Try modifying your search terms.`,
+            preview: `Brave Search completed but returned no web results for this query. Try modifying your search terms for better results.`,
             domain: "no-results",
             published: new Date().toISOString().split('T')[0],
             selected: false
@@ -531,15 +546,15 @@ Return ONLY the JSON array of real articles from actual search results.`;
       }
 
     } catch (error) {
-      console.log('⚠️ Web search failed:', error.message);
+      console.error('⚠️ Brave Search failed:', error.message);
       
-      // Minimal fallback
+      // Error fallback
       articles = [
         {
           id: 1,
           title: `Search Error: ${query}`,
           url: "#",
-          preview: `Web search encountered an error: ${error.message}`,
+          preview: `Brave Search API error: ${error.message}. Please check your API key and try again.`,
           domain: "error",
           published: new Date().toISOString().split('T')[0],
           selected: false
@@ -582,6 +597,111 @@ Return ONLY the JSON array of real articles from actual search results.`;
   }
 });
 
+// Generate Twitter content briefs from search results
+app.post('/api/generate-twitter-briefs', async (req, res) => {
+  try {
+    const { articles, businessContext } = req.body;
+    console.log('🐦 Twitter brief generation request received');
+    
+    if (!articles || !Array.isArray(articles) || articles.length === 0) {
+      return res.status(400).json({ error: 'Articles array is required' });
+    }
+    
+    // Build comprehensive context for brief generation
+    const contextPrompt = businessContext ? `
+Business Context:
+- Company: ${businessContext.companyName || 'Not specified'}
+- Launch Date: ${businessContext.launchDate || 'Not specified'}
+- Target Market: ${businessContext.targetGeography || 'Not specified'}
+- Business Details: ${businessContext.businessSpecifics || 'Not specified'}
+- Category: ${businessContext.category || 'Not specified'}
+- Additional Info: ${JSON.stringify(businessContext)}
+` : 'No business context provided.';
+
+    const briefingPrompt = `You are an expert content strategist creating Twitter content briefs. Your job is to evaluate search results and create HIGH-QUALITY Twitter content ONLY for ideas with real value.
+
+${contextPrompt}
+
+CRITICAL INSTRUCTIONS:
+1. FILTER AGGRESSIVELY - Reject ideas that are too generic, lack concrete value, or don't align with business goals
+2. NO FABRICATION - Use only information directly from the article. Never invent details.
+3. AUTHENTIC VOICE - Write from the founder's perspective, not generic marketing
+4. MULTIPLE ANGLES - For viable ideas, create 2-3 different tweet angles
+5. BUSINESS VALUE - Every tweet must demonstrate expertise or advance business goals
+
+VIABILITY CRITERIA:
+✅ APPROVE ideas with:
+- Specific data, metrics, or insights
+- Real examples or case studies
+- Unique perspectives or surprising information
+- Clear value for the target audience
+- Connection to business expertise
+
+❌ REJECT ideas that are:
+- Too generic or obvious
+- Lacking concrete details
+- Not relevant to business goals
+- Requiring fabricated information
+- Poor fit for Twitter engagement
+
+ARTICLES TO EVALUATE:
+${JSON.stringify(articles, null, 2)}
+
+For each article, determine if it's viable for Twitter content. For viable articles, create 2-3 different tweet briefs.
+
+RESPOND WITH THIS EXACT JSON FORMAT:
+{
+  "evaluated_count": <number of articles evaluated>,
+  "viable_count": <number of viable articles>,
+  "total_briefs": <total number of briefs generated>,
+  "results": [
+    {
+      "article_id": <article id>,
+      "article_title": "<original article title>",
+      "viable": true/false,
+      "rejection_reason": "<if not viable, explain why>",
+      "briefs": [
+        {
+          "angle": "<specific angle/perspective for this tweet>",
+          "hook": "<attention-grabbing first line>",
+          "content": "<complete tweet text, 280 chars max>",
+          "content_type": "single_tweet",
+          "engagement_strategy": "<question/statement/statistic>",
+          "hashtags": ["<relevant hashtag>"],
+          "metrics_to_track": ["replies", "retweets", "clicks"]
+        }
+      ]
+    }
+  ]
+}
+
+Remember: Quality over quantity. It's better to have fewer excellent tweets than many mediocre ones.`;
+
+    const briefsResponse = await callClaudeAPI(briefingPrompt, false);
+    
+    // Parse the response
+    let briefs;
+    try {
+      const jsonMatch = briefsResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        briefs = JSON.parse(jsonMatch[0]);
+        console.log(`✅ Generated briefs: ${briefs.viable_count} viable articles, ${briefs.total_briefs} total briefs`);
+      } else {
+        throw new Error('No JSON found in response');
+      }
+    } catch (parseError) {
+      console.error('Failed to parse briefs:', parseError);
+      return res.status(500).json({ error: 'Failed to parse content briefs' });
+    }
+    
+    res.json(briefs);
+    
+  } catch (error) {
+    console.error('Twitter brief generation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Serve the main page
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
@@ -589,4 +709,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
+  
 });
