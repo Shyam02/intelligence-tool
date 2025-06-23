@@ -1,0 +1,57 @@
+/* Responsive design for mobile and tablet */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .form-container, .results-container, .queries-container {
+        padding: 25px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .search-test {
+        flex-direction: column;
+    }
+    
+    .search-test input {
+        margin-bottom: 10px;
+    }
+    
+    .articles-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .selection-controls {
+        justify-content: center;
+    }
+    
+    .article-card {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .article-checkbox {
+        align-items: center;
+    }
+    
+    .twitter-briefs-container {
+        padding: 20px;
+    }
+    
+    .briefs-summary {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .brief-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+}
