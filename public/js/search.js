@@ -1,9 +1,9 @@
 // Search functionality and article handling
 
-// Generate search queries from intelligence data
+// Generate search queries from foundational intelligence data
 async function generateSearchQueries() {
-    if (!window.appState.intelligence) {
-        alert('No intelligence data available');
+    if (!window.appState.foundationalIntelligence) {
+        alert('No foundational intelligence data available');
         return;
     }
     
@@ -14,7 +14,7 @@ async function generateSearchQueries() {
         generateBtn.textContent = '⏳ Generating Queries...';
         generateBtn.disabled = true;
         
-        const queries = await generateQueriesFromAPI(window.appState.intelligence);
+        const queries = await generateQueriesFromAPI(window.appState.foundationalIntelligence);
         
         console.log('Queries structure:', queries);
         console.log('Has competitor_queries?', !!queries?.competitor_queries);

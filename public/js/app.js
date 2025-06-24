@@ -1,21 +1,22 @@
-// Main app initialization and global state
+// Main app initialization and clean global state
 
-// Global state object - replaces scattered global variables
+// Clean global state object - separates user input from AI-processed data
 window.appState = {
-    onboarding: null,
-    intelligence: null,
-    crawledData: null,
-    searchResults: []
+    userInput: null,                    // Pure user form input
+    websiteIntelligence: null,          // AI-extracted website data  
+    foundationalIntelligence: null,     // Strategic business analysis
+    searchResults: []                   // Search articles
 };
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Application initializing...');
+    console.log('Application initializing with clean data structure...');
     
     // Initialize forms
     initializeForms();
     
     console.log('Application initialized successfully');
+    console.log('Clean state structure:', Object.keys(window.appState));
 });
 
 // Global function wrappers for HTML onclick handlers

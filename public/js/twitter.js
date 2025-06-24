@@ -15,8 +15,8 @@ async function generateTwitterContentBriefs() {
     generateBtn.disabled = true;
     
     try {
-        // Prepare business context from stored data
-        const businessContext = window.appState.onboarding || {};
+        // Prepare comprehensive business context from clean data sources
+        const businessContext = createBusinessContext();
         
         console.log('Generating Twitter briefs for', selectedArticles.length, 'articles');
         console.log('Business context:', businessContext);
@@ -34,6 +34,56 @@ async function generateTwitterContentBriefs() {
         generateBtn.textContent = originalText;
         generateBtn.disabled = false;
     }
+}
+
+// Create comprehensive business context from clean data sources
+function createBusinessContext() {
+    const userInput = window.appState.userInput || {};
+    const websiteIntelligence = window.appState.websiteIntelligence || {};
+    
+    // Combine user input with website intelligence for rich business context
+    const businessContext = {
+        // User-provided information
+        launchDate: userInput.launchDate,
+        targetGeography: userInput.targetGeography,
+        websiteUrl: userInput.websiteUrl,
+        businessSpecifics: userInput.businessSpecifics,
+        category: userInput.category,
+        
+        // Form-specific fields based on category
+        businessDescription: userInput.businessDescription,
+        targetCustomer: userInput.targetCustomer,
+        customerAcquisition: userInput.customerAcquisition,
+        additionalInfo: userInput.additionalInfo,
+        
+        // AI-extracted website intelligence
+        companyName: websiteIntelligence.company_name,
+        aiBusinessDescription: websiteIntelligence.business_description,
+        valueProposition: websiteIntelligence.value_proposition,
+        aiTargetCustomer: websiteIntelligence.target_customer,
+        mainProductService: websiteIntelligence.main_product_service,
+        keyFeatures: websiteIntelligence.key_features,
+        industryCategory: websiteIntelligence.industry_category,
+        uniqueSellingPoints: websiteIntelligence.unique_selling_points,
+        companyMission: websiteIntelligence.company_mission,
+        businessStage: websiteIntelligence.business_stage,
+        
+        // Combined context notes
+        dataSource: {
+            hasUserInput: !!userInput && Object.keys(userInput).length > 0,
+            hasWebsiteIntelligence: !!websiteIntelligence && Object.keys(websiteIntelligence).length > 0,
+            extractionMethod: websiteIntelligence.extraction_method || 'none'
+        }
+    };
+    
+    // Log context quality for debugging
+    console.log('Business context created:', {
+        userFields: Object.keys(userInput).length,
+        websiteFields: Object.keys(websiteIntelligence).length,
+        extractionMethod: businessContext.dataSource.extractionMethod
+    });
+    
+    return businessContext;
 }
 
 // Display Twitter briefs

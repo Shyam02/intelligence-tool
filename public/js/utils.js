@@ -92,17 +92,17 @@ function copyTweet(tweetText, button) {
     }
 }
 
-// Reset form and application state
+// Reset form and application state with clean data structure
 function resetForm() {
     // Reset all form data
     const form = document.getElementById('onboardingForm');
     form.reset();
     
-    // Reset global state
+    // Reset clean global state structure
     window.appState = {
-        onboarding: null,
-        intelligence: null,
-        crawledData: null,
+        userInput: null,
+        websiteIntelligence: null,
+        foundationalIntelligence: null,
         searchResults: []
     };
     
@@ -112,10 +112,22 @@ function resetForm() {
     document.getElementById('categorySpecificSection').style.display = 'none';
     document.getElementById('searchResults').style.display = 'none';
     
+    // Hide website intelligence section if it exists
+    const websiteSection = document.getElementById('websiteIntelligenceSection');
+    if (websiteSection) {
+        websiteSection.style.display = 'none';
+    }
+    
     // Hide Twitter briefs if they exist
     const twitterBriefs = document.getElementById('twitterBriefs');
     if (twitterBriefs) {
         twitterBriefs.style.display = 'none';
+    }
+    
+    // Hide crawled data display
+    const crawledDataDisplay = document.getElementById('crawledDataDisplay');
+    if (crawledDataDisplay) {
+        crawledDataDisplay.style.display = 'none';
     }
     
     // Show form container
@@ -123,4 +135,6 @@ function resetForm() {
     
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    console.log('✅ Application state reset with clean data structure');
 }

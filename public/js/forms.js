@@ -36,8 +36,8 @@ async function handleWebsiteUrlEntry(event) {
         // Crawl the website
         const crawlResult = await crawlWebsiteAPI(websiteUrl);
         
-        // Store crawled data globally
-        window.appState.crawledData = crawlResult.crawled_data;
+        // Store crawled data in separate, clean location
+        window.appState.websiteIntelligence = crawlResult.crawled_data;
         
         // Display crawled data to user
         displayCrawledData(crawlResult.crawled_data);
@@ -281,56 +281,63 @@ function generateCategoryQuestions(category) {
     categoryQuestions.innerHTML = questionsHTML;
 }
 
-// Handle form submission
+// Handle form submission with clean data organization
 async function handleFormSubmission(e) {
     e.preventDefault();
     
-    // Collect form data
+    // Collect pure user form data
     const formData = new FormData(e.target);
-    const onboardingData = {};
+    const userInput = {};
     
     for (let [key, value] of formData.entries()) {
-        onboardingData[key] = value;
+        userInput[key] = value;
     }
     
-    // Add calculated category
-    const launchDate = onboardingData.launchDate;
-    const websiteUrl = onboardingData.websiteUrl;
+    // Add calculated category to user input
+    const launchDate = userInput.launchDate;
+    const websiteUrl = userInput.websiteUrl;
     const today = new Date().toISOString().split('T')[0];
     const isPreLaunch = launchDate > today;
     const hasWebsite = websiteUrl && websiteUrl.trim() !== '';
     
     if (isPreLaunch && !hasWebsite) {
-        onboardingData.category = 'Pre-launch + No website';
+        userInput.category = 'Pre-launch + No website';
     } else if (isPreLaunch && hasWebsite) {
-        onboardingData.category = 'Pre-launch + Has website';
+        userInput.category = 'Pre-launch + Has website';
     } else if (!isPreLaunch && !hasWebsite) {
-        onboardingData.category = 'Post-launch + No website';
+        userInput.category = 'Post-launch + No website';
     } else {
-        onboardingData.category = 'Post-launch + Has website';
+        userInput.category = 'Post-launch + Has website';
     }
     
-    // Add crawled data if available
-    if (window.appState.crawledData) {
-        onboardingData.crawledData = window.appState.crawledData;
-        console.log('🌐 Including crawled website data in intelligence generation');
-    }
+    // Store pure user input separately
+    window.appState.userInput = userInput;
     
-    // Store data globally
-    window.appState.onboarding = onboardingData;
+    // Prepare combined data for API (maintains backend compatibility)
+    const combinedDataForAPI = { ...userInput };
+    
+    // Add crawled data if available (for API compatibility)
+    if (window.appState.websiteIntelligence) {
+        combinedDataForAPI.crawledData = window.appState.websiteIntelligence;
+        console.log('🌐 Including website intelligence in API request');
+    }
     
     // Show loading
     document.querySelector('.form-container').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
     
     try {
-        // Generate intelligence using API
-        const intelligence = await generateIntelligence(onboardingData);
-        window.appState.intelligence = intelligence;
+        // Generate intelligence using API (with combined data for compatibility)
+        const intelligence = await generateIntelligence(combinedDataForAPI);
+        window.appState.foundationalIntelligence = intelligence;
         
-        // Hide loading and show results
+        // Hide loading and show results with clean organization
         document.getElementById('loading').style.display = 'none';
-        displayIntelligenceResults(onboardingData, intelligence);
+        displayIntelligenceResults(
+            window.appState.userInput, 
+            window.appState.websiteIntelligence, 
+            window.appState.foundationalIntelligence
+        );
         
     } catch (error) {
         console.error('Error:', error);
