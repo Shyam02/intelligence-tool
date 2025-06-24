@@ -1,6 +1,7 @@
 // Claude AI service
 const axios = require('axios');
 const { config } = require('../config/config');
+const { intelligence } = require('../prompts');
 
 // Helper function to call Claude API
 async function callClaudeAPI(prompt, useWebSearch = false) {
@@ -173,36 +174,8 @@ async function crawlWebsite(websiteUrl) {
   try {
     console.log('🌐 Starting website crawl for:', websiteUrl);
     
-    // SIMPLIFIED APPROACH: Ask Claude to research the website without complex tool handling
-    const crawlPrompt = `I need you to research and analyze this website: ${websiteUrl}
-
-Please analyze what you can find about this business and respond with ONLY a JSON object containing the business information:
-
-{
-  "company_name": "",
-  "business_description": "",
-  "value_proposition": "",
-  "target_customer": "",
-  "main_product_service": "",
-  "key_features": [],
-  "pricing_info": "",
-  "business_stage": "",
-  "industry_category": "",
-  "competitors_mentioned": [],
-  "unique_selling_points": [],
-  "team_size": "",
-  "recent_updates": "",
-  "social_media": {
-    "twitter": "",
-    "linkedin": "",
-    "other": []
-  },
-  "additional_notes": ""
-}
-
-For any information you cannot find, use "Not found" as the value. 
-For arrays that are empty, use [].
-Respond with ONLY the JSON object, no additional text or explanation.`;
+    // Use extracted prompts instead of inline
+    const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl);
 
     // Try with web search first
     let crawlResult;
@@ -211,31 +184,7 @@ Respond with ONLY the JSON object, no additional text or explanation.`;
     } catch (webSearchError) {
       console.log('Web search failed, trying without web search:', webSearchError.message);
       // Fallback: Try without web search (Claude might still have some knowledge)
-      const fallbackPrompt = `Based on the website URL ${websiteUrl}, please provide your best analysis of what this business likely does. Respond with ONLY a JSON object:
-
-{
-  "company_name": "",
-  "business_description": "",
-  "value_proposition": "",
-  "target_customer": "",
-  "main_product_service": "",
-  "key_features": [],
-  "pricing_info": "Not found",
-  "business_stage": "Unknown",
-  "industry_category": "",
-  "competitors_mentioned": [],
-  "unique_selling_points": [],
-  "team_size": "Not found",
-  "recent_updates": "Not found",
-  "social_media": {
-    "twitter": "",
-    "linkedin": "",
-    "other": []
-  },
-  "additional_notes": "Analysis based on URL and general knowledge"
-}
-
-Extract what you can infer from the domain name and provide your best educated analysis.`;
+      const fallbackPrompt = intelligence.fallbackCrawlPrompt(websiteUrl);
       
       crawlResult = await callClaudeAPI(fallbackPrompt, false);
     }

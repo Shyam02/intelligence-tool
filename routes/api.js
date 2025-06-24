@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 // Import services
-const { testClaudeAPI } = require('../services/claude');
-const { testBraveAPI } = require('../services/brave');
+const { testClaudeAPI } = require('../services/ai');
+const { testBraveAPI } = require('../services/search');
 
 // Import controllers
 const { generateIntelligence, generateQueries, crawlWebsiteController } = require('../controllers/intelligence');
