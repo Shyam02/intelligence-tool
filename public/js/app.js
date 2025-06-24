@@ -1,10 +1,12 @@
-// Main app initialization and global variables
+// Main app initialization and global state
 
-// Global variables
-window.currentOnboardingData = null;
-window.currentIntelligence = null;
-window.currentCrawledData = null; // NEW: Store crawled website data
-window.foundArticles = []; // Store articles globally for selection
+// Global state object - replaces scattered global variables
+window.appState = {
+    onboarding: null,
+    intelligence: null,
+    crawledData: null,
+    searchResults: []
+};
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -18,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Global function wrappers for HTML onclick handlers
 window.testAPI = testAPI;
-window.crawlWebsiteAPI = crawlWebsiteAPI; // NEW: Expose website crawling function
+window.crawlWebsiteAPI = crawlWebsiteAPI;
 window.generateQueries = generateSearchQueries;
 window.executeTestSearch = executeTestSearch;
 window.generateTwitterBriefs = generateTwitterContentBriefs;

@@ -37,7 +37,7 @@ async function handleWebsiteUrlEntry(event) {
         const crawlResult = await crawlWebsiteAPI(websiteUrl);
         
         // Store crawled data globally
-        window.currentCrawledData = crawlResult.crawled_data;
+        window.appState.crawledData = crawlResult.crawled_data;
         
         // Display crawled data to user
         displayCrawledData(crawlResult.crawled_data);
@@ -311,13 +311,13 @@ async function handleFormSubmission(e) {
     }
     
     // Add crawled data if available
-    if (window.currentCrawledData) {
-        onboardingData.crawledData = window.currentCrawledData;
+    if (window.appState.crawledData) {
+        onboardingData.crawledData = window.appState.crawledData;
         console.log('🌐 Including crawled website data in intelligence generation');
     }
     
     // Store data globally
-    window.currentOnboardingData = onboardingData;
+    window.appState.onboarding = onboardingData;
     
     // Show loading
     document.querySelector('.form-container').style.display = 'none';
@@ -326,7 +326,7 @@ async function handleFormSubmission(e) {
     try {
         // Generate intelligence using API
         const intelligence = await generateIntelligence(onboardingData);
-        window.currentIntelligence = intelligence;
+        window.appState.intelligence = intelligence;
         
         // Hide loading and show results
         document.getElementById('loading').style.display = 'none';

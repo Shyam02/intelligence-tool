@@ -2,7 +2,7 @@
 
 // Generate search queries from intelligence data
 async function generateSearchQueries() {
-    if (!window.currentIntelligence) {
+    if (!window.appState.intelligence) {
         alert('No intelligence data available');
         return;
     }
@@ -14,7 +14,7 @@ async function generateSearchQueries() {
         generateBtn.textContent = '⏳ Generating Queries...';
         generateBtn.disabled = true;
         
-        const queries = await generateQueriesFromAPI(window.currentIntelligence);
+        const queries = await generateQueriesFromAPI(window.appState.intelligence);
         
         console.log('Queries structure:', queries);
         console.log('Has competitor_queries?', !!queries?.competitor_queries);
@@ -63,8 +63,8 @@ async function executeTestSearch() {
         
         // Store articles globally and display them
         if (searchData.articles && Array.isArray(searchData.articles)) {
-            window.foundArticles = searchData.articles;
-            displayArticles(window.foundArticles);
+            window.appState.searchResults = searchData.articles;
+            displayArticles(window.appState.searchResults);
         }
         
         // Display API call information for debugging
@@ -162,7 +162,7 @@ function displayAPICallInfo(searchData) {
 
 // Article selection functions
 function toggleArticleSelection(articleId) {
-    const article = window.foundArticles.find(a => a.id === articleId);
+    const article = window.appState.searchResults.find(a => a.id === articleId);
     if (article) {
         article.selected = !article.selected;
         console.log(`Article ${articleId} ${article.selected ? 'selected' : 'deselected'}`);
@@ -170,8 +170,8 @@ function toggleArticleSelection(articleId) {
 }
 
 function selectAllArticles() {
-    window.foundArticles.forEach(article => article.selected = true);
-    window.foundArticles.forEach(article => {
+    window.appState.searchResults.forEach(article => article.selected = true);
+    window.appState.searchResults.forEach(article => {
         const checkbox = document.getElementById(`article-${article.id}`);
         if (checkbox) checkbox.checked = true;
     });
@@ -179,8 +179,8 @@ function selectAllArticles() {
 }
 
 function deselectAllArticles() {
-    window.foundArticles.forEach(article => article.selected = false);
-    window.foundArticles.forEach(article => {
+    window.appState.searchResults.forEach(article => article.selected = false);
+    window.appState.searchResults.forEach(article => {
         const checkbox = document.getElementById(`article-${article.id}`);
         if (checkbox) checkbox.checked = false;
     });
@@ -188,7 +188,7 @@ function deselectAllArticles() {
 }
 
 function copySelectedArticles() {
-    const selectedArticles = window.foundArticles.filter(article => article.selected);
+    const selectedArticles = window.appState.searchResults.filter(article => article.selected);
     
     if (selectedArticles.length === 0) {
         alert('Please select some articles first');

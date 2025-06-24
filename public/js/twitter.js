@@ -2,7 +2,7 @@
 
 // Generate Twitter briefs from selected articles
 async function generateTwitterContentBriefs() {
-    const selectedArticles = window.foundArticles.filter(article => article.selected);
+    const selectedArticles = window.appState.searchResults.filter(article => article.selected);
     
     if (selectedArticles.length === 0) {
         alert('Please select at least one article to generate Twitter briefs');
@@ -16,7 +16,7 @@ async function generateTwitterContentBriefs() {
     
     try {
         // Prepare business context from stored data
-        const businessContext = window.currentOnboardingData || {};
+        const businessContext = window.appState.onboarding || {};
         
         console.log('Generating Twitter briefs for', selectedArticles.length, 'articles');
         console.log('Business context:', businessContext);

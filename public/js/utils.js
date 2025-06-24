@@ -98,10 +98,13 @@ function resetForm() {
     const form = document.getElementById('onboardingForm');
     form.reset();
     
-    // Reset global variables
-    window.currentOnboardingData = null;
-    window.currentIntelligence = null;
-    window.foundArticles = []; // Reset articles too
+    // Reset global state
+    window.appState = {
+        onboarding: null,
+        intelligence: null,
+        crawledData: null,
+        searchResults: []
+    };
     
     // Hide all result containers
     document.getElementById('resultsContainer').style.display = 'none';
