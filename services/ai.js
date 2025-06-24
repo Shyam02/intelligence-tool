@@ -20,6 +20,20 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
           },
           "required": ["query"]
         }
+      },
+      {
+        "name": "web_fetch",
+        "description": "Fetch the contents of a web page at a given URL",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "URL to fetch"
+            }
+          },
+          "required": ["url"]
+        }
       }
     ] : [];
 
@@ -169,24 +183,67 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
   }
 }
 
-// SIMPLIFIED FUNCTION: Crawl website using basic research approach
+// NEW FUNCTION: Fetch website HTML content
+async function fetchWebsiteHTML(websiteUrl) {
+  try {
+    console.log('🌐 Fetching HTML content from:', websiteUrl);
+    
+    const response = await axios.get(websiteUrl, {
+      timeout: 15000, // 15 second timeout
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+    
+    let htmlContent = response.data;
+    
+    // Truncate HTML if too large (Claude has token limits)
+    const maxLength = 15000; // Reasonable limit for analysis
+    if (htmlContent.length > maxLength) {
+      console.log(`📏 HTML too large (${htmlContent.length} chars), truncating to ${maxLength}`);
+      htmlContent = htmlContent.substring(0, maxLength) + '...[truncated]';
+    }
+    
+    console.log('✅ Successfully fetched HTML content:', {
+      originalLength: response.data.length,
+      finalLength: htmlContent.length,
+      truncated: response.data.length > maxLength
+    });
+    
+    return htmlContent;
+    
+  } catch (error) {
+    console.log('❌ HTML fetch failed:', error.message);
+    throw new Error(`Could not fetch website content: ${error.message}`);
+  }
+}
+
+// UPDATED FUNCTION: Crawl website using actual HTML fetching
 async function crawlWebsite(websiteUrl) {
   try {
-    console.log('🌐 Starting website crawl for:', websiteUrl);
+    console.log('🌐 Starting enhanced website crawl for:', websiteUrl);
     
-    // Use extracted prompts instead of inline
-    const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl);
-
-    // Try with web search first
+    // Step 1: Try to fetch actual HTML content
     let crawlResult;
+    let useRealContent = false;
+    
     try {
-      crawlResult = await callClaudeAPI(crawlPrompt, true);
-    } catch (webSearchError) {
-      console.log('Web search failed, trying without web search:', webSearchError.message);
-      // Fallback: Try without web search (Claude might still have some knowledge)
-      const fallbackPrompt = intelligence.fallbackCrawlPrompt(websiteUrl);
+      const htmlContent = await fetchWebsiteHTML(websiteUrl);
       
+      // Use enhanced prompt with real HTML content
+      const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, htmlContent);
+      crawlResult = await callClaudeAPI(crawlPrompt, false);
+      useRealContent = true;
+      
+      console.log('✅ Successfully analyzed real HTML content');
+      
+    } catch (fetchError) {
+      console.log('⚠️ HTML fetch failed, falling back to URL-based analysis:', fetchError.message);
+      
+      // Fallback: Use URL-based analysis (current approach)
+      const fallbackPrompt = intelligence.fallbackCrawlPrompt(websiteUrl);
       crawlResult = await callClaudeAPI(fallbackPrompt, false);
+      useRealContent = false;
     }
     
     console.log('Raw crawl response length:', crawlResult.length);
@@ -209,7 +266,7 @@ async function crawlWebsite(websiteUrl) {
       console.log('Full raw crawl response:', crawlResult);
       
       // SMART FALLBACK: Create structured data based on URL analysis
-      extractedData = createFallbackData(websiteUrl, crawlResult);
+      extractedData = createFallbackData(websiteUrl, crawlResult, parseError.message);
     }
     
     // Ensure we have a company name
@@ -217,7 +274,13 @@ async function crawlWebsite(websiteUrl) {
       extractedData.company_name = extractCompanyNameFromUrl(websiteUrl);
     }
     
+    // Add metadata about extraction method
+    extractedData.extraction_method = useRealContent ? 'html_analysis' : 'url_analysis';
+    extractedData.extraction_timestamp = new Date().toISOString();
+    
     console.log('✅ Successfully extracted website data for:', extractedData.company_name);
+    console.log('📊 Extraction method:', extractedData.extraction_method);
+    
     return extractedData;
     
   } catch (error) {
@@ -277,12 +340,17 @@ function createFallbackData(websiteUrl, rawResponse = null, errorMessage = null)
       linkedin: '',
       other: []
     },
-    additional_notes: errorMessage ? `Error: ${errorMessage}` : 'Information extracted from URL analysis'
+    funding_info: 'Not found',
+    company_mission: 'Not found',
+    team_background: 'Not found',
+    additional_notes: errorMessage ? `Error: ${errorMessage}` : 'Information extracted from URL analysis',
+    extraction_method: 'fallback_analysis',
+    extraction_timestamp: new Date().toISOString()
   };
   
   // If we have raw response, try to extract any useful information
   if (rawResponse) {
-    fallbackData.raw_response = rawResponse;
+    fallbackData.raw_response = rawResponse.substring(0, 500); // Store first 500 chars for debugging
     fallbackData.additional_notes += '. Raw response available for manual review.';
   }
   
