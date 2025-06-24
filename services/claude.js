@@ -168,6 +168,189 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
   }
 }
 
+// SIMPLIFIED FUNCTION: Crawl website using basic research approach
+async function crawlWebsite(websiteUrl) {
+  try {
+    console.log('🌐 Starting website crawl for:', websiteUrl);
+    
+    // SIMPLIFIED APPROACH: Ask Claude to research the website without complex tool handling
+    const crawlPrompt = `I need you to research and analyze this website: ${websiteUrl}
+
+Please analyze what you can find about this business and respond with ONLY a JSON object containing the business information:
+
+{
+  "company_name": "",
+  "business_description": "",
+  "value_proposition": "",
+  "target_customer": "",
+  "main_product_service": "",
+  "key_features": [],
+  "pricing_info": "",
+  "business_stage": "",
+  "industry_category": "",
+  "competitors_mentioned": [],
+  "unique_selling_points": [],
+  "team_size": "",
+  "recent_updates": "",
+  "social_media": {
+    "twitter": "",
+    "linkedin": "",
+    "other": []
+  },
+  "additional_notes": ""
+}
+
+For any information you cannot find, use "Not found" as the value. 
+For arrays that are empty, use [].
+Respond with ONLY the JSON object, no additional text or explanation.`;
+
+    // Try with web search first
+    let crawlResult;
+    try {
+      crawlResult = await callClaudeAPI(crawlPrompt, true);
+    } catch (webSearchError) {
+      console.log('Web search failed, trying without web search:', webSearchError.message);
+      // Fallback: Try without web search (Claude might still have some knowledge)
+      const fallbackPrompt = `Based on the website URL ${websiteUrl}, please provide your best analysis of what this business likely does. Respond with ONLY a JSON object:
+
+{
+  "company_name": "",
+  "business_description": "",
+  "value_proposition": "",
+  "target_customer": "",
+  "main_product_service": "",
+  "key_features": [],
+  "pricing_info": "Not found",
+  "business_stage": "Unknown",
+  "industry_category": "",
+  "competitors_mentioned": [],
+  "unique_selling_points": [],
+  "team_size": "Not found",
+  "recent_updates": "Not found",
+  "social_media": {
+    "twitter": "",
+    "linkedin": "",
+    "other": []
+  },
+  "additional_notes": "Analysis based on URL and general knowledge"
+}
+
+Extract what you can infer from the domain name and provide your best educated analysis.`;
+      
+      crawlResult = await callClaudeAPI(fallbackPrompt, false);
+    }
+    
+    console.log('Raw crawl response length:', crawlResult.length);
+    console.log('First 200 chars of response:', crawlResult.substring(0, 200));
+    
+    // Extract JSON from response
+    let extractedData;
+    try {
+      // Look for JSON object in the response
+      const jsonMatch = crawlResult.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        extractedData = JSON.parse(jsonMatch[0]);
+        console.log('✅ Successfully parsed JSON from crawl response');
+      } else {
+        throw new Error('No JSON structure found in response');
+      }
+      
+    } catch (parseError) {
+      console.error('JSON Parse Error from crawl:', parseError);
+      console.log('Full raw crawl response:', crawlResult);
+      
+      // SMART FALLBACK: Create structured data based on URL analysis
+      extractedData = createFallbackData(websiteUrl, crawlResult);
+    }
+    
+    // Ensure we have a company name
+    if (!extractedData.company_name || extractedData.company_name === 'Not found' || extractedData.company_name === '') {
+      extractedData.company_name = extractCompanyNameFromUrl(websiteUrl);
+    }
+    
+    console.log('✅ Successfully extracted website data for:', extractedData.company_name);
+    return extractedData;
+    
+  } catch (error) {
+    console.error('Website crawling error:', error);
+    
+    // Return structured fallback data
+    return createFallbackData(websiteUrl, null, error.message);
+  }
+}
+
+// HELPER FUNCTION: Create fallback data when parsing fails
+function createFallbackData(websiteUrl, rawResponse = null, errorMessage = null) {
+  console.log('🔧 Creating fallback data for:', websiteUrl);
+  
+  const companyName = extractCompanyNameFromUrl(websiteUrl);
+  
+  // Try to infer some information from the URL
+  const urlLower = websiteUrl.toLowerCase();
+  let industryGuess = 'Not found';
+  let serviceGuess = 'Not found';
+  let features = [];
+  
+  // Basic URL analysis for common patterns
+  if (urlLower.includes('photo') || urlLower.includes('image') || urlLower.includes('pic')) {
+    industryGuess = 'Photography/Image';
+    serviceGuess = 'Image or photography related service';
+    features.push('Image processing');
+  }
+  
+  if (urlLower.includes('ai') || urlLower.includes('artificial')) {
+    industryGuess = 'AI/Technology';
+    if (serviceGuess === 'Not found') serviceGuess = 'AI-powered service';
+    features.push('AI-powered');
+  }
+  
+  if (urlLower.includes('app') || urlLower.includes('software')) {
+    if (industryGuess === 'Not found') industryGuess = 'Software';
+    if (serviceGuess === 'Not found') serviceGuess = 'Software application';
+  }
+  
+  const fallbackData = {
+    company_name: companyName,
+    business_description: serviceGuess,
+    value_proposition: 'Not found',
+    target_customer: 'Not found',
+    main_product_service: serviceGuess,
+    key_features: features,
+    pricing_info: 'Not found',
+    business_stage: 'Unknown',
+    industry_category: industryGuess,
+    competitors_mentioned: [],
+    unique_selling_points: [],
+    team_size: 'Not found',
+    recent_updates: 'Not found',
+    social_media: {
+      twitter: '',
+      linkedin: '',
+      other: []
+    },
+    additional_notes: errorMessage ? `Error: ${errorMessage}` : 'Information extracted from URL analysis'
+  };
+  
+  // If we have raw response, try to extract any useful information
+  if (rawResponse) {
+    fallbackData.raw_response = rawResponse;
+    fallbackData.additional_notes += '. Raw response available for manual review.';
+  }
+  
+  return fallbackData;
+}
+
+// HELPER FUNCTION: Extract company name from URL
+function extractCompanyNameFromUrl(url) {
+  try {
+    const cleanUrl = url.replace('https://', '').replace('http://', '').replace('www.', '');
+    const domain = cleanUrl.split('.')[0];
+    return domain.charAt(0).toUpperCase() + domain.slice(1);
+  } catch (error) {
+    return 'Unknown Company';
+  }
+}
+
 // Test Claude API connection
 async function testClaudeAPI() {
   try {
@@ -190,5 +373,6 @@ async function testClaudeAPI() {
 
 module.exports = {
   callClaudeAPI,
+  crawlWebsite,
   testClaudeAPI
 };

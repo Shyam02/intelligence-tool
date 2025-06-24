@@ -33,6 +33,33 @@ async function testAPI() {
     }, 3000);
 }
 
+// NEW FUNCTION: Crawl website and extract business information
+async function crawlWebsiteAPI(websiteUrl) {
+    try {
+        console.log('🌐 Starting website crawl for:', websiteUrl);
+        
+        const response = await fetch('/api/crawl-website', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ websiteUrl })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const crawlResult = await response.json();
+        console.log('✅ Website crawl completed:', crawlResult);
+        return crawlResult;
+        
+    } catch (error) {
+        console.error('Error crawling website:', error);
+        throw new Error('Failed to crawl website: ' + error.message);
+    }
+}
+
 // Generate foundational intelligence
 async function generateIntelligence(onboardingData) {
     try {

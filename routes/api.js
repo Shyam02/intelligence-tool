@@ -7,7 +7,7 @@ const { testClaudeAPI } = require('../services/claude');
 const { testBraveAPI } = require('../services/brave');
 
 // Import controllers
-const { generateIntelligence, generateQueries } = require('../controllers/intelligence');
+const { generateIntelligence, generateQueries, crawlWebsiteController } = require('../controllers/intelligence');
 const { executeSearch } = require('../controllers/search');
 const { generateTwitterBriefs } = require('../controllers/twitter');
 
@@ -36,6 +36,9 @@ router.get('/test', async (req, res) => {
     });
   }
 });
+
+// Website crawling route (NEW)
+router.post('/crawl-website', crawlWebsiteController);
 
 // Intelligence generation routes
 router.post('/generate-intelligence', generateIntelligence);

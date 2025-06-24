@@ -3,6 +3,7 @@
 // Global variables
 window.currentOnboardingData = null;
 window.currentIntelligence = null;
+window.currentCrawledData = null; // NEW: Store crawled website data
 window.foundArticles = []; // Store articles globally for selection
 
 // Initialize the application
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Global function wrappers for HTML onclick handlers
 window.testAPI = testAPI;
+window.crawlWebsiteAPI = crawlWebsiteAPI; // NEW: Expose website crawling function
 window.generateQueries = generateSearchQueries;
 window.executeTestSearch = executeTestSearch;
 window.generateTwitterBriefs = generateTwitterContentBriefs;

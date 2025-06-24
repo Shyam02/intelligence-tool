@@ -1,10 +1,49 @@
 // Intelligence generation controller
-const { callClaudeAPI } = require('../services/claude');
+const { callClaudeAPI, crawlWebsite } = require('../services/claude');
+
+// NEW FUNCTION: Crawl website and extract business information
+async function crawlWebsiteController(req, res) {
+  try {
+    const { websiteUrl } = req.body;
+    
+    if (!websiteUrl || !websiteUrl.trim()) {
+      return res.status(400).json({ error: 'Website URL is required' });
+    }
+    
+    console.log('🌐 Website crawling request for:', websiteUrl);
+    
+    const crawledData = await crawlWebsite(websiteUrl);
+    
+    console.log('✅ Website crawling completed for:', crawledData.company_name || 'Unknown');
+    
+    res.json({
+      success: true,
+      website_url: websiteUrl,
+      crawled_data: crawledData,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Website crawling controller error:', error);
+    res.status(500).json({ 
+      error: 'Website crawling failed: ' + error.message,
+      website_url: req.body.websiteUrl || 'unknown',
+      timestamp: new Date().toISOString()
+    });
+  }
+}
 
 // Generate foundational intelligence from onboarding data
 async function generateIntelligence(req, res) {
   try {
     const onboardingData = req.body;
+    
+    // Check if we have crawled website data
+    let combinedData = { ...onboardingData };
+    if (onboardingData.crawledData) {
+      console.log('🌐 Using crawled website data in intelligence generation');
+      combinedData.websiteCrawlResults = onboardingData.crawledData;
+    }
     
     const prompt = `You are a marketing intelligence analyst. Analyze the business information and generate foundational intelligence that will be used to create targeted search queries for content marketing.
 
@@ -16,7 +55,14 @@ INSTRUCTIONS FOR SPECIFIC FIELDS:
 - competitive_landscape_descriptors: List 3-4 terms that describe the competitive category
 
 INPUT DATA:
-${JSON.stringify(onboardingData, null, 2)}
+${JSON.stringify(combinedData, null, 2)}
+
+${combinedData.websiteCrawlResults ? `
+WEBSITE CRAWL RESULTS AVAILABLE:
+Use the crawled website data as the primary source of business information. The form data should supplement or override the crawled data where the user has provided more specific information.
+
+Priority: Website crawled data > User form input > Defaults
+` : ''}
 
 Generate ONLY what can be determined with 100% accuracy from the provided information:
 
@@ -187,6 +233,7 @@ async function generateQueries(req, res) {
 }
 
 module.exports = {
+  crawlWebsiteController,
   generateIntelligence,
   generateQueries
 };
