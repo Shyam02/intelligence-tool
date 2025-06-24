@@ -1,0 +1,45 @@
+.
+├── README.md
+├── config
+│   └── config.js
+├── controllers
+│   ├── intelligence.js
+│   ├── search.js
+│   └── twitter.js
+├── package-lock.json
+├── package.json
+├── project-structure.txt
+├── prompts
+│   ├── content
+│   │   └── twitterBriefs.js
+│   ├── index.js
+│   └── intelligence
+│       ├── businessAnalysis.js
+│       └── websiteCrawling.js
+├── public
+│   ├── index.html
+│   ├── js
+│   │   ├── api.js
+│   │   ├── app.js
+│   │   ├── forms.js
+│   │   ├── results.js
+│   │   ├── search.js
+│   │   ├── twitter.js
+│   │   └── utils.js
+│   ├── results.html
+│   └── styles
+│       ├── articles.css
+│       ├── base.css
+│       ├── components.css
+│       ├── forms.css
+│       ├── layout.css
+│       ├── responsive.css
+│       └── twitter-briefs.css
+├── routes
+│   └── api.js
+├── server.js
+└── services
+    ├── ai.js
+    └── search.js
+
+11 directories, 32 files

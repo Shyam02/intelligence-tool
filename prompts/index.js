@@ -3,6 +3,7 @@
 
 const { businessAnalysisPrompt } = require('./intelligence/businessAnalysis');
 const { mainCrawlPrompt, fallbackCrawlPrompt } = require('./intelligence/websiteCrawling');
+const { linkSelectionPrompt } = require('./intelligence/linkSelection');
 const { twitterBriefsPrompt } = require('./content/twitterBriefs');
 
 // Export all prompts for easy importing
@@ -11,7 +12,8 @@ module.exports = {
   intelligence: {
     businessAnalysisPrompt,
     mainCrawlPrompt,
-    fallbackCrawlPrompt
+    fallbackCrawlPrompt,
+    linkSelectionPrompt
   },
   
   // Content prompts

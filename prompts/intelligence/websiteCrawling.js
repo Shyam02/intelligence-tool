@@ -1,12 +1,12 @@
-// Website Crawling Prompts for extracting business information
+// Website Crawling Prompts for extracting business information - Updated for clean text
 
-const mainCrawlPrompt = (websiteUrl, htmlContent) => {
-  return `Analyze the following website content and extract detailed business information. Focus on finding real, specific details rather than making assumptions.
+const mainCrawlPrompt = (websiteUrl, cleanTextContent) => {
+  return `Analyze the following website content and extract detailed business information. This content has been processed to remove HTML markup and focus on meaningful business information.
 
 Website URL: ${websiteUrl}
 
-HTML Content to analyze:
-${htmlContent}
+WEBSITE CONTENT TO ANALYZE:
+${cleanTextContent}
 
 Extract business information and respond with ONLY a JSON object containing the business details:
 
@@ -36,15 +36,18 @@ Extract business information and respond with ONLY a JSON object containing the 
 }
 
 EXTRACTION RULES:
-- Use ONLY information explicitly found in the HTML content
+- Use ONLY information explicitly found in the website content
 - For any information you cannot find, use "Not found" as the value
 - For arrays that are empty, use []
 - Look for specific details like founder names, funding amounts, customer types, pricing models
-- Pay attention to About sections, mission statements, product descriptions
+- Pay attention to company descriptions, mission statements, product descriptions
 - Extract social media links if present
 - Note any mentioned competitors or partnerships
 - Include team/founder background information if available
 - Business stage indicators: "just getting started", "early stage", "growing", "established", etc.
+- Look for pricing information, subscription models, or business model details
+- Extract key features, benefits, or capabilities mentioned
+- Note any recent updates, news, or milestones mentioned
 
 Respond with ONLY the JSON object, no additional text or explanation.`;
 };
