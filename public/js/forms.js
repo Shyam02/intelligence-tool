@@ -10,52 +10,31 @@ function initializeForms() {
     launchDateInput.addEventListener('change', updateCategoryQuestions);
     websiteUrlInput.addEventListener('input', updateCategoryQuestions);
     
-    // NEW: Add website crawling trigger
-    websiteUrlInput.addEventListener('blur', handleWebsiteUrlEntry);
+    // UPDATED: Only validate URL, no crawling
+    websiteUrlInput.addEventListener('blur', handleWebsiteUrlValidation);
     
     form.addEventListener('submit', handleFormSubmission);
 }
 
-// NEW FUNCTION: Handle website URL entry and trigger crawling
-async function handleWebsiteUrlEntry(event) {
+// UPDATED: Simple URL validation only, no crawling
+function handleWebsiteUrlValidation(event) {
     const websiteUrl = event.target.value.trim();
     
-    // Only crawl if we have a valid URL
-    if (!websiteUrl || !isValidUrl(websiteUrl)) {
-        // Clear any previous crawled data display
+    // Only validate if we have a URL
+    if (!websiteUrl) {
+        // Clear any previous displays
         hideCrawledDataDisplay();
         return;
     }
     
-    console.log('🌐 User entered website URL:', websiteUrl);
-    
-    // Show crawling indicator
-    showCrawlingIndicator();
-    
-    try {
-        // Crawl the website
-        const crawlResult = await crawlWebsiteAPI(websiteUrl);
-        
-        // Store crawled data in separate, clean location
-        window.appState.websiteIntelligence = crawlResult.crawled_data;
-        
-        // Display crawled data to user
-        displayCrawledData(crawlResult.crawled_data);
-        
-        // Hide crawling indicator
-        hideCrawlingIndicator();
-        
-        console.log('✅ Website crawling completed and displayed');
-        
-    } catch (error) {
-        console.error('Website crawling failed:', error);
-        
-        // Show error to user
-        displayCrawlingError(error.message);
-        
-        // Hide crawling indicator
-        hideCrawlingIndicator();
+    if (!isValidUrl(websiteUrl)) {
+        // Could show validation error here if needed
+        hideCrawledDataDisplay();
+        return;
     }
+    
+    // Just hide any previous displays, no crawling
+    hideCrawledDataDisplay();
 }
 
 // Helper function to validate URL
@@ -68,117 +47,7 @@ function isValidUrl(string) {
     }
 }
 
-// Show crawling indicator
-function showCrawlingIndicator() {
-    const websiteInput = document.getElementById('websiteUrl');
-    
-    // Create or show crawling indicator
-    let indicator = document.getElementById('crawlingIndicator');
-    if (!indicator) {
-        indicator = document.createElement('div');
-        indicator.id = 'crawlingIndicator';
-        indicator.className = 'crawling-indicator';
-        indicator.innerHTML = `
-            <div class="crawling-spinner"></div>
-            <span>🌐 Analyzing website...</span>
-        `;
-        websiteInput.parentNode.appendChild(indicator);
-    }
-    
-    indicator.style.display = 'flex';
-}
-
-// Hide crawling indicator
-function hideCrawlingIndicator() {
-    const indicator = document.getElementById('crawlingIndicator');
-    if (indicator) {
-        indicator.style.display = 'none';
-    }
-}
-
-// Display crawled data to user
-function displayCrawledData(crawledData) {
-    // Create or update crawled data display
-    let display = document.getElementById('crawledDataDisplay');
-    if (!display) {
-        display = document.createElement('div');
-        display.id = 'crawledDataDisplay';
-        display.className = 'crawled-data-display';
-        
-        // Insert after website URL input
-        const websiteInput = document.getElementById('websiteUrl');
-        websiteInput.parentNode.insertBefore(display, websiteInput.nextSibling);
-    }
-    
-    // Build display content
-    let displayHTML = `
-        <div class="crawled-data-header">
-            <h4>✅ Website Information Extracted</h4>
-            <p>We found the following information from your website. This will be used to generate better marketing intelligence.</p>
-        </div>
-        <div class="crawled-data-content">
-    `;
-    
-    // Show key extracted information
-    if (crawledData.company_name && crawledData.company_name !== 'Not found') {
-        displayHTML += `<div class="data-item"><strong>Company:</strong> ${crawledData.company_name}</div>`;
-    }
-    
-    if (crawledData.business_description && crawledData.business_description !== 'Not found') {
-        displayHTML += `<div class="data-item"><strong>Business:</strong> ${crawledData.business_description}</div>`;
-    }
-    
-    if (crawledData.target_customer && crawledData.target_customer !== 'Not found') {
-        displayHTML += `<div class="data-item"><strong>Target Customer:</strong> ${crawledData.target_customer}</div>`;
-    }
-    
-    if (crawledData.industry_category && crawledData.industry_category !== 'Not found') {
-        displayHTML += `<div class="data-item"><strong>Industry:</strong> ${crawledData.industry_category}</div>`;
-    }
-    
-    if (crawledData.key_features && crawledData.key_features.length > 0) {
-        displayHTML += `<div class="data-item"><strong>Key Features:</strong> ${crawledData.key_features.join(', ')}</div>`;
-    }
-    
-    // Show if there were any errors
-    if (crawledData.error) {
-        displayHTML += `<div class="data-error">⚠️ ${crawledData.error}</div>`;
-    }
-    
-    displayHTML += `
-        </div>
-        <div class="crawled-data-footer">
-            <p><em>You can still fill out the form below to add or correct any information.</em></p>
-        </div>
-    `;
-    
-    display.innerHTML = displayHTML;
-    display.style.display = 'block';
-}
-
-// Display crawling error
-function displayCrawlingError(errorMessage) {
-    let display = document.getElementById('crawledDataDisplay');
-    if (!display) {
-        display = document.createElement('div');
-        display.id = 'crawledDataDisplay';
-        display.className = 'crawled-data-display';
-        
-        const websiteInput = document.getElementById('websiteUrl');
-        websiteInput.parentNode.insertBefore(display, websiteInput.nextSibling);
-    }
-    
-    display.innerHTML = `
-        <div class="crawled-data-error">
-            <h4>⚠️ Website Analysis Failed</h4>
-            <p>We couldn't extract information from your website: ${errorMessage}</p>
-            <p><em>Please fill out the form below manually.</em></p>
-        </div>
-    `;
-    display.style.display = 'block';
-}
-
-// Hide crawled data display
+// UPDATED: Only hide display, no other functionality needed
 function hideCrawledDataDisplay() {
     const display = document.getElementById('crawledDataDisplay');
     if (display) {
@@ -281,7 +150,7 @@ function generateCategoryQuestions(category) {
     categoryQuestions.innerHTML = questionsHTML;
 }
 
-// Handle form submission with clean data organization
+// UPDATED: Handle form submission with crawling integration
 async function handleFormSubmission(e) {
     e.preventDefault();
     
@@ -313,21 +182,34 @@ async function handleFormSubmission(e) {
     // Store pure user input separately
     window.appState.userInput = userInput;
     
-    // Prepare combined data for API (maintains backend compatibility)
+    // Prepare combined data for API
     const combinedDataForAPI = { ...userInput };
-    
-    // Add crawled data if available (for API compatibility)
-    if (window.appState.websiteIntelligence) {
-        combinedDataForAPI.crawledData = window.appState.websiteIntelligence;
-        console.log('🌐 Including website intelligence in API request');
-    }
     
     // Show loading
     document.querySelector('.form-container').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
     
+    // Update loading message for combined process
+    const loadingText = document.querySelector('#loading p');
+    if (loadingText) {
+        loadingText.textContent = hasWebsite ? 
+            'Analyzing website and generating intelligence...' : 
+            'Generating foundational intelligence...';
+    }
+    
     try {
-        // Generate intelligence using API (with combined data for compatibility)
+        // UPDATED: Crawl website first if URL provided
+        if (hasWebsite) {
+            console.log('🌐 Starting website crawling during form submission for:', websiteUrl);
+            
+            const crawlResult = await crawlWebsiteAPI(websiteUrl);
+            window.appState.websiteIntelligence = crawlResult.crawled_data;
+            combinedDataForAPI.crawledData = crawlResult.crawled_data;
+            
+            console.log('✅ Website crawling completed during form submission');
+        }
+        
+        // Generate intelligence using API (with crawled data if available)
         const intelligence = await generateIntelligence(combinedDataForAPI);
         window.appState.foundationalIntelligence = intelligence;
         
@@ -340,9 +222,21 @@ async function handleFormSubmission(e) {
         );
         
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error during form submission:', error);
         document.getElementById('loading').style.display = 'none';
-        alert('Error generating intelligence: ' + error.message);
+        
+        // Show specific error message based on failure point
+        let errorMessage = 'Error processing your request: ' + error.message;
+        if (error.message.includes('crawl') || error.message.includes('website')) {
+            errorMessage = 'Failed to analyze website. Please check the URL and try again, or continue without website analysis.\n\n' + error.message;
+        }
+        
+        alert(errorMessage);
         document.querySelector('.form-container').style.display = 'block';
+        
+        // Reset loading text
+        if (loadingText) {
+            loadingText.textContent = 'Generating foundational intelligence...';
+        }
     }
 }

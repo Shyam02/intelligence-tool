@@ -92,7 +92,7 @@ function copyTweet(tweetText, button) {
     }
 }
 
-// Reset form and application state with clean data structure
+// UPDATED: Reset form and application state with clean data structure
 function resetForm() {
     // Reset all form data
     const form = document.getElementById('onboardingForm');
@@ -122,12 +122,6 @@ function resetForm() {
     const twitterBriefs = document.getElementById('twitterBriefs');
     if (twitterBriefs) {
         twitterBriefs.style.display = 'none';
-    }
-    
-    // Hide crawled data display
-    const crawledDataDisplay = document.getElementById('crawledDataDisplay');
-    if (crawledDataDisplay) {
-        crawledDataDisplay.style.display = 'none';
     }
     
     // Show form container
