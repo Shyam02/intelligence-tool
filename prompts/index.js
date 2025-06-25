@@ -1,8 +1,9 @@
 // Central prompts export file
 // Import all prompts from their respective files
+// File path: /prompts/index.js
 
 const { businessAnalysisPrompt } = require('./intelligence/businessAnalysis');
-const { mainCrawlPrompt, fallbackCrawlPrompt } = require('./intelligence/websiteCrawling');
+const { mainCrawlPrompt, fallbackCrawlPrompt, multiPageAnalysisPrompt } = require('./intelligence/websiteCrawling');
 const { linkSelectionPrompt } = require('./intelligence/linkSelection');
 const { twitterBriefsPrompt } = require('./content/twitterBriefs');
 
@@ -13,7 +14,8 @@ module.exports = {
     businessAnalysisPrompt,
     mainCrawlPrompt,
     fallbackCrawlPrompt,
-    linkSelectionPrompt
+    linkSelectionPrompt,
+    multiPageAnalysisPrompt
   },
   
   // Content prompts

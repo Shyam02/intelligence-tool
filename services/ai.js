@@ -1,4 +1,6 @@
-// Claude AI service - Enhanced with multi-page website crawling
+// Claude AI service - Enhanced with flexible multi-page crawling and external domain support
+// File path: /services/ai.js
+
 const axios = require('axios');
 const { config } = require('../config/config');
 const { intelligence } = require('../prompts');
@@ -210,10 +212,10 @@ async function fetchWebsiteHTML(websiteUrl) {
   }
 }
 
-// NEW: Fetch and analyze multiple pages for comprehensive business intelligence
+// ENHANCED: Fetch and analyze multiple pages with flexible 0-10 page selection
 async function fetchMultiplePages(websiteUrl) {
   try {
-    console.log('🔍 Starting multi-page analysis for:', websiteUrl);
+    console.log('🔍 Starting enhanced multi-page analysis for:', websiteUrl);
     
     // Step 1: Fetch and analyze homepage
     const homepageHtml = await fetchWebsiteHTML(websiteUrl);
@@ -225,7 +227,8 @@ async function fetchMultiplePages(websiteUrl) {
       originalHtmlLength: homepageHtml.length,
       cleanTextLength: homepageCleanText.length,
       totalLinks: allLinks.length,
-      relevantLinks: relevantLinks.length
+      relevantLinks: relevantLinks.length,
+      externalLinks: relevantLinks.filter(l => l.isExternal).length
     });
     
     // Step 2: If we have no relevant links, return homepage analysis only
@@ -238,7 +241,7 @@ async function fetchMultiplePages(websiteUrl) {
       };
     }
     
-    // Step 3: Use AI to select the 5 most valuable links
+    // Step 3: Use AI to select the 0-10 most valuable links
     console.log('🤖 Asking AI to select most valuable links from', relevantLinks.length, 'options');
     const companyName = extractCompanyNameFromUrl(websiteUrl);
     const linkSelectionPrompt = intelligence.linkSelectionPrompt(relevantLinks, companyName, websiteUrl);
@@ -254,26 +257,32 @@ async function fetchMultiplePages(websiteUrl) {
       }
     } catch (aiError) {
       console.log('⚠️ AI link selection failed, using fallback selection:', aiError.message);
-      // Fallback: select first 5 relevant links
+      // Fallback: select up to 5 most promising links
+      const fallbackCount = Math.min(5, relevantLinks.length);
       selectedLinksData = {
-        selected_links: relevantLinks.slice(0, 5).map(link => ({
+        selected_links: relevantLinks.slice(0, fallbackCount).map(link => ({
           url: link.url,
           text: link.text,
           reasoning: 'Fallback selection due to AI error'
         })),
-        total_selected: Math.min(5, relevantLinks.length),
-        selection_strategy: 'Fallback - first 5 relevant links'
+        total_selected: fallbackCount,
+        selection_strategy: 'Fallback - most relevant links due to AI selection error'
       };
     }
     
     console.log('🎯 AI selected', selectedLinksData.total_selected, 'links:', 
-      selectedLinksData.selected_links.map(l => l.text));
+      selectedLinksData.selected_links.map(l => `${l.text} (${l.url.includes(new URL(websiteUrl).hostname) ? 'internal' : 'external'})`));
     
-    // Step 4: Fetch content from selected pages
+    // Step 4: Fetch content from selected pages (handle both internal and external)
     const additionalPages = [];
     for (const selectedLink of selectedLinksData.selected_links) {
       try {
         console.log('📄 Fetching page:', selectedLink.text, '→', selectedLink.url);
+        
+        // ENHANCEMENT: Handle external domains
+        const linkDomain = new URL(selectedLink.url).hostname;
+        const baseDomain = new URL(websiteUrl).hostname;
+        const isExternal = linkDomain !== baseDomain;
         
         const pageHtml = await fetchWebsiteHTML(selectedLink.url);
         const pageCleanText = extractCleanText(pageHtml);
@@ -283,47 +292,61 @@ async function fetchMultiplePages(websiteUrl) {
           title: selectedLink.text,
           content: pageCleanText,
           reasoning: selectedLink.reasoning,
-          contentLength: pageCleanText.length
+          contentLength: pageCleanText.length,
+          isExternal: isExternal,
+          domain: linkDomain
         });
         
         console.log('✅ Successfully processed page:', selectedLink.text, 
-          '(', pageCleanText.length, 'chars)');
+          '(', pageCleanText.length, 'chars,', isExternal ? 'external' : 'internal', ')');
         
       } catch (pageError) {
         console.log('⚠️ Failed to fetch page:', selectedLink.url, '→', pageError.message);
-        // Continue with other pages
+        // Continue with other pages - don't fail entire process for one bad link
+        additionalPages.push({
+          url: selectedLink.url,
+          title: selectedLink.text,
+          content: `Failed to fetch content: ${pageError.message}`,
+          reasoning: selectedLink.reasoning,
+          contentLength: 0,
+          isExternal: new URL(selectedLink.url).hostname !== new URL(websiteUrl).hostname,
+          domain: new URL(selectedLink.url).hostname,
+          error: true
+        });
       }
     }
     
-    console.log('🎉 Multi-page crawling complete:', {
+    console.log('🎉 Enhanced multi-page crawling complete:', {
       homepageLength: homepageCleanText.length,
       additionalPages: additionalPages.length,
-      totalContent: homepageCleanText.length + additionalPages.reduce((sum, page) => sum + page.contentLength, 0)
+      successfulPages: additionalPages.filter(p => !p.error).length,
+      externalPages: additionalPages.filter(p => p.isExternal && !p.error).length,
+      totalContent: homepageCleanText.length + additionalPages.reduce((sum, page) => sum + (page.error ? 0 : page.contentLength), 0)
     });
     
     return {
       homepageContent: homepageCleanText,
       additionalPages: additionalPages,
-      analysisMethod: 'multi_page_analysis',
-      selectionStrategy: selectedLinksData.selection_strategy
+      analysisMethod: 'enhanced_multi_page_analysis',
+      selectionStrategy: selectedLinksData.selection_strategy,
+      pagesSelected: selectedLinksData.total_selected
     };
     
   } catch (error) {
-    console.error('❌ Multi-page crawling failed:', error.message);
+    console.error('❌ Enhanced multi-page crawling failed:', error.message);
     throw error;
   }
 }
 
-// ENHANCED: Main website crawling function with multi-page support
+// ENHANCED: Main website crawling function with flexible page support
 async function crawlWebsite(websiteUrl) {
   try {
     console.log('🌐 Starting enhanced website crawl for:', websiteUrl);
     
     let crawlResult;
-    let useMultiPage = true;
     let crawlData;
     
-    // Step 1: Try multi-page crawling
+    // Step 1: Try enhanced multi-page crawling (0-10 pages)
     try {
       crawlData = await fetchMultiplePages(websiteUrl);
       
@@ -333,18 +356,22 @@ async function crawlWebsite(websiteUrl) {
       if (crawlData.additionalPages.length > 0) {
         combinedContent += 'ADDITIONAL PAGES:\n';
         crawlData.additionalPages.forEach((page, index) => {
-          combinedContent += `\nPage ${index + 1}: ${page.title}\nURL: ${page.url}\nContent: ${page.content}\n`;
+          if (!page.error) {
+            combinedContent += `\nPage ${index + 1}: ${page.title} ${page.isExternal ? '(External Domain: ' + page.domain + ')' : '(Internal Page)'}\nURL: ${page.url}\nContent: ${page.content}\n`;
+          } else {
+            combinedContent += `\nPage ${index + 1}: ${page.title} (Failed to fetch from ${page.domain})\n`;
+          }
         });
       }
       
-      // Use enhanced prompt for multi-page analysis
-      const enhancedCrawlPrompt = createMultiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData);
+      // Use imported prompt for multi-page analysis
+      const enhancedCrawlPrompt = intelligence.multiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData);
       crawlResult = await callClaudeAPI(enhancedCrawlPrompt, false);
       
-      console.log('✅ Multi-page analysis completed successfully');
+      console.log('✅ Enhanced multi-page analysis completed successfully');
       
     } catch (multiPageError) {
-      console.log('⚠️ Multi-page crawling failed, falling back to single page:', multiPageError.message);
+      console.log('⚠️ Enhanced multi-page crawling failed, falling back to single page:', multiPageError.message);
       
       // Fallback: Try single page with clean text extraction
       try {
@@ -353,12 +380,12 @@ async function crawlWebsite(websiteUrl) {
         
         const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
         crawlResult = await callClaudeAPI(crawlPrompt, false);
-        useMultiPage = false;
         
         crawlData = {
           homepageContent: cleanText,
           additionalPages: [],
-          analysisMethod: 'single_page_fallback'
+          analysisMethod: 'single_page_fallback',
+          pagesSelected: 0
         };
         
         console.log('✅ Single-page fallback completed');
@@ -366,22 +393,22 @@ async function crawlWebsite(websiteUrl) {
       } catch (singlePageError) {
         console.log('⚠️ Single-page fallback failed, using URL-only analysis:', singlePageError.message);
         
-        // Final fallback: URL-based analysis (existing approach)
+        // Final fallback: URL-based analysis
         const fallbackPrompt = intelligence.fallbackCrawlPrompt(websiteUrl);
         crawlResult = await callClaudeAPI(fallbackPrompt, false);
-        useMultiPage = false;
         
         crawlData = {
           homepageContent: '',
           additionalPages: [],
-          analysisMethod: 'url_only_fallback'
+          analysisMethod: 'url_only_fallback',
+          pagesSelected: 0
         };
       }
     }
     
     console.log('Raw crawl response length:', crawlResult.length);
     
-    // Parse JSON response (keeping existing logic)
+    // Parse JSON response
     let extractedData;
     try {
       const jsonMatch = crawlResult.match(/\{[\s\S]*\}/);
@@ -400,7 +427,7 @@ async function crawlWebsite(websiteUrl) {
       extractedData = createFallbackData(websiteUrl, crawlResult, parseError.message);
     }
     
-    // Ensure we have a company name (keeping existing logic)
+    // Ensure we have a company name
     if (!extractedData.company_name || extractedData.company_name === 'Not found' || extractedData.company_name === '') {
       extractedData.company_name = extractCompanyNameFromUrl(websiteUrl);
     }
@@ -408,9 +435,11 @@ async function crawlWebsite(websiteUrl) {
     // Add enhanced metadata
     extractedData.extraction_method = crawlData.analysisMethod;
     extractedData.extraction_timestamp = new Date().toISOString();
-    extractedData.pages_analyzed = 1 + crawlData.additionalPages.length;
+    extractedData.pages_analyzed = 1 + (crawlData.additionalPages ? crawlData.additionalPages.filter(p => !p.error).length : 0);
+    extractedData.pages_selected = crawlData.pagesSelected || 0;
+    extractedData.external_pages_analyzed = crawlData.additionalPages ? crawlData.additionalPages.filter(p => p.isExternal && !p.error).length : 0;
     extractedData.total_content_length = crawlData.homepageContent.length + 
-      crawlData.additionalPages.reduce((sum, page) => sum + page.contentLength, 0);
+      (crawlData.additionalPages ? crawlData.additionalPages.reduce((sum, page) => sum + (page.error ? 0 : page.contentLength), 0) : 0);
     
     if (crawlData.selectionStrategy) {
       extractedData.ai_selection_strategy = crawlData.selectionStrategy;
@@ -420,6 +449,8 @@ async function crawlWebsite(websiteUrl) {
     console.log('📊 Extraction summary:', {
       method: extractedData.extraction_method,
       pages: extractedData.pages_analyzed,
+      selected: extractedData.pages_selected,
+      external: extractedData.external_pages_analyzed,
       contentLength: extractedData.total_content_length
     });
     
@@ -428,64 +459,12 @@ async function crawlWebsite(websiteUrl) {
   } catch (error) {
     console.error('Website crawling error:', error);
     
-    // Return structured fallback data (keeping existing logic)
+    // Return structured fallback data
     return createFallbackData(websiteUrl, null, error.message);
   }
 }
 
-// NEW: Create enhanced prompt for multi-page analysis
-function createMultiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData) {
-  return `Analyze the following comprehensive website content and extract detailed business information. This analysis includes the homepage plus ${crawlData.additionalPages.length} additional pages selected for maximum business intelligence value.
-
-Website URL: ${websiteUrl}
-Analysis Method: ${crawlData.analysisMethod}
-Pages Analyzed: ${1 + crawlData.additionalPages.length}
-
-COMPREHENSIVE WEBSITE CONTENT:
-${combinedContent}
-
-Extract business information and respond with ONLY a JSON object containing the business details:
-
-{
-"company_name": "",
-"business_description": "",
-"value_proposition": "",
-"target_customer": "",
-"main_product_service": "",
-"key_features": [],
-"pricing_info": "",
-"business_stage": "",
-"industry_category": "",
-"competitors_mentioned": [],
-"unique_selling_points": [],
-"team_size": "",
-"recent_updates": "",
-"social_media": {
-  "twitter": "",
-  "linkedin": "",
-  "other": []
-},
-"funding_info": "",
-"company_mission": "",
-"team_background": "",
-"additional_notes": ""
-}
-
-EXTRACTION RULES:
-- Use ONLY information explicitly found in the website content
-- For any information you cannot find, use "Not found" as the value
-- For arrays that are empty, use []
-- Combine information from all pages to create comprehensive business profile
-- Prioritize specific details like founder names, funding amounts, customer types, pricing models
-- Look for specific business metrics, customer counts, revenue information
-- Extract team/founder background information if available
-- Note any competitive advantages or unique positioning mentioned
-- Include recent news, updates, or milestones if mentioned
-
-Respond with ONLY the JSON object, no additional text or explanation.`;
-}
-
-// HELPER FUNCTION: Create fallback data when parsing fails (keeping existing logic)
+// HELPER FUNCTION: Create fallback data when parsing fails
 function createFallbackData(websiteUrl, rawResponse = null, errorMessage = null) {
   console.log('🔧 Creating fallback data for:', websiteUrl);
   
@@ -541,6 +520,8 @@ function createFallbackData(websiteUrl, rawResponse = null, errorMessage = null)
     extraction_method: 'fallback_analysis',
     extraction_timestamp: new Date().toISOString(),
     pages_analyzed: 0,
+    pages_selected: 0,
+    external_pages_analyzed: 0,
     total_content_length: 0
   };
   
@@ -553,7 +534,7 @@ function createFallbackData(websiteUrl, rawResponse = null, errorMessage = null)
   return fallbackData;
 }
 
-// HELPER FUNCTION: Extract company name from URL (keeping existing logic)
+// HELPER FUNCTION: Extract company name from URL
 function extractCompanyNameFromUrl(url) {
   try {
     const cleanUrl = url.replace('https://', '').replace('http://', '').replace('www.', '');
@@ -564,7 +545,7 @@ function extractCompanyNameFromUrl(url) {
   }
 }
 
-// Test Claude API connection (keeping existing function)
+// Test Claude API connection
 async function testClaudeAPI() {
   try {
     if (!config.claudeApiKey) {

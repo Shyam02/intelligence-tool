@@ -1,37 +1,52 @@
-// HTML Parser Service - Extract clean content and links from HTML
+// HTML Parser Service - Minimal filtering, let AI decide what's valuable
+// File path: /services/htmlParser.js
 
 const { URL } = require('url');
 
 /**
- * Extract clean, meaningful text from HTML by removing all non-content elements
+ * Extract clean, meaningful text from HTML by removing ONLY non-business elements
+ * ENHANCED: Preserves headers, footers, navigation, forms - ALL business content
  * @param {string} html - Raw HTML content
- * @returns {string} - Clean text content only
+ * @returns {string} - Clean text content with ALL business information
  */
 function extractCleanText(html) {
   try {
-    // Remove script and style elements completely
+    // Remove ONLY script and style elements (non-business content)
     let cleanHtml = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     cleanHtml = cleanHtml.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
     
     // Remove comments
     cleanHtml = cleanHtml.replace(/<!--[\s\S]*?-->/g, '');
     
-    // Remove navigation, header, footer elements (common noise)
-    cleanHtml = cleanHtml.replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, '');
-    cleanHtml = cleanHtml.replace(/<header\b[^>]*>[\s\S]*?<\/header>/gi, '');
-    cleanHtml = cleanHtml.replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '');
+    // REMOVED: No longer removing nav, header, footer, forms - they contain business info!
+    // ENHANCEMENT: Keep ALL content that might contain business intelligence
     
-    // Remove forms (usually just contact/newsletter forms)
-    cleanHtml = cleanHtml.replace(/<form\b[^>]*>[\s\S]*?<\/form>/gi, '');
-    
-    // Remove SVG and other non-text elements
+    // Remove SVG and other non-text elements (keep alt text though)
     cleanHtml = cleanHtml.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, '');
     cleanHtml = cleanHtml.replace(/<canvas\b[^>]*>[\s\S]*?<\/canvas>/gi, '');
+    
+    // Extract alt text from images before removing them
+    const altTextMatches = cleanHtml.match(/alt\s*=\s*["'][^"']*["']/gi);
+    let altTexts = '';
+    if (altTextMatches) {
+      altTexts = altTextMatches.map(alt => 
+        alt.replace(/alt\s*=\s*["']/, '').replace(/["']$/, '')
+      ).join(' ');
+    }
+    
+    // Extract placeholder text from inputs
+    const placeholderMatches = cleanHtml.match(/placeholder\s*=\s*["'][^"']*["']/gi);
+    let placeholderTexts = '';
+    if (placeholderMatches) {
+      placeholderTexts = placeholderMatches.map(placeholder => 
+        placeholder.replace(/placeholder\s*=\s*["']/, '').replace(/["']$/, '')
+      ).join(' ');
+    }
     
     // Extract text from remaining HTML tags
     let textContent = cleanHtml
       // Add spaces before block elements to separate content
-      .replace(/<(div|p|h[1-6]|section|article|main|aside|li|td|th)\b[^>]*>/gi, ' ')
+      .replace(/<(div|p|h[1-6]|section|article|main|aside|li|td|th|header|footer|nav|form)\b[^>]*>/gi, ' ')
       // Remove all remaining HTML tags
       .replace(/<[^>]+>/g, ' ')
       // Decode common HTML entities
@@ -44,6 +59,10 @@ function extractCleanText(html) {
       // Clean up whitespace
       .replace(/\s+/g, ' ')
       .trim();
+    
+    // Add extracted alt texts and placeholders
+    if (altTexts) textContent += ' ' + altTexts;
+    if (placeholderTexts) textContent += ' ' + placeholderTexts;
     
     // If result is too short, something went wrong - return a portion of original
     if (textContent.length < 100 && html.length > 500) {
@@ -61,10 +80,12 @@ function extractCleanText(html) {
       return fallbackText.substring(0, 8000); // Reasonable limit
     }
     
-    console.log('✅ Clean text extraction successful:', {
+    console.log('✅ Enhanced clean text extraction successful:', {
       originalLength: html.length,
       cleanLength: textContent.length,
-      compressionRatio: Math.round((1 - textContent.length / html.length) * 100) + '%'
+      compressionRatio: Math.round((1 - textContent.length / html.length) * 100) + '%',
+      altTextsFound: altTextMatches ? altTextMatches.length : 0,
+      placeholdersFound: placeholderMatches ? placeholderMatches.length : 0
     });
     
     return textContent;
@@ -83,10 +104,11 @@ function extractCleanText(html) {
 }
 
 /**
- * Extract all links from HTML and convert to absolute URLs
+ * Extract ALL links from HTML including external domains
+ * MINIMAL FILTERING: Only exclude invalid links and fragments, let AI decide everything else
  * @param {string} html - Raw HTML content
  * @param {string} baseUrl - Base URL for converting relative links
- * @returns {Array} - Array of {text, url, type} objects
+ * @returns {Array} - Array of {text, url, type} objects from ALL domains
  */
 function extractAllLinks(html, baseUrl) {
   try {
@@ -104,7 +126,7 @@ function extractAllLinks(html, baseUrl) {
         .replace(/\s+/g, ' ')
         .trim();
       
-      // Skip empty links or javascript links
+      // MINIMAL FILTERING: Only skip truly invalid links
       if (!href || href.startsWith('javascript:') || href === '#' || !linkText) {
         continue;
       }
@@ -113,22 +135,20 @@ function extractAllLinks(html, baseUrl) {
         // Convert to absolute URL
         const absoluteUrl = new URL(href, baseUrlObj).href;
         
-        // Filter out fragment URLs (anchor links to sections on same page)
+        // MINIMAL FILTERING: Only exclude fragment URLs (same page sections)
         if (absoluteUrl.includes('#')) {
           continue;
         }
         
-        // Only include links to the same domain or its subdomains
-        const linkDomain = new URL(absoluteUrl).hostname;
-        const baseDomain = baseUrlObj.hostname;
+        // Include ALL domains - no restrictions whatsoever
+        links.push({
+          text: linkText.substring(0, 100), // Limit text length
+          url: absoluteUrl,
+          type: categorizeLink(linkText, absoluteUrl),
+          domain: new URL(absoluteUrl).hostname,
+          isExternal: new URL(absoluteUrl).hostname !== baseUrlObj.hostname
+        });
         
-        if (linkDomain === baseDomain || linkDomain.endsWith('.' + baseDomain)) {
-          links.push({
-            text: linkText.substring(0, 100), // Limit text length
-            url: absoluteUrl,
-            type: categorizeLink(linkText, absoluteUrl)
-          });
-        }
       } catch (urlError) {
         // Skip invalid URLs
         continue;
@@ -140,10 +160,19 @@ function extractAllLinks(html, baseUrl) {
       index === self.findIndex(l => l.url === link.url)
     );
     
-    console.log('🔗 Link extraction results:', {
+    // ENHANCED LOGGING: Show all found links
+    console.log('🔗 Enhanced link extraction results:', {
       totalLinksFound: links.length,
       uniqueLinks: uniqueLinks.length,
+      externalDomains: uniqueLinks.filter(l => l.isExternal).length,
+      internalPages: uniqueLinks.filter(l => !l.isExternal).length,
       baseUrl: baseUrl
+    });
+    
+    // LOG ALL FOUND LINKS
+    console.log('📋 ALL LINKS FOUND:');
+    uniqueLinks.forEach((link, index) => {
+      console.log(`  ${index + 1}. "${link.text}" → ${link.url} [${link.type}] ${link.isExternal ? '(EXTERNAL)' : '(INTERNAL)'}`);
     });
     
     return uniqueLinks;
@@ -155,10 +184,10 @@ function extractAllLinks(html, baseUrl) {
 }
 
 /**
- * Basic categorization of links to help AI make better decisions
+ * Basic categorization of links for AI information (no filtering decisions)
  * @param {string} linkText - The text content of the link
  * @param {string} url - The URL of the link
- * @returns {string} - Category type
+ * @returns {string} - Category type (for AI information only)
  */
 function categorizeLink(linkText, url) {
   const text = linkText.toLowerCase();
@@ -174,46 +203,45 @@ function categorizeLink(linkText, url) {
   if (text.includes('solution') || urlLower.includes('/solution')) return 'solutions';
   if (text.includes('feature') || urlLower.includes('/feature')) return 'features';
   
+  // External platform links
+  if (urlLower.includes('app.apple.com') || urlLower.includes('play.google.com')) return 'app-store';
+  if (urlLower.includes('twitter.com') || urlLower.includes('linkedin.com') || 
+      urlLower.includes('facebook.com') || urlLower.includes('instagram.com')) return 'social-media';
+  if (urlLower.includes('medium.com') || urlLower.includes('substack.com')) return 'blog-external';
+  
   // Medium priority pages
   if (text.includes('case') || text.includes('customer') || urlLower.includes('/case')) return 'case-studies';
   if (text.includes('blog') || urlLower.includes('/blog')) return 'blog';
   if (text.includes('news') || urlLower.includes('/news')) return 'news';
   if (text.includes('career') || urlLower.includes('/career')) return 'careers';
+  if (text.includes('help') || text.includes('support') || urlLower.includes('/help')) return 'support';
+  if (text.includes('docs') || text.includes('documentation') || urlLower.includes('/docs')) return 'documentation';
   
-  // Low priority / noise
+  // Legal and auth pages (but AI will decide if they're valuable)
   if (text.includes('privacy') || text.includes('terms') || text.includes('cookie')) return 'legal';
-  if (text.includes('login') || text.includes('sign') || text.includes('register')) return 'auth';
-  if (text.includes('download') || urlLower.includes('/download')) return 'downloads';
+  if (text.includes('login') || text.includes('sign in') || text.includes('register')) return 'auth';
   
   // Default
   return 'other';
 }
 
 /**
- * Filter out obviously irrelevant links to reduce noise for AI
+ * NO FILTERING - Pass all links to AI for decision making
+ * AI will decide what's valuable, not hard-coded logic
  * @param {Array} links - Array of link objects
- * @returns {Array} - Filtered array of relevant links
+ * @returns {Array} - All links (no filtering)
  */
 function filterRelevantLinks(links) {
-  return links.filter(link => {
-    const type = link.type;
-    const text = link.text.toLowerCase();
-    const url = link.url.toLowerCase();
-    
-    // Always exclude these
-    if (type === 'legal' || type === 'auth') return false;
-    if (text.includes('cookie') || text.includes('privacy') || text.includes('terms')) return false;
-    if (text.includes('logout') || text.includes('dashboard')) return false;
-    if (url.includes('admin') || url.includes('wp-') || url.includes('?')) return false;
-    
-    // Exclude very short link text (likely navigation noise)
-    if (link.text.length < 3) return false;
-    
-    // Exclude file downloads
-    if (url.includes('.pdf') || url.includes('.zip') || url.includes('.doc')) return false;
-    
-    return true;
+  // NO FILTERING - Let AI decide what's valuable
+  console.log('📊 LINK FILTERING RESULTS:');
+  console.log(`  ✅ PASSED TO AI: ${links.length} links (NO HARD-CODED FILTERING)`);
+  links.forEach((link, index) => {
+    console.log(`    ${index + 1}. "${link.text}" → ${link.url} [${link.type}] ${link.isExternal ? '(EXTERNAL)' : '(INTERNAL)'}`);
   });
+  
+  console.log('🤖 AI will decide which links are valuable for business intelligence');
+  
+  return links; // Return ALL links, let AI decide
 }
 
 module.exports = {
