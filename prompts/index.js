@@ -5,6 +5,7 @@
 const { businessAnalysisPrompt } = require('./intelligence/businessAnalysis');
 const { mainCrawlPrompt, fallbackCrawlPrompt, multiPageAnalysisPrompt } = require('./intelligence/websiteCrawling');
 const { linkSelectionPrompt } = require('./intelligence/linkSelection');
+const { competitorAnalysisPrompt } = require('./intelligence/competitorAnalysis');
 const { twitterBriefsPrompt } = require('./content/twitterBriefs');
 
 // Export all prompts for easy importing
@@ -15,7 +16,8 @@ module.exports = {
     mainCrawlPrompt,
     fallbackCrawlPrompt,
     linkSelectionPrompt,
-    multiPageAnalysisPrompt
+    multiPageAnalysisPrompt,
+    competitorAnalysisPrompt
   },
   
   // Content prompts

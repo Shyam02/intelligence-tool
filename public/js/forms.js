@@ -150,7 +150,7 @@ function generateCategoryQuestions(category) {
     categoryQuestions.innerHTML = questionsHTML;
 }
 
-// UPDATED: Handle form submission with crawling integration
+// UPDATED: Handle form submission with enhanced loading message for competitor research
 async function handleFormSubmission(e) {
     e.preventDefault();
     
@@ -189,12 +189,14 @@ async function handleFormSubmission(e) {
     document.querySelector('.form-container').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
     
-    // Update loading message for combined process
+    // UPDATED: Enhanced loading message for competitor research
     const loadingText = document.querySelector('#loading p');
     if (loadingText) {
-        loadingText.textContent = hasWebsite ? 
-            'Analyzing website and generating intelligence...' : 
-            'Generating foundational intelligence...';
+        if (hasWebsite) {
+            loadingText.textContent = 'Analyzing website, researching competitors, and generating intelligence...';
+        } else {
+            loadingText.textContent = 'Researching competitors and generating foundational intelligence...';
+        }
     }
     
     try {
@@ -207,9 +209,14 @@ async function handleFormSubmission(e) {
             combinedDataForAPI.crawledData = crawlResult.crawled_data;
             
             console.log('✅ Website crawling completed during form submission');
+            
+            // Update loading message to show progress
+            if (loadingText) {
+                loadingText.textContent = 'Website analyzed! Now researching competitors and generating intelligence...';
+            }
         }
         
-        // Generate intelligence using API (with crawled data if available)
+        // Generate intelligence using API (with crawled data if available) - now includes competitor research
         const intelligence = await generateIntelligence(combinedDataForAPI);
         window.appState.foundationalIntelligence = intelligence;
         
@@ -229,6 +236,8 @@ async function handleFormSubmission(e) {
         let errorMessage = 'Error processing your request: ' + error.message;
         if (error.message.includes('crawl') || error.message.includes('website')) {
             errorMessage = 'Failed to analyze website. Please check the URL and try again, or continue without website analysis.\n\n' + error.message;
+        } else if (error.message.includes('competitor')) {
+            errorMessage = 'Competitor research failed, but basic analysis completed. You can continue with the available data.\n\n' + error.message;
         }
         
         alert(errorMessage);
