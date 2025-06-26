@@ -6,8 +6,10 @@ const router = express.Router();
 const { testClaudeAPI } = require('../services/ai');
 const { testBraveAPI } = require('../services/search');
 
-// Import controllers
-const { generateIntelligence, generateQueries, crawlWebsiteController } = require('../controllers/intelligence');
+// Import controllers from new separated files
+const { generateIntelligence } = require('../controllers/businessIntelligence');
+const { generateQueries } = require('../controllers/queryGeneration');
+const { crawlWebsiteController } = require('../controllers/websiteCrawling');
 const { executeSearch } = require('../controllers/search');
 const { generateTwitterBriefs } = require('../controllers/twitter');
 

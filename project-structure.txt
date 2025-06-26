@@ -15,6 +15,7 @@
 │   ├── index.js
 │   └── intelligence
 │       ├── businessAnalysis.js
+│       ├── competitorAnalysis.js
 │       ├── linkSelection.js
 │       └── websiteCrawling.js
 ├── public
@@ -44,4 +45,4 @@
     ├── htmlParser.js
     └── search.js
 
-11 directories, 34 files
+11 directories, 35 files
