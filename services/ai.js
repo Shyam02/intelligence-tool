@@ -212,6 +212,65 @@ async function fetchWebsiteHTML(websiteUrl) {
   }
 }
 
+// NEW: Simple homepage-only crawling for competitors
+async function crawlHomepageOnly(websiteUrl) {
+  try {
+    console.log('🏠 Starting simple homepage crawl for competitor:', websiteUrl);
+    
+    // Step 1: Fetch homepage HTML
+    const homepageHtml = await fetchWebsiteHTML(websiteUrl);
+    const cleanText = extractCleanText(homepageHtml);
+    
+    console.log('📄 Homepage content extracted:', {
+      originalLength: homepageHtml.length,
+      cleanLength: cleanText.length,
+      compressionRatio: Math.round((1 - cleanText.length / homepageHtml.length) * 100) + '%'
+    });
+    
+    // Step 2: Simple AI analysis (homepage only)
+    const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
+    const crawlResult = await callClaudeAPI(crawlPrompt, false);
+    
+    console.log('🤖 AI analysis completed for competitor homepage');
+    
+    // Step 3: Parse JSON response
+    let extractedData;
+    try {
+      const jsonMatch = crawlResult.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        extractedData = JSON.parse(jsonMatch[0]);
+        console.log('✅ Successfully parsed competitor data');
+      } else {
+        throw new Error('No JSON structure found in response');
+      }
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error for competitor:', parseError);
+      // Use fallback data for competitors
+      extractedData = createFallbackData(websiteUrl, crawlResult, parseError.message);
+    }
+    
+    // Step 4: Add metadata
+    if (!extractedData.company_name || extractedData.company_name === 'Not found' || extractedData.company_name === '') {
+      extractedData.company_name = extractCompanyNameFromUrl(websiteUrl);
+    }
+    
+    extractedData.extraction_method = 'homepage_only_competitor';
+    extractedData.extraction_timestamp = new Date().toISOString();
+    extractedData.pages_analyzed = 1;
+    extractedData.pages_selected = 0;
+    extractedData.external_pages_analyzed = 0;
+    extractedData.total_content_length = cleanText.length;
+    
+    console.log('✅ Competitor homepage crawl completed:', extractedData.company_name);
+    return extractedData;
+    
+  } catch (error) {
+    console.error('❌ Competitor homepage crawl failed:', error.message);
+    // Return fallback data for competitors
+    return createFallbackData(websiteUrl, null, error.message);
+  }
+}
+
 // ENHANCED: Fetch and analyze multiple pages with flexible 0-10 page selection
 async function fetchMultiplePages(websiteUrl) {
   try {
@@ -338,7 +397,7 @@ async function fetchMultiplePages(websiteUrl) {
   }
 }
 
-// ENHANCED: Main website crawling function with flexible page support
+// ENHANCED: Main website crawling function with flexible page support (FOR MAIN BUSINESS ONLY)
 async function crawlWebsite(websiteUrl) {
   try {
     console.log('🌐 Starting enhanced website crawl for:', websiteUrl);
@@ -568,5 +627,6 @@ async function testClaudeAPI() {
 module.exports = {
   callClaudeAPI,
   crawlWebsite,
+  crawlHomepageOnly,
   testClaudeAPI
 };

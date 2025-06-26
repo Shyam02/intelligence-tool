@@ -1,5 +1,5 @@
 // Competitor research controller
-const { callClaudeAPI, crawlWebsite } = require('../services/ai');
+const { callClaudeAPI, crawlHomepageOnly } = require('../services/ai');
 const { searchBrave } = require('../services/search');
 const { intelligence } = require('../prompts');
 
@@ -8,7 +8,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// FIXED: Perform competitor research with sequential API calls to respect rate limits
+// FIXED: Perform competitor research with sequential API calls and simple homepage crawling
 async function performCompetitorResearch(competitorQueries, businessContext) {
   try {
     console.log('🔍 Starting competitor research with queries:', competitorQueries);
@@ -87,17 +87,17 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
       };
     }
     
-    // STEP 3: Crawl competitor websites (homepage only)
+    // STEP 3: FIXED - Crawl competitor homepages only (simple and fast)
     const competitorCrawlResults = [];
     for (const competitor of competitorUrls) {
       try {
-        console.log(`🌐 Crawling competitor: ${competitor.title} (${competitor.url})`);
-        const crawledData = await crawlWebsite(competitor.url);
+        console.log(`🏠 Crawling competitor homepage: ${competitor.title} (${competitor.url})`);
+        const crawledData = await crawlHomepageOnly(competitor.url);
         competitorCrawlResults.push({
           search_info: competitor,
           crawled_data: crawledData
         });
-        console.log(`✅ Successfully crawled: ${crawledData.company_name || competitor.title}`);
+        console.log(`✅ Successfully crawled homepage: ${crawledData.company_name || competitor.title}`);
         
         // Add small delay between crawls to be respectful to competitor sites
         await delay(500);

@@ -3,7 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { config, validateConfig } = require('./config/config');
-const apiRoutes = require('./routes/api');
+
+// Import separated route files
+const testingRoutes = require('./routes/testing');
+const intelligenceRoutes = require('./routes/intelligence');
+const contentRoutes = require('./routes/content');
+const searchRoutes = require('./routes/search');
 
 const app = express();
 
@@ -18,8 +23,11 @@ if (!validateConfig()) {
   process.exit(1);
 }
 
-// API routes
-app.use('/api', apiRoutes);
+// Mount all API routes on /api prefix
+app.use('/api', testingRoutes);
+app.use('/api', intelligenceRoutes);
+app.use('/api', contentRoutes);
+app.use('/api', searchRoutes);
 
 // Serve the main page
 app.get('/', (req, res) => {
@@ -34,8 +42,10 @@ app.listen(config.port, () => {
   console.log('   - Config management');
   console.log('   - Claude AI service');
   console.log('   - Brave Search service');
-  console.log('   - Intelligence controller');
-  console.log('   - Search controller');
-  console.log('   - Twitter controller');
-  console.log('   - API routes');
+  console.log('   - Separated controllers (4 files)');
+  console.log('   - Separated routes (4 files)');
+  console.log('   - API testing routes');
+  console.log('   - Intelligence routes');
+  console.log('   - Content routes');
+  console.log('   - Search routes');
 });
