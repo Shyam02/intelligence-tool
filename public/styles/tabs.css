@@ -1,0 +1,173 @@
+/* Tab Navigation Styles */
+
+.tab-navigation {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.tab-button {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #718096;
+    position: relative;
+    min-width: 120px;
+}
+
+.tab-button:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: translateY(-1px);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.tab-button.completed {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.tab-button.completed.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tab-status-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #48bb78;
+    border: 2px solid white;
+    display: none;
+}
+
+.tab-button.completed .tab-status-indicator {
+    display: block;
+}
+
+/* Tab Content Styles */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tab Content Containers */
+.tab-content-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    min-height: 400px;
+}
+
+/* Tab Specific Styles */
+.setup-tab h2 {
+    color: #667eea;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.idea-sources-tab h2 {
+    color: #ed8936;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.idea-bank-tab h2 {
+    color: #38b2ac;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.content-briefs-tab h2 {
+    color: #1DA1F2;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.settings-tab h2 {
+    color: #718096;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Empty State Styles */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #718096;
+}
+
+.empty-state h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.empty-state .arrow {
+    font-size: 24px;
+    margin: 20px 0;
+    color: #667eea;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tab-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tab-button {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: 5px;
+    }
+    
+    .tab-content-container {
+        padding: 25px;
+    }
+}

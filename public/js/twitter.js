@@ -27,6 +27,15 @@ async function generateTwitterContentBriefs() {
         // Display the briefs
         displayTwitterBriefs(briefs);
         
+        // UPDATED: Mark content briefs tab as completed and switch to it
+        markTabCompleted('contentBriefs');
+        switchTab('contentBriefs');
+        
+        // Update empty states
+        updateEmptyStates();
+        
+        console.log('✅ Twitter briefs generated and content briefs tab activated');
+        
     } catch (error) {
         console.error('Error generating Twitter briefs:', error);
         alert('Error generating Twitter briefs: ' + error.message);
@@ -88,17 +97,12 @@ function createBusinessContext() {
 
 // Display Twitter briefs
 function displayTwitterBriefs(briefsData) {
-    // Check if briefs container exists, if not create it
+    // Get the existing briefs container in the content briefs tab
     let briefsContainer = document.getElementById('twitterBriefs');
+    
     if (!briefsContainer) {
-        briefsContainer = document.createElement('div');
-        briefsContainer.id = 'twitterBriefs';
-        briefsContainer.className = 'twitter-briefs-container';
-        briefsContainer.style.display = 'none';
-        
-        // Insert after search results
-        const searchResults = document.getElementById('searchResults');
-        searchResults.parentNode.insertBefore(briefsContainer, searchResults.nextSibling);
+        console.error('Twitter briefs container not found');
+        return;
     }
     
     // Build HTML for briefs
@@ -153,5 +157,6 @@ function displayTwitterBriefs(briefsData) {
     
     briefsContainer.innerHTML = briefsHTML;
     briefsContainer.style.display = 'block';
-    briefsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    console.log('✅ Twitter briefs displayed in content briefs tab');
 }

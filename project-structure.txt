@@ -3,9 +3,12 @@
 ├── config
 │   └── config.js
 ├── controllers
-│   ├── intelligence.js
+│   ├── businessIntelligence.js
+│   ├── competitorResearch.js
+│   ├── queryGeneration.js
 │   ├── search.js
-│   └── twitter.js
+│   ├── twitter.js
+│   └── websiteCrawling.js
 ├── package-lock.json
 ├── package.json
 ├── project-structure.txt
@@ -38,11 +41,15 @@
 │       ├── responsive.css
 │       └── twitter-briefs.css
 ├── routes
-│   └── api.js
+│   ├── content.js
+│   ├── intelligence.js
+│   ├── search.js
+│   └── testing.js
 ├── server.js
 └── services
     ├── ai.js
     ├── htmlParser.js
-    └── search.js
+    ├── search.js
+    └── websiteCrawler.js
 
-11 directories, 35 files
+11 directories, 42 files

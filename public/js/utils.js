@@ -92,7 +92,7 @@ function copyTweet(tweetText, button) {
     }
 }
 
-// UPDATED: Reset form and application state with clean data structure
+// UPDATED: Reset form and application state with clean data structure and tab navigation
 function resetForm() {
     // Reset all form data
     const form = document.getElementById('onboardingForm');
@@ -103,7 +103,15 @@ function resetForm() {
         userInput: null,
         websiteIntelligence: null,
         foundationalIntelligence: null,
-        searchResults: []
+        searchResults: [],
+        currentTab: 'setup',                // Reset to setup tab
+        tabsCompleted: {                    // Reset completion status
+            setup: false,
+            ideaSources: false,
+            ideaBank: false,
+            contentBriefs: false,
+            settings: true                  // Settings is always available
+        }
     };
     
     // Hide all result containers
@@ -122,13 +130,19 @@ function resetForm() {
     const twitterBriefs = document.getElementById('twitterBriefs');
     if (twitterBriefs) {
         twitterBriefs.style.display = 'none';
+        twitterBriefs.innerHTML = ''; // Clear content
     }
     
     // Show form container
     document.querySelector('.form-container').style.display = 'block';
     
+    // UPDATED: Reset tab navigation to setup tab
+    switchTab('setup');
+    updateTabAvailability();
+    updateEmptyStates();
+    
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    console.log('✅ Application state reset with clean data structure');
+    console.log('✅ Application state reset with clean data structure and tab navigation');
 }

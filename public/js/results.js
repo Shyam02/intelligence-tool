@@ -42,19 +42,18 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
     delete foundationalWithoutCompetitor.competitor_intelligence; // Remove competitor data for separate display
     document.getElementById('intelligenceOutput').textContent = JSON.stringify(foundationalWithoutCompetitor, null, 2);
     
-    // Display 4: NEW - Competitor Intelligence Analysis
+    // Display 4: Competitor Intelligence Analysis
     displayCompetitorIntelligence(foundationalIntelligence.competitor_intelligence);
     
     // Update section titles for clarity
     updateSectionTitles();
     
-    // Show results container
-    const resultsContainer = document.getElementById('resultsContainer');
-    resultsContainer.style.display = 'block';
-    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    // NOTE: Results container visibility is now handled by the calling function
+    // to support tab navigation - no longer auto-scroll here
+    console.log('✅ Intelligence results displayed in setup tab');
 }
 
-// NEW FUNCTION: Display competitor intelligence section
+// Display competitor intelligence section
 function displayCompetitorIntelligence(competitorIntelligence) {
     // Create or update competitor intelligence section
     let competitorSection = document.getElementById('competitorIntelligenceSection');

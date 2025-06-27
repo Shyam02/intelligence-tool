@@ -150,7 +150,7 @@ function generateCategoryQuestions(category) {
     categoryQuestions.innerHTML = questionsHTML;
 }
 
-// UPDATED: Handle form submission with enhanced loading message for competitor research
+// UPDATED: Handle form submission with enhanced loading message and tab navigation
 async function handleFormSubmission(e) {
     e.preventDefault();
     
@@ -227,6 +227,14 @@ async function handleFormSubmission(e) {
             window.appState.websiteIntelligence, 
             window.appState.foundationalIntelligence
         );
+        
+        // UPDATED: Mark setup tab as completed and enable idea sources tab
+        markTabCompleted('setup');
+        
+        // Show the "Generate Search Queries" button by making results container visible
+        document.getElementById('resultsContainer').style.display = 'block';
+        
+        console.log('✅ Setup completed successfully, ready for idea sources');
         
     } catch (error) {
         console.error('Error during form submission:', error);

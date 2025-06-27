@@ -1,7 +1,7 @@
 // Search functionality and article handling
 
 // Generate search queries from foundational intelligence data
-async function generateSearchQueries() {
+async function generateQueries() {
     if (!window.appState.foundationalIntelligence) {
         alert('No foundational intelligence data available');
         return;
@@ -27,11 +27,19 @@ async function generateSearchQueries() {
         // Show queries container
         const queriesContainer = document.getElementById('queriesContainer');
         queriesContainer.style.display = 'block';
-        queriesContainer.scrollIntoView({ behavior: 'smooth' });
+        
+        // UPDATED: Mark idea sources tab as completed and switch to it
+        markTabCompleted('ideaSources');
+        switchTab('ideaSources');
+        
+        // Update empty states
+        updateEmptyStates();
         
         // Reset button
         generateBtn.textContent = originalText;
         generateBtn.disabled = false;
+        
+        console.log('✅ Search queries generated and idea sources tab activated');
         
     } catch (error) {
         console.error('Error:', error);
@@ -73,7 +81,15 @@ async function executeTestSearch() {
         // Show search results container
         document.getElementById('searchResults').style.display = 'block';
         
+        // UPDATED: Mark idea bank tab as completed and switch to it
+        markTabCompleted('ideaBank');
+        switchTab('ideaBank');
+        
+        // Update empty states
+        updateEmptyStates();
+        
         console.log('✅ Successfully received', searchData.articles?.length || 0, 'articles');
+        console.log('✅ Switched to idea bank tab with search results');
         
     } catch (error) {
         console.error('Search execution error:', error);
