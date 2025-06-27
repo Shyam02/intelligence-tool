@@ -128,7 +128,6 @@
             <div class="tab-content-container idea-sources-tab">
                 <h2>💡 Idea Generation Sources</h2>
                 
-                <!-- FIXED: Better layout - stacked instead of side by side -->
                 <div class="idea-sources-layout">
                     <!-- Search Intelligence Section -->
                     <div class="source-section search-section">
@@ -165,7 +164,7 @@
                             <div class="test-search-section">
                                 <h4>🔎 Test Search Query</h4>
                                 <div class="search-test">
-                                    <input type="text" id="testQuery" placeholder="Paste a query here to test it">
+                                    <input type="text" id="testQuery" placeholder="Paste a search query here to test it">
                                     <button onclick="executeTestSearch()" class="test-btn">Execute Search</button>
                                 </div>
                             </div>
@@ -186,16 +185,31 @@
                                 <button onclick="discoverSubreddits()" class="discover-subreddits-btn">
                                     📍 Discover Subreddits
                                 </button>
-                                
-                                <button onclick="searchReddit()" class="search-reddit-btn">
-                                    🔍 Search Discussions
-                                </button>
                             </div>
                             
                             <!-- Subreddit Discovery Results -->
                             <div id="subredditResults" style="display: none;"></div>
                             
-                            <!-- Reddit Search Results -->
+                            <!-- UPDATED: Reddit Queries Display -->
+                            <div class="reddit-queries-container" id="redditQueriesContainer" style="display: none;">
+                                <div class="query-section">
+                                    <h4>Reddit Discussion Queries</h4>
+                                    <div class="copy-section">
+                                        <pre id="redditQueriesOutput"></pre>
+                                        <button class="copy-btn" onclick="copyToClipboard('redditQueriesOutput', this)">📋 Copy Reddit Queries</button>
+                                    </div>
+                                </div>
+
+                                <div class="test-search-section">
+                                    <h4>🔍 Test Reddit Query</h4>
+                                    <div class="search-test">
+                                        <input type="text" id="testRedditQuery" placeholder="Paste a Reddit query here to test it">
+                                        <button onclick="executeTestRedditSearch()" class="test-btn">Execute Reddit Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Reddit Search Results Summary (No longer shows full results) -->
                             <div id="redditSearchResults" style="display: none;"></div>
                         </div>
                     </div>

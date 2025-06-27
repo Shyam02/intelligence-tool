@@ -1,4 +1,4 @@
-// Reddit API service - Core Reddit communication functionality
+// Reddit API service - Core Reddit communication functionality with FIXED response handling
 const axios = require('axios');
 const { config } = require('../config/config');
 
@@ -27,7 +27,7 @@ async function getRedditAccessToken() {
   }
 }
 
-// Search Reddit for posts and discussions
+// FIXED: Search Reddit for posts and discussions with proper error handling
 async function searchReddit(query, subreddit = null, timeFrame = 'month', limit = 25) {
   try {
     console.log('🔍 Searching Reddit for:', query, subreddit ? `in r/${subreddit}` : 'sitewide');
@@ -59,13 +59,99 @@ async function searchReddit(query, subreddit = null, timeFrame = 'month', limit 
       }
     });
     
-    const posts = response.data.data.children.map(child => child.data);
-    console.log('✅ Reddit search completed:', posts.length, 'posts found');
+    console.log('📊 Reddit API raw response structure:', {
+      status: response.status,
+      hasData: !!response.data,
+      dataKeys: response.data ? Object.keys(response.data) : 'none',
+      dataType: typeof response.data
+    });
     
-    return posts;
+    // FIXED: Better response structure handling
+    if (!response.data) {
+      console.log('⚠️ Reddit API returned no data');
+      return [];
+    }
+    
+    // Log the actual structure we received
+    console.log('📋 Reddit response structure:', JSON.stringify(response.data, null, 2).substring(0, 500));
+    
+    // FIXED: Handle different possible response structures
+    let posts = [];
+    
+    // Try the expected structure first
+    if (response.data.data && response.data.data.children) {
+      posts = response.data.data.children.map(child => child.data);
+      console.log('✅ Used standard Reddit response structure');
+    }
+    // Try alternative structure
+    else if (response.data.children) {
+      posts = response.data.children.map(child => child.data);
+      console.log('✅ Used alternative Reddit response structure');
+    }
+    // Try direct data array
+    else if (Array.isArray(response.data)) {
+      posts = response.data;
+      console.log('✅ Used direct array Reddit response structure');
+    }
+    // Handle empty but successful response
+    else if (response.data.error) {
+      console.log('⚠️ Reddit API returned error:', response.data.error);
+      return [];
+    }
+    else {
+      console.log('⚠️ Unexpected Reddit response structure, trying to extract data...');
+      
+      // Try to find any array in the response
+      const findArrayInObject = (obj) => {
+        if (Array.isArray(obj)) return obj;
+        if (typeof obj === 'object' && obj !== null) {
+          for (const key in obj) {
+            const result = findArrayInObject(obj[key]);
+            if (result) return result;
+          }
+        }
+        return null;
+      };
+      
+      const foundArray = findArrayInObject(response.data);
+      if (foundArray && foundArray.length > 0) {
+        posts = foundArray.filter(item => item && typeof item === 'object');
+        console.log('✅ Found array data in Reddit response');
+      } else {
+        console.log('❌ No usable data found in Reddit response');
+        return [];
+      }
+    }
+    
+    // Validate posts
+    if (!Array.isArray(posts)) {
+      console.log('⚠️ Posts is not an array:', typeof posts);
+      return [];
+    }
+    
+    // Filter valid posts
+    const validPosts = posts.filter(post => 
+      post && 
+      typeof post === 'object' && 
+      (post.title || post.name || post.id)
+    );
+    
+    console.log('✅ Reddit search completed:', validPosts.length, 'valid posts found out of', posts.length, 'total items');
+    
+    return validPosts;
     
   } catch (error) {
     console.error('❌ Reddit search failed:', error.response?.status, error.message);
+    
+    // Log more details for debugging
+    if (error.response) {
+      console.error('📊 Reddit API error details:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data
+      });
+    }
+    
     throw new Error(`Reddit search failed: ${error.message}`);
   }
 }
@@ -95,7 +181,18 @@ async function discoverSubreddits(keywords, limit = 10) {
           }
         });
         
-        const foundSubreddits = response.data.data.children.map(child => ({
+        // FIXED: Same structure handling for subreddit search
+        let subredditData = [];
+        if (response.data.data && response.data.data.children) {
+          subredditData = response.data.data.children;
+        } else if (response.data.children) {
+          subredditData = response.data.children;
+        } else {
+          console.log('⚠️ Unexpected subreddit response structure for keyword:', keyword);
+          continue;
+        }
+        
+        const foundSubreddits = subredditData.map(child => ({
           name: child.data.display_name,
           title: child.data.title,
           description: child.data.public_description,
@@ -134,48 +231,59 @@ async function discoverSubreddits(keywords, limit = 10) {
 
 // Format Reddit posts to match existing article structure
 function formatRedditPostsAsArticles(redditPosts) {
+  console.log('📝 Formatting', redditPosts.length, 'Reddit posts as articles');
+  
   return redditPosts.map((post, index) => {
+    // Handle different post structures
+    const title = post.title || post.name || `Reddit Post ${index + 1}`;
+    const selftext = post.selftext || post.body || '';
+    const subreddit = post.subreddit || 'unknown';
+    const score = post.score || post.ups || 0;
+    const numComments = post.num_comments || post.comment_count || 0;
+    const permalink = post.permalink || `/r/${subreddit}/comments/${post.id}/`;
+    const createdUtc = post.created_utc || Math.floor(Date.now() / 1000);
+    
     // Create engaging title
-    const title = post.title.length > 80 
-      ? `${post.title.substring(0, 80)}...` 
-      : post.title;
+    const displayTitle = title.length > 80 
+      ? `${title.substring(0, 80)}...` 
+      : title;
     
     // Create preview with context
     let preview = '';
-    if (post.selftext && post.selftext.trim()) {
+    if (selftext && selftext.trim()) {
       // For text posts, use the content
-      preview = post.selftext.length > 200 
-        ? `"${post.selftext.substring(0, 200)}..."` 
-        : `"${post.selftext}"`;
+      preview = selftext.length > 200 
+        ? `"${selftext.substring(0, 200)}..."` 
+        : `"${selftext}"`;
     } else {
       // For link posts, use title as preview
-      preview = `Reddit discussion: "${title}"`;
+      preview = `Reddit discussion: "${displayTitle}"`;
     }
     
     // Add engagement context
-    const engagement = `(${post.score || 0} upvotes, ${post.num_comments || 0} comments from r/${post.subreddit})`;
+    const engagement = `(${score} upvotes, ${numComments} comments from r/${subreddit})`;
     preview += ` ${engagement}`;
     
     // Format date
-    const publishedDate = post.created_utc 
-      ? new Date(post.created_utc * 1000).toISOString().split('T')[0]
+    const publishedDate = createdUtc 
+      ? new Date(createdUtc * 1000).toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0];
     
     return {
       id: `reddit_${index + 1}`,
-      title: `Reddit: ${title}`,
-      url: `https://reddit.com${post.permalink}`,
+      title: `Reddit: ${displayTitle}`,
+      url: `https://reddit.com${permalink}`,
       preview: preview,
       domain: 'reddit.com',
       published: publishedDate,
       selected: false,
       // Additional Reddit-specific metadata for internal use
       source_type: 'reddit',
-      subreddit: post.subreddit,
-      upvotes: post.score || 0,
-      comments: post.num_comments || 0,
-      post_type: post.selftext ? 'text' : 'link',
-      original_title: post.title
+      subreddit: subreddit,
+      upvotes: score,
+      comments: numComments,
+      post_type: selftext ? 'text' : 'link',
+      original_title: title
     };
   });
 }
@@ -202,7 +310,17 @@ async function getTrendingPosts(subredditNames, limit = 10) {
           }
         });
         
-        const posts = response.data.data.children.map(child => child.data);
+        // FIXED: Same structure handling for trending posts
+        let posts = [];
+        if (response.data.data && response.data.data.children) {
+          posts = response.data.data.children.map(child => child.data);
+        } else if (response.data.children) {
+          posts = response.data.children.map(child => child.data);
+        } else {
+          console.log('⚠️ Unexpected trending response structure for subreddit:', subredditName);
+          continue;
+        }
+        
         allPosts.push(...posts);
         
         // Small delay between requests

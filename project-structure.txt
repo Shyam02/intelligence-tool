@@ -6,6 +6,7 @@
 │   ├── businessIntelligence.js
 │   ├── competitorResearch.js
 │   ├── queryGeneration.js
+│   ├── reddit.js
 │   ├── search.js
 │   ├── twitter.js
 │   └── websiteCrawling.js
@@ -16,17 +17,20 @@
 │   ├── content
 │   │   └── twitterBriefs.js
 │   ├── index.js
-│   └── intelligence
-│       ├── businessAnalysis.js
-│       ├── competitorAnalysis.js
-│       ├── linkSelection.js
-│       └── websiteCrawling.js
+│   ├── intelligence
+│   │   ├── businessAnalysis.js
+│   │   ├── competitorAnalysis.js
+│   │   ├── linkSelection.js
+│   │   └── websiteCrawling.js
+│   └── reddit
+│       └── queryGeneration.js
 ├── public
 │   ├── index.html
 │   ├── js
 │   │   ├── api.js
 │   │   ├── app.js
 │   │   ├── forms.js
+│   │   ├── reddit.js
 │   │   ├── results.js
 │   │   ├── search.js
 │   │   ├── twitter.js
@@ -38,18 +42,22 @@
 │       ├── components.css
 │       ├── forms.css
 │       ├── layout.css
+│       ├── reddit.css
 │       ├── responsive.css
+│       ├── tabs.css
 │       └── twitter-briefs.css
 ├── routes
 │   ├── content.js
 │   ├── intelligence.js
+│   ├── reddit.js
 │   ├── search.js
 │   └── testing.js
 ├── server.js
 └── services
     ├── ai.js
     ├── htmlParser.js
+    ├── reddit.js
     ├── search.js
     └── websiteCrawler.js
 
-11 directories, 42 files
+12 directories, 49 files

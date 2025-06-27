@@ -57,7 +57,7 @@ async function discoverRelevantSubreddits(req, res) {
   }
 }
 
-// Search Reddit discussions using generated queries
+// UPDATED: Search Reddit discussions using generated queries (supports single or multiple queries)
 async function searchRedditDiscussions(req, res) {
   try {
     const { searchQueries, subreddits, timeFrame = 'month' } = req.body;
@@ -71,22 +71,28 @@ async function searchRedditDiscussions(req, res) {
     const allPosts = [];
     const searchResults = [];
     
-    // Execute searches (limit to prevent rate limiting)
-    const limitedQueries = searchQueries.slice(0, 5); // Limit to 5 queries
+    // UPDATED: Support both single and multiple queries efficiently
+    const limitedQueries = searchQueries.slice(0, 5); // Limit to 5 queries maximum for rate limiting
+    const isMultipleQueries = limitedQueries.length > 1;
     
+    // Execute searches
     for (let i = 0; i < limitedQueries.length; i++) {
       const query = limitedQueries[i];
       console.log(`🔍 Executing search ${i + 1}/${limitedQueries.length}: ${query}`);
       
       try {
+        // UPDATED: Adjust search limits based on single vs multiple queries
+        const searchLimit = isMultipleQueries ? 10 : 15; // More results for single query
+        const subredditLimit = isMultipleQueries ? 5 : 8;  // More subreddit results for single query
+        
         // Search sitewide first
-        const sitewideResults = await searchReddit(query, null, timeFrame, 10);
+        const sitewideResults = await searchReddit(query, null, timeFrame, searchLimit);
         
         let subredditResults = [];
         // If specific subreddits provided, search within them too
         if (subreddits && subreddits.length > 0) {
           const targetSubreddit = subreddits[i % subreddits.length]; // Rotate through subreddits
-          subredditResults = await searchReddit(query, targetSubreddit, timeFrame, 5);
+          subredditResults = await searchReddit(query, targetSubreddit, timeFrame, subredditLimit);
         }
         
         const combinedResults = [...sitewideResults, ...subredditResults];
@@ -101,10 +107,11 @@ async function searchRedditDiscussions(req, res) {
         
         console.log(`✅ Search ${i + 1} completed: ${combinedResults.length} posts found`);
         
-        // Rate limiting: wait between searches
+        // UPDATED: Shorter delay for single queries, longer for multiple
         if (i < limitedQueries.length - 1) {
-          console.log('⏱️ Waiting 1 second before next search...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          const delay = isMultipleQueries ? 1000 : 500; // 0.5s for single, 1s for multiple
+          console.log(`⏱️ Waiting ${delay}ms before next search...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
         
       } catch (searchError) {
@@ -134,8 +141,9 @@ async function searchRedditDiscussions(req, res) {
       return scoreB - scoreA;
     });
     
-    // Format as articles for existing system
-    const formattedArticles = formatRedditPostsAsArticles(sortedPosts.slice(0, 25)); // Limit to top 25
+    // UPDATED: Return more results for single queries
+    const maxResults = isMultipleQueries ? 25 : 35;
+    const formattedArticles = formatRedditPostsAsArticles(sortedPosts.slice(0, maxResults));
     
     console.log('✅ Reddit discussion search completed:', formattedArticles.length, 'unique discussions found');
     
@@ -145,6 +153,7 @@ async function searchRedditDiscussions(req, res) {
       search_results: searchResults,
       total_posts_found: uniquePosts.length,
       articles: formattedArticles,
+      query_type: isMultipleQueries ? 'multiple' : 'single',
       timestamp: new Date().toISOString()
     });
     

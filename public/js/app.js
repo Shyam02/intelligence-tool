@@ -14,7 +14,7 @@ window.appState = {
         contentBriefs: false,
         settings: true                  // Settings is always available
     },
-    // NEW: Reddit-specific state
+    // Reddit-specific state
     discoveredSubreddits: [],           // Discovered relevant subreddits
     redditQueries: []                   // Generated Reddit search queries
 };
@@ -165,9 +165,10 @@ window.deselectAllArticles = deselectAllArticles;
 window.copySelectedArticles = copySelectedArticles;
 window.copyTweet = copyTweet;
 
-// NEW: Reddit function wrappers
+// UPDATED: Reddit function wrappers - added new functions
 window.discoverSubreddits = discoverRelevantSubreddits;
-window.searchReddit = searchRedditDiscussions;
+window.generateRedditQueries = generateRedditQueries;
+window.executeTestRedditSearch = executeTestRedditSearch;
 
 // Tab navigation functions for global access
 window.switchTab = switchTab;

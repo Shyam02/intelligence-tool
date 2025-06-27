@@ -1,6 +1,6 @@
 // Search functionality and article handling
 
-// Generate search queries from foundational intelligence data
+// UPDATED: Generate search queries AND Reddit queries from foundational intelligence data
 async function generateQueries() {
     if (!window.appState.foundationalIntelligence) {
         alert('No foundational intelligence data available');
@@ -14,19 +14,29 @@ async function generateQueries() {
         generateBtn.textContent = '⏳ Generating Queries...';
         generateBtn.disabled = true;
         
+        // Generate search queries
         const queries = await generateQueriesFromAPI(window.appState.foundationalIntelligence);
         
         console.log('Queries structure:', queries);
         console.log('Has competitor_queries?', !!queries?.competitor_queries);
         
-        // FIXED: Display ALL queries like before (not simplified)
+        // Display search queries
         document.getElementById('competitorQueriesOutput').textContent = JSON.stringify(queries.competitor_queries, null, 2);
         document.getElementById('keywordQueriesOutput').textContent = JSON.stringify(queries.keyword_queries, null, 2);
         document.getElementById('contentQueriesOutput').textContent = JSON.stringify(queries.content_queries, null, 2);
         
-        // Show queries container
+        // Show search queries container
         const queriesContainer = document.getElementById('queriesContainer');
         queriesContainer.style.display = 'block';
+        
+        // UPDATED: Also generate Reddit queries
+        try {
+            console.log('🔍 Also generating Reddit queries...');
+            await generateRedditQueries();
+        } catch (redditError) {
+            console.error('⚠️ Reddit query generation failed, but continuing with search queries:', redditError.message);
+            // Don't fail the entire process if Reddit queries fail
+        }
         
         // Mark idea sources tab as completed and switch to it
         markTabCompleted('ideaSources');
@@ -45,7 +55,7 @@ async function generateQueries() {
         generateBtn.textContent = originalText;
         generateBtn.disabled = false;
         
-        console.log('✅ Search queries generated and idea sources tab activated');
+        console.log('✅ Search queries and Reddit queries generated, idea sources tab activated');
         
     } catch (error) {
         console.error('Error:', error);
@@ -58,7 +68,7 @@ async function generateQueries() {
     }
 }
 
-// Execute test search
+// Execute test search (NO CHANGES)
 async function executeTestSearch() {
     const query = document.getElementById('testQuery').value.trim();
     
@@ -109,7 +119,7 @@ async function executeTestSearch() {
     }
 }
 
-// UPDATED: Display articles with Reddit support (unified display)
+// UPDATED: Display articles with Reddit support (unified display) (NO CHANGES)
 function displayArticles(articles) {
     if (!articles || !Array.isArray(articles) || articles.length === 0) {
         document.getElementById('searchResultsOutput').innerHTML = '<p>No articles found.</p>';
@@ -184,7 +194,7 @@ function displayArticles(articles) {
     });
 }
 
-// Display API call information for debugging
+// Display API call information for debugging (NO CHANGES)
 function displayAPICallInfo(searchData) {
     const apiInfoHTML = `
         <div class="api-info-container">
@@ -210,7 +220,7 @@ function displayAPICallInfo(searchData) {
     existingOutput.innerHTML = apiInfoHTML + existingOutput.innerHTML;
 }
 
-// FIXED: Article selection functions with proper ID handling
+// FIXED: Article selection functions with proper ID handling (NO CHANGES)
 function toggleArticleSelection(articleId) {
     // Ensure articleId is treated as string
     const targetId = String(articleId);

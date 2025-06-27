@@ -92,13 +92,13 @@ function copyTweet(tweetText, button) {
     }
 }
 
-// UPDATED: Reset form and application state with clean data structure and tab navigation
+// UPDATED: Reset form and application state with Reddit support
 function resetForm() {
     // Reset all form data
     const form = document.getElementById('onboardingForm');
     form.reset();
     
-    // Reset clean global state structure
+    // Reset clean global state structure including Reddit data
     window.appState = {
         userInput: null,
         websiteIntelligence: null,
@@ -111,7 +111,10 @@ function resetForm() {
             ideaBank: false,
             contentBriefs: false,
             settings: true                  // Settings is always available
-        }
+        },
+        // Reset Reddit state
+        discoveredSubreddits: [],
+        redditQueries: []
     };
     
     // Hide all result containers
@@ -119,6 +122,22 @@ function resetForm() {
     document.getElementById('queriesContainer').style.display = 'none';
     document.getElementById('categorySpecificSection').style.display = 'none';
     document.getElementById('searchResults').style.display = 'none';
+    
+    // UPDATED: Hide Reddit-specific containers
+    const redditQueriesContainer = document.getElementById('redditQueriesContainer');
+    if (redditQueriesContainer) {
+        redditQueriesContainer.style.display = 'none';
+    }
+    
+    const subredditResults = document.getElementById('subredditResults');
+    if (subredditResults) {
+        subredditResults.style.display = 'none';
+    }
+    
+    const redditSearchResults = document.getElementById('redditSearchResults');
+    if (redditSearchResults) {
+        redditSearchResults.style.display = 'none';
+    }
     
     // Hide website intelligence section if it exists
     const websiteSection = document.getElementById('websiteIntelligenceSection');
@@ -144,5 +163,5 @@ function resetForm() {
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    console.log('✅ Application state reset with clean data structure and tab navigation');
+    console.log('✅ Application state reset with clean data structure, tab navigation, and Reddit support');
 }
