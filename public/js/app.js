@@ -5,7 +5,7 @@ window.appState = {
     userInput: null,                    // Pure user form input
     websiteIntelligence: null,          // AI-extracted website data  
     foundationalIntelligence: null,     // Strategic business analysis
-    searchResults: [],                  // Search articles
+    searchResults: [],                  // Search articles + Reddit posts (unified)
     currentTab: 'setup',                // Current active tab
     tabsCompleted: {                    // Track which tabs have been completed
         setup: false,
@@ -13,7 +13,10 @@ window.appState = {
         ideaBank: false,
         contentBriefs: false,
         settings: true                  // Settings is always available
-    }
+    },
+    // NEW: Reddit-specific state
+    discoveredSubreddits: [],           // Discovered relevant subreddits
+    redditQueries: []                   // Generated Reddit search queries
 };
 
 // Initialize the application
@@ -25,6 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize tab system
     initializeTabs();
+    
+    // Initialize Reddit monitoring
+    initializeRedditMonitor();
     
     console.log('Application initialized successfully');
     console.log('Clean state structure:', Object.keys(window.appState));
@@ -139,12 +145,15 @@ function updateEmptyStates() {
             contentBriefsEmpty.style.display = 'none';
         }
     }
+    
+    // Update Reddit monitor status
+    updateRedditMonitorStatus();
 }
 
 // Global function wrappers for HTML onclick handlers
 window.testAPI = testAPI;
 window.crawlWebsiteAPI = crawlWebsiteAPI;
-// FIXED: Point directly to the search.js function to avoid circular calls
+// Point directly to the search.js function to avoid circular calls
 window.generateQueries = generateQueries;
 window.executeTestSearch = executeTestSearch;
 window.generateTwitterBriefs = generateTwitterContentBriefs;
@@ -155,6 +164,10 @@ window.selectAllArticles = selectAllArticles;
 window.deselectAllArticles = deselectAllArticles;
 window.copySelectedArticles = copySelectedArticles;
 window.copyTweet = copyTweet;
+
+// NEW: Reddit function wrappers
+window.discoverSubreddits = discoverRelevantSubreddits;
+window.searchReddit = searchRedditDiscussions;
 
 // Tab navigation functions for global access
 window.switchTab = switchTab;

@@ -19,7 +19,7 @@ async function generateQueries() {
         console.log('Queries structure:', queries);
         console.log('Has competitor_queries?', !!queries?.competitor_queries);
         
-        // Display queries
+        // FIXED: Display ALL queries like before (not simplified)
         document.getElementById('competitorQueriesOutput').textContent = JSON.stringify(queries.competitor_queries, null, 2);
         document.getElementById('keywordQueriesOutput').textContent = JSON.stringify(queries.keyword_queries, null, 2);
         document.getElementById('contentQueriesOutput').textContent = JSON.stringify(queries.content_queries, null, 2);
@@ -28,12 +28,18 @@ async function generateQueries() {
         const queriesContainer = document.getElementById('queriesContainer');
         queriesContainer.style.display = 'block';
         
-        // UPDATED: Mark idea sources tab as completed and switch to it
+        // Mark idea sources tab as completed and switch to it
         markTabCompleted('ideaSources');
         switchTab('ideaSources');
         
         // Update empty states
         updateEmptyStates();
+        
+        // Update search status
+        const searchStatus = document.getElementById('searchStatus');
+        if (searchStatus) {
+            searchStatus.textContent = 'Queries generated - ready to search';
+        }
         
         // Reset button
         generateBtn.textContent = originalText;
@@ -71,7 +77,10 @@ async function executeTestSearch() {
         
         // Store articles globally and display them
         if (searchData.articles && Array.isArray(searchData.articles)) {
-            window.appState.searchResults = searchData.articles;
+            // UPDATED: Merge with existing search results instead of replacing
+            const existingResults = window.appState.searchResults || [];
+            window.appState.searchResults = [...existingResults, ...searchData.articles];
+            
             displayArticles(window.appState.searchResults);
         }
         
@@ -81,7 +90,7 @@ async function executeTestSearch() {
         // Show search results container
         document.getElementById('searchResults').style.display = 'block';
         
-        // UPDATED: Mark idea bank tab as completed and switch to it
+        // Mark idea bank tab as completed and switch to it
         markTabCompleted('ideaBank');
         switchTab('ideaBank');
         
@@ -89,7 +98,7 @@ async function executeTestSearch() {
         updateEmptyStates();
         
         console.log('✅ Successfully received', searchData.articles?.length || 0, 'articles');
-        console.log('✅ Switched to idea bank tab with search results');
+        console.log('✅ Total articles in state:', window.appState.searchResults.length);
         
     } catch (error) {
         console.error('Search execution error:', error);
@@ -100,17 +109,21 @@ async function executeTestSearch() {
     }
 }
 
-// Display articles with selection interface
+// UPDATED: Display articles with Reddit support (unified display)
 function displayArticles(articles) {
     if (!articles || !Array.isArray(articles) || articles.length === 0) {
         document.getElementById('searchResultsOutput').innerHTML = '<p>No articles found.</p>';
         return;
     }
     
+    // Separate by source type for display
+    const searchArticles = articles.filter(article => article.source_type !== 'reddit');
+    const redditPosts = articles.filter(article => article.source_type === 'reddit');
+    
     let articlesHTML = `
         <div class="articles-container">
             <div class="articles-header">
-                <h4>📰 Found ${articles.length} Articles</h4>
+                <h4>📰 Found ${articles.length} Ideas (${searchArticles.length} articles, ${redditPosts.length} Reddit discussions)</h4>
                 <div class="selection-controls">
                     <button onclick="selectAllArticles()" class="selection-btn">Select All</button>
                     <button onclick="deselectAllArticles()" class="selection-btn">Deselect All</button>
@@ -121,16 +134,29 @@ function displayArticles(articles) {
     `;
     
     articles.forEach(article => {
+        const isReddit = article.source_type === 'reddit';
+        const sourceIcon = isReddit ? '💬' : '🔍';
+        const sourceClass = isReddit ? 'reddit' : 'search';
+        
+        // FIXED: Ensure article ID is treated as string consistently
+        const articleId = String(article.id);
+        
         articlesHTML += `
-            <div class="article-card" data-article-id="${article.id}">
+            <div class="article-card" data-article-id="${articleId}" data-source="${sourceClass}">
                 <div class="article-checkbox">
-                    <input type="checkbox" id="article-${article.id}" onchange="toggleArticleSelection(${article.id})" ${article.selected ? 'checked' : ''}>
+                    <input type="checkbox" id="article-${articleId}" onchange="toggleArticleSelection('${articleId}')" ${article.selected ? 'checked' : ''}>
                 </div>
                 <div class="article-content">
-                    <h5 class="article-title">${article.title}</h5>
+                    <h5 class="article-title">${sourceIcon} ${article.title}</h5>
                     <div class="article-meta">
                         <span class="article-domain">${article.domain}</span>
                         <span class="article-date">${article.published}</span>
+                        ${isReddit ? `
+                            <div class="reddit-engagement">
+                                <span class="reddit-upvotes">${article.upvotes || 0}</span>
+                                <span class="reddit-comments">${article.comments || 0}</span>
+                            </div>
+                        ` : ''}
                     </div>
                     <p class="article-preview">${article.preview}</p>
                     <a href="${article.url}" target="_blank" class="article-url">${article.url}</a>
@@ -148,6 +174,14 @@ function displayArticles(articles) {
     `;
     
     document.getElementById('searchResultsOutput').innerHTML = articlesHTML;
+    
+    // DEBUGGING: Log article selection state
+    console.log('📊 Article display state:', {
+        totalArticles: articles.length,
+        selectedArticles: articles.filter(a => a.selected).length,
+        searchArticles: searchArticles.length,
+        redditPosts: redditPosts.length
+    });
 }
 
 // Display API call information for debugging
@@ -176,31 +210,47 @@ function displayAPICallInfo(searchData) {
     existingOutput.innerHTML = apiInfoHTML + existingOutput.innerHTML;
 }
 
-// Article selection functions
+// FIXED: Article selection functions with proper ID handling
 function toggleArticleSelection(articleId) {
-    const article = window.appState.searchResults.find(a => a.id === articleId);
+    // Ensure articleId is treated as string
+    const targetId = String(articleId);
+    const article = window.appState.searchResults.find(a => String(a.id) === targetId);
+    
     if (article) {
         article.selected = !article.selected;
-        console.log(`Article ${articleId} ${article.selected ? 'selected' : 'deselected'}`);
+        console.log(`✅ Article ${targetId} ${article.selected ? 'selected' : 'deselected'} (${article.source_type || 'search'})`);
+        
+        // Update the checkbox state
+        const checkbox = document.getElementById(`article-${targetId}`);
+        if (checkbox) {
+            checkbox.checked = article.selected;
+        }
+        
+        // Debug: Log current selection state
+        const selectedCount = window.appState.searchResults.filter(a => a.selected).length;
+        console.log(`📊 Total selected: ${selectedCount}/${window.appState.searchResults.length}`);
+    } else {
+        console.error(`❌ Article with ID ${targetId} not found in searchResults`);
+        console.log('Available IDs:', window.appState.searchResults.map(a => String(a.id)));
     }
 }
 
 function selectAllArticles() {
     window.appState.searchResults.forEach(article => article.selected = true);
     window.appState.searchResults.forEach(article => {
-        const checkbox = document.getElementById(`article-${article.id}`);
+        const checkbox = document.getElementById(`article-${String(article.id)}`);
         if (checkbox) checkbox.checked = true;
     });
-    console.log('All articles selected');
+    console.log('✅ All articles selected (search + Reddit)');
 }
 
 function deselectAllArticles() {
     window.appState.searchResults.forEach(article => article.selected = false);
     window.appState.searchResults.forEach(article => {
-        const checkbox = document.getElementById(`article-${article.id}`);
+        const checkbox = document.getElementById(`article-${String(article.id)}`);
         if (checkbox) checkbox.checked = false;
     });
-    console.log('All articles deselected');
+    console.log('✅ All articles deselected');
 }
 
 function copySelectedArticles() {
@@ -212,15 +262,23 @@ function copySelectedArticles() {
     }
     
     // Format selected articles for copying
-    const copyText = selectedArticles.map(article => 
-        `Title: ${article.title}\nURL: ${article.url}\nPreview: ${article.preview}\nDomain: ${article.domain}\nPublished: ${article.published}\n${'='.repeat(50)}`
-    ).join('\n\n');
+    const copyText = selectedArticles.map(article => {
+        const sourceType = article.source_type === 'reddit' ? 'Reddit' : 'Search';
+        let formatText = `Source: ${sourceType}\nTitle: ${article.title}\nURL: ${article.url}\nPreview: ${article.preview}`;
+        
+        if (article.source_type === 'reddit') {
+            formatText += `\nSubreddit: r/${article.subreddit}\nUpvotes: ${article.upvotes}\nComments: ${article.comments}`;
+        }
+        
+        formatText += `\nDomain: ${article.domain}\nPublished: ${article.published}\n${'='.repeat(50)}`;
+        return formatText;
+    }).join('\n\n');
     
     // Try to copy to clipboard
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(copyText).then(() => {
             showCopySuccess(document.querySelector('.copy-selected-btn'));
-            console.log(`Copied ${selectedArticles.length} selected articles`);
+            console.log(`Copied ${selectedArticles.length} selected items (search + Reddit)`);
         }).catch(err => {
             console.log('Clipboard API failed:', err);
             fallbackCopyToClipboard(copyText, document.querySelector('.copy-selected-btn'));

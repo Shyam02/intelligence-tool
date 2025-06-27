@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles/articles.css">
     <link rel="stylesheet" href="styles/twitter-briefs.css">
     <link rel="stylesheet" href="styles/tabs.css">
+    <link rel="stylesheet" href="styles/reddit.css">
     <link rel="stylesheet" href="styles/responsive.css">
 </head>
 <body>
@@ -127,43 +128,76 @@
             <div class="tab-content-container idea-sources-tab">
                 <h2>💡 Idea Generation Sources</h2>
                 
-                <div class="queries-container" id="queriesContainer" style="display: none;">
-                    <h3>🔍 Generated Search Queries</h3>
-                    
-                    <div class="query-section">
-                        <h3>Competitor Discovery Queries</h3>
-                        <div class="copy-section">
-                            <pre id="competitorQueriesOutput"></pre>
-                            <button class="copy-btn" onclick="copyToClipboard('competitorQueriesOutput', this)">📋 Copy Competitor Queries</button>
+                <!-- FIXED: Better layout - stacked instead of side by side -->
+                <div class="idea-sources-layout">
+                    <!-- Search Intelligence Section -->
+                    <div class="source-section search-section">
+                        <div class="source-header">
+                            <h3>🔍 Search Intelligence</h3>
+                            <span class="source-status" id="searchStatus">Ready to generate queries</span>
+                        </div>
+                        
+                        <div class="queries-container" id="queriesContainer" style="display: none;">
+                            <div class="query-section">
+                                <h4>Competitor Discovery Queries</h4>
+                                <div class="copy-section">
+                                    <pre id="competitorQueriesOutput"></pre>
+                                    <button class="copy-btn" onclick="copyToClipboard('competitorQueriesOutput', this)">📋 Copy Competitor Queries</button>
+                                </div>
+                            </div>
+
+                            <div class="query-section">
+                                <h4>Keyword Intelligence Queries</h4>
+                                <div class="copy-section">
+                                    <pre id="keywordQueriesOutput"></pre>
+                                    <button class="copy-btn" onclick="copyToClipboard('keywordQueriesOutput', this)">📋 Copy Keyword Queries</button>
+                                </div>
+                            </div>
+
+                            <div class="query-section">
+                                <h4>Content Discovery Queries</h4>
+                                <div class="copy-section">
+                                    <pre id="contentQueriesOutput"></pre>
+                                    <button class="copy-btn" onclick="copyToClipboard('contentQueriesOutput', this)">📋 Copy Content Queries</button>
+                                </div>
+                            </div>
+
+                            <div class="test-search-section">
+                                <h4>🔎 Test Search Query</h4>
+                                <div class="search-test">
+                                    <input type="text" id="testQuery" placeholder="Paste a query here to test it">
+                                    <button onclick="executeTestSearch()" class="test-btn">Execute Search</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="query-section">
-                        <h3>Keyword Intelligence Queries</h3>
-                        <div class="copy-section">
-                            <pre id="keywordQueriesOutput"></pre>
-                            <button class="copy-btn" onclick="copyToClipboard('keywordQueriesOutput', this)">📋 Copy Keyword Queries</button>
+                    <!-- Reddit Intelligence Section -->
+                    <div class="source-section reddit-section">
+                        <div class="source-header">
+                            <h3>💬 Reddit Intelligence</h3>
+                            <span class="source-status" id="redditStatus">Ready to discover communities</span>
                         </div>
-                    </div>
-
-                    <div class="query-section">
-                        <h3>Content Discovery Queries</h3>
-                        <div class="copy-section">
-                            <pre id="contentQueriesOutput"></pre>
-                            <button class="copy-btn" onclick="copyToClipboard('contentQueriesOutput', this)">📋 Copy Content Queries</button>
+                        
+                        <div class="reddit-content">
+                            <p class="section-description">Monitor discussions and discover communities where your customers gather</p>
+                            
+                            <div class="reddit-actions">
+                                <button onclick="discoverSubreddits()" class="discover-subreddits-btn">
+                                    📍 Discover Subreddits
+                                </button>
+                                
+                                <button onclick="searchReddit()" class="search-reddit-btn">
+                                    🔍 Search Discussions
+                                </button>
+                            </div>
+                            
+                            <!-- Subreddit Discovery Results -->
+                            <div id="subredditResults" style="display: none;"></div>
+                            
+                            <!-- Reddit Search Results -->
+                            <div id="redditSearchResults" style="display: none;"></div>
                         </div>
-                    </div>
-
-                    <div class="test-search-section">
-                        <h3>🔎 Test Search Query</h3>
-                        <div class="search-test">
-                            <input type="text" id="testQuery" placeholder="Paste a query here to test it">
-                            <button onclick="executeTestSearch()" class="test-btn">Execute Search</button>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="reset-btn" onclick="resetForm()">🔄 Start Over</button>
                     </div>
                 </div>
 
@@ -172,6 +206,10 @@
                     <p>Complete the Setup tab first to generate search queries and start collecting content ideas.</p>
                     <div class="arrow">↤</div>
                     <p>Go to Setup tab to begin</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="reset-btn" onclick="resetForm()">🔄 Start Over</button>
                 </div>
             </div>
         </div>
@@ -246,6 +284,7 @@
     <script src="js/forms.js"></script>
     <script src="js/search.js"></script>
     <script src="js/twitter.js"></script>
+    <script src="js/reddit.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

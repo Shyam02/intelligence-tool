@@ -25,6 +25,17 @@ const config = {
         country: 'us',
         spellcheck: 1,
         searchLang: 'en'
+    },
+    
+    // Reddit API Configuration
+    reddit: {
+        clientId: process.env.REDDIT_CLIENT_ID,
+        clientSecret: process.env.REDDIT_CLIENT_SECRET,
+        userAgent: 'AI-Marketing-Intelligence-Tool/1.0',
+        rateLimit: {
+            requestsPerMinute: 60,
+            requestsPerHour: 600
+        }
     }
 };
 
@@ -40,6 +51,15 @@ function validateConfig() {
     
     if (!config.braveApiKey) {
         errors.push('BRAVE_API_KEY environment variable is required');
+    }
+    
+    // Reddit API validation
+    if (!config.reddit.clientId) {
+        console.warn('⚠️ REDDIT_CLIENT_ID not configured - Reddit features will be disabled');
+    }
+    
+    if (!config.reddit.clientSecret) {
+        console.warn('⚠️ REDDIT_CLIENT_SECRET not configured - Reddit features will be disabled');
     }
     
     if (errors.length > 0) {

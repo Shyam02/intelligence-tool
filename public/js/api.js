@@ -168,3 +168,99 @@ async function generateTwitterBriefsFromAPI(selectedArticles, businessContext) {
         throw new Error('Failed to generate Twitter briefs: ' + error.message);
     }
 }
+
+// NEW: Discover relevant subreddits
+async function discoverSubredditsAPI(foundationalIntelligence) {
+    try {
+        console.log('🔍 Discovering subreddits using business intelligence...');
+        
+        const response = await fetch('/api/discover-subreddits', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ foundationalIntelligence })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Subreddit discovery completed:', result);
+        return result;
+        
+    } catch (error) {
+        console.error('Error discovering subreddits:', error);
+        throw new Error('Failed to discover subreddits: ' + error.message);
+    }
+}
+
+// NEW: Generate Reddit search queries
+async function generateRedditQueriesAPI(foundationalIntelligence) {
+    try {
+        console.log('📝 Generating Reddit search queries...');
+        
+        // Generate simple queries from business intelligence
+        // Extract relevant information with fallbacks
+        const primaryProblem = foundationalIntelligence.pain_points?.primary_problem || 'productivity issues';
+        const productKeywords = foundationalIntelligence.core_keywords?.product_keywords || ['business tools'];
+        const targetMarket = foundationalIntelligence.target_market?.market_segment || 'small business';
+        const industryKeywords = foundationalIntelligence.core_keywords?.industry_keywords || ['productivity'];
+        const solutionKeywords = foundationalIntelligence.core_keywords?.solution_keywords || ['tools'];
+        const competitorName = foundationalIntelligence.competitor_intelligence?.competitor_analysis?.[0]?.company_name || 'current solutions';
+        
+        const queries = [
+            `${primaryProblem}`,
+            `looking for ${productKeywords[0]}`,
+            `${targetMarket} struggling with ${industryKeywords[0]}`,
+            `alternatives to ${competitorName}`,
+            `best ${solutionKeywords[0]} for ${targetMarket}`,
+            `${productKeywords[0]} recommendations`,
+            `frustrated with ${primaryProblem}`,
+            `${industryKeywords[0]} tools review`
+        ];
+        
+        console.log('✅ Reddit queries generated:', queries);
+        return queries;
+        
+    } catch (error) {
+        console.error('Error generating Reddit queries:', error);
+        throw new Error('Failed to generate Reddit queries: ' + error.message);
+    }
+}
+
+// NEW: Search Reddit discussions
+async function searchRedditAPI(searchQueries, discoveredSubreddits = []) {
+    try {
+        console.log('🔍 Searching Reddit discussions...');
+        
+        const subredditNames = discoveredSubreddits.map(sub => sub.name).slice(0, 5);
+        
+        const response = await fetch('/api/search-reddit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                searchQueries: searchQueries,
+                subreddits: subredditNames,
+                timeFrame: 'month'
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Reddit search completed:', result);
+        return result;
+        
+    } catch (error) {
+        console.error('Error searching Reddit:', error);
+        throw new Error('Failed to search Reddit: ' + error.message);
+    }
+}

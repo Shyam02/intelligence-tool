@@ -9,6 +9,7 @@ const testingRoutes = require('./routes/testing');
 const intelligenceRoutes = require('./routes/intelligence');
 const contentRoutes = require('./routes/content');
 const searchRoutes = require('./routes/search');
+const redditRoutes = require('./routes/reddit');
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api', testingRoutes);
 app.use('/api', intelligenceRoutes);
 app.use('/api', contentRoutes);
 app.use('/api', searchRoutes);
+app.use('/api', redditRoutes);
 
 // Serve the main page
 app.get('/', (req, res) => {
@@ -42,10 +44,12 @@ app.listen(config.port, () => {
   console.log('   - Config management');
   console.log('   - Claude AI service');
   console.log('   - Brave Search service');
-  console.log('   - Separated controllers (4 files)');
-  console.log('   - Separated routes (4 files)');
+  console.log('   - Reddit API service');
+  console.log('   - Separated controllers (5 files)');
+  console.log('   - Separated routes (5 files)');
   console.log('   - API testing routes');
   console.log('   - Intelligence routes');
   console.log('   - Content routes');
   console.log('   - Search routes');
+  console.log('   - Reddit routes');
 });
