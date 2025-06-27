@@ -1,5 +1,6 @@
 // Business intelligence generation controller
 const { callClaudeAPI } = require('../services/ai');
+const { crawlWebsite } = require('../services/websiteCrawler');
 const { performCompetitorResearch } = require('./competitorResearch');
 const { intelligence } = require('../prompts');
 

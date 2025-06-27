@@ -1,5 +1,5 @@
 // Website crawling controller
-const { crawlWebsite } = require('../services/ai');
+const { crawlWebsite } = require('../services/websiteCrawler');
 
 // NEW FUNCTION: Crawl website and extract business information
 async function crawlWebsiteController(req, res) {
