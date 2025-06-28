@@ -6,6 +6,6 @@ const router = express.Router();
 const { executeSearch } = require('../controllers/search');
 
 // Search routes
-router.post('/execute-search', executeSearch);
+router.post('/executeSearch', executeSearch);
 
 module.exports = router;

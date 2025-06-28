@@ -6,6 +6,6 @@ const router = express.Router();
 const { generateTwitterBriefs } = require('../controllers/twitter');
 
 // Twitter content routes
-router.post('/generate-twitter-briefs', generateTwitterBriefs);
+router.post('/generateTwitterBriefs', generateTwitterBriefs);
 
 module.exports = router;

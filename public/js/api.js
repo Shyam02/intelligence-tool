@@ -38,7 +38,7 @@ async function crawlWebsiteAPI(websiteUrl) {
     try {
         console.log('🌐 Starting website crawl for:', websiteUrl);
         
-        const response = await fetch('/api/crawl-website', {
+        const response = await fetch('/api/crawlWebsite', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ async function crawlWebsiteAPI(websiteUrl) {
 // Generate foundational intelligence
 async function generateIntelligence(onboardingData) {
     try {
-        const response = await fetch('/api/generate-intelligence', {
+        const response = await fetch('/api/generateIntelligence', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ async function generateIntelligence(onboardingData) {
 // Generate search queries
 async function generateQueriesFromAPI(foundationalIntelligence) {
     try {
-        const response = await fetch('/api/generate-queries', {
+        const response = await fetch('/api/generateQueries', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ async function executeSearch(query) {
     try {
         console.log('Sending search request for query:', query);
         
-        const response = await fetch('/api/execute-search', {
+        const response = await fetch('/api/executeSearch', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ async function executeSearch(query) {
 async function generateTwitterBriefsFromAPI(selectedArticles, businessContext) {
     console.log('API: generateTwitterBriefsFromAPI called with', selectedArticles.length, 'articles');
     try {
-        const response = await fetch('/api/generate-twitter-briefs', {
+        const response = await fetch('/api/generateTwitterBriefs', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ async function discoverSubredditsAPI(foundationalIntelligence) {
     try {
         console.log('🔍 Discovering subreddits using business intelligence...');
         
-        const response = await fetch('/api/discover-subreddits', {
+        const response = await fetch('/api/discoverSubreddits', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ async function searchRedditAPI(searchQueries, discoveredSubreddits = []) {
         
         const subredditNames = discoveredSubreddits.map(sub => sub.name).slice(0, 5);
         
-        const response = await fetch('/api/search-reddit', {
+        const response = await fetch('/api/searchReddit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

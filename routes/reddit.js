@@ -6,9 +6,9 @@ const router = express.Router();
 const { discoverRelevantSubreddits, searchRedditDiscussions, getRedditTrending, generateRedditSearchQueries } = require('../controllers/reddit');
 
 // Reddit API routes
-router.post('/discover-subreddits', discoverRelevantSubreddits);
-router.post('/search-reddit', searchRedditDiscussions);
-router.post('/reddit-trending', getRedditTrending);
+router.post('/discoverSubreddits', discoverRelevantSubreddits);
+router.post('/searchReddit', searchRedditDiscussions);
+router.post('/redditTrending', getRedditTrending);
 router.post('/generateRedditSearchQueries', generateRedditSearchQueries);
 
 module.exports = router;
