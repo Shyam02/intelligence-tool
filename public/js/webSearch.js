@@ -1,4 +1,5 @@
-// Search functionality and article handling
+// ===== public/js/webSearch.js =====
+// Web search functionality and article handling
 
 // UPDATED: Generate search queries AND Reddit queries from foundational intelligence data
 async function generateQueries() {

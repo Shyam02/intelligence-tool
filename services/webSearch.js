@@ -1,3 +1,4 @@
+// ===== services/webSearch.js =====
 // Brave Search API service
 const axios = require('axios');
 const { config } = require('../config/config');

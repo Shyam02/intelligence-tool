@@ -1,5 +1,6 @@
-// Search functionality controller
-const { searchBrave } = require('../services/search');
+// ===== controllers/webSearch.js =====
+// Web search functionality controller
+const { searchBrave } = require('../services/webSearch');
 const { config } = require('../config/config');
 
 // Execute search queries using Brave Search API

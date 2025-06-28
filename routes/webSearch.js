@@ -1,11 +1,12 @@
-// Search-related routes
+// ===== routes/webSearch.js =====
+// Web search-related routes
 const express = require('express');
 const router = express.Router();
 
 // Import controllers
-const { executeSearch } = require('../controllers/search');
+const { executeSearch } = require('../controllers/webSearch');
 
-// Search routes
+// Web search routes
 router.post('/executeSearch', executeSearch);
 
 module.exports = router;

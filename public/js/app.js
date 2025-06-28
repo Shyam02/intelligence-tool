@@ -153,7 +153,7 @@ function updateEmptyStates() {
 // Global function wrappers for HTML onclick handlers
 window.testAPI = testAPI;
 window.crawlWebsiteAPI = crawlWebsiteAPI;
-// Point directly to the search.js function to avoid circular calls
+// Point directly to the webSearch.js function to avoid circular calls
 window.generateQueries = generateQueries;
 window.executeTestSearch = executeTestSearch;
 window.generateTwitterBriefs = generateTwitterContentBriefs;

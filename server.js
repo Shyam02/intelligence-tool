@@ -1,3 +1,4 @@
+// ===== server.js =====
 // Main server file - simplified and modular
 const express = require('express');
 const cors = require('cors');
@@ -8,7 +9,7 @@ const { config, validateConfig } = require('./config/config');
 const testingRoutes = require('./routes/testing');
 const intelligenceRoutes = require('./routes/intelligence');
 const contentRoutes = require('./routes/content');
-const searchRoutes = require('./routes/search');
+const webSearchRoutes = require('./routes/webSearch');
 const redditRoutes = require('./routes/reddit');
 
 const app = express();
@@ -28,7 +29,7 @@ if (!validateConfig()) {
 app.use('/api', testingRoutes);
 app.use('/api', intelligenceRoutes);
 app.use('/api', contentRoutes);
-app.use('/api', searchRoutes);
+app.use('/api', webSearchRoutes);
 app.use('/api', redditRoutes);
 
 // Serve the main page
@@ -45,11 +46,11 @@ app.listen(config.port, () => {
   console.log('   - Claude AI service');
   console.log('   - Brave Search service');
   console.log('   - Reddit API service');
-  console.log('   - Separated controllers (5 files)');
+  console.log('   - Separated controllers (7 files)');
   console.log('   - Separated routes (5 files)');
   console.log('   - API testing routes');
   console.log('   - Intelligence routes');
   console.log('   - Content routes');
-  console.log('   - Search routes');
+  console.log('   - Web search routes');
   console.log('   - Reddit routes');
 });

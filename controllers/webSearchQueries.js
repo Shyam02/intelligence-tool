@@ -1,4 +1,5 @@
-// Query generation controller
+// ===== controllers/webSearchQueries.js =====
+// Web search query generation controller
 
 // ENHANCED: Generate search queries using competitor intelligence
 async function generateQueries(req, res) {
@@ -46,7 +47,7 @@ async function generateQueries(req, res) {
           `site:reddit.com "${name}" review OR experience`
         );
       }
-  
+
       // Generate keyword queries (enhanced with competitor insights)
       const keywordQueries = {
         core_product_keywords: [
@@ -77,7 +78,7 @@ async function generateQueries(req, res) {
           `${foundationalIntelligence.target_market.market_segment} ${foundationalIntelligence.core_keywords.industry_keywords[0]} predictions`
         ]
       };
-  
+
       // Add competitor-enhanced keyword queries
       if (competitorNames.length > 0) {
         keywordQueries.competitor_keywords = [
@@ -86,7 +87,7 @@ async function generateQueries(req, res) {
           `${foundationalIntelligence.core_keywords.product_keywords[0]} vs ${competitorNames[0]} keywords`
         ];
       }
-  
+
       // Generate content discovery queries (enhanced with competitor insights)
       const contentQueries = {
         twitter_content: [
@@ -118,20 +119,20 @@ async function generateQueries(req, res) {
           `"${foundationalIntelligence.core_keywords.industry_keywords[0]}" content marketing success stories`
         ]
       };
-  
+
       // Add competitor content discovery queries
       if (competitorNames.length > 0) {
         contentQueries.competitor_content = competitorNames.slice(0, 2).map(name =>
           `site:twitter.com "${name}" popular tweets OR viral content`
         );
       }
-  
+
       const allQueries = {
         competitor_queries: competitorQueries,
         keyword_queries: keywordQueries,
         content_queries: contentQueries
       };
-  
+
       res.json(allQueries);
     } catch (error) {
       console.error('Error generating queries:', error);

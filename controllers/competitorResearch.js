@@ -1,7 +1,7 @@
 // Competitor research controller
 const { callClaudeAPI } = require('../services/ai');
 const { crawlHomepageOnly } = require('../services/websiteCrawler');
-const { searchBrave } = require('../services/search');
+const { searchBrave } = require('../services/webSearch');
 const { intelligence } = require('../prompts');
 
 // Helper function to delay execution

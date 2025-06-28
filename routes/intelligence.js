@@ -1,10 +1,11 @@
+// ===== routes/intelligence.js =====
 // Intelligence-related routes
 const express = require('express');
 const router = express.Router();
 
 // Import controllers
 const { generateIntelligence } = require('../controllers/businessIntelligence');
-const { generateQueries } = require('../controllers/queryGeneration');
+const { generateQueries } = require('../controllers/webSearchQueries');
 const { crawlWebsiteController } = require('../controllers/websiteCrawling');
 
 // Website crawling route

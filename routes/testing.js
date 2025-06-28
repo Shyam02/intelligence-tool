@@ -1,10 +1,11 @@
+// ===== routes/testing.js =====
 // API testing routes
 const express = require('express');
 const router = express.Router();
 
 // Import services for testing
 const { testClaudeAPI } = require('../services/ai');
-const { testBraveAPI } = require('../services/search');
+const { testBraveAPI } = require('../services/webSearch');
 const { testRedditAPI } = require('../services/reddit');
 
 // Test API key endpoint
