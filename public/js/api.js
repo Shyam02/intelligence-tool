@@ -197,33 +197,27 @@ async function discoverSubredditsAPI(foundationalIntelligence) {
     }
 }
 
-// NEW: Generate Reddit search queries
+// UPDATED: Generate Reddit search queries using AI backend (replaced frontend-only version)
 async function generateRedditQueriesAPI(foundationalIntelligence) {
     try {
-        console.log('📝 Generating Reddit search queries...');
+        console.log('📝 Generating Reddit search queries using AI backend...');
         
-        // Generate simple queries from business intelligence
-        // Extract relevant information with fallbacks
-        const primaryProblem = foundationalIntelligence.pain_points?.primary_problem || 'productivity issues';
-        const productKeywords = foundationalIntelligence.core_keywords?.product_keywords || ['business tools'];
-        const targetMarket = foundationalIntelligence.target_market?.market_segment || 'small business';
-        const industryKeywords = foundationalIntelligence.core_keywords?.industry_keywords || ['productivity'];
-        const solutionKeywords = foundationalIntelligence.core_keywords?.solution_keywords || ['tools'];
-        const competitorName = foundationalIntelligence.competitor_intelligence?.competitor_analysis?.[0]?.company_name || 'current solutions';
+        const response = await fetch('/api/generateRedditSearchQueries', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ foundationalIntelligence })
+        });
         
-        const queries = [
-            `${primaryProblem}`,
-            `looking for ${productKeywords[0]}`,
-            `${targetMarket} struggling with ${industryKeywords[0]}`,
-            `alternatives to ${competitorName}`,
-            `best ${solutionKeywords[0]} for ${targetMarket}`,
-            `${productKeywords[0]} recommendations`,
-            `frustrated with ${primaryProblem}`,
-            `${industryKeywords[0]} tools review`
-        ];
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
+        }
         
-        console.log('✅ Reddit queries generated:', queries);
-        return queries;
+        const result = await response.json();
+        console.log('✅ AI-powered Reddit queries generated:', result);
+        return result.queries; // Return the simple array for frontend compatibility
         
     } catch (error) {
         console.error('Error generating Reddit queries:', error);

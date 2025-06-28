@@ -203,8 +203,73 @@ async function getRedditTrending(req, res) {
   }
 }
 
+// NEW: Generate Reddit search queries using AI (matching the sophisticated pattern)
+async function generateRedditSearchQueries(req, res) {
+  try {
+    const { foundationalIntelligence } = req.body;
+    
+    if (!foundationalIntelligence) {
+      return res.status(400).json({ error: 'Foundational intelligence data is required' });
+    }
+    
+    console.log('🔍 Starting AI-powered Reddit query generation...');
+    
+    // Use the sophisticated AI prompt for Reddit query generation
+    const redditQueryPrompt = reddit.generateRedditSearchQueries(foundationalIntelligence);
+    const redditQueriesResponse = await callClaudeAPI(redditQueryPrompt);
+    
+    // Parse the AI response
+    let generatedQueries;
+    try {
+      const jsonMatch = redditQueriesResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        generatedQueries = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in AI response');
+      }
+    } catch (parseError) {
+      console.error('Failed to parse Reddit queries:', parseError);
+      return res.status(500).json({ error: 'Failed to parse Reddit queries from AI response' });
+    }
+    
+    // Extract queries into a simple array for consistency with frontend expectations
+    const queryArray = [];
+    if (generatedQueries.pain_point_queries) {
+      queryArray.push(...generatedQueries.pain_point_queries);
+    }
+    if (generatedQueries.solution_seeking_queries) {
+      queryArray.push(...generatedQueries.solution_seeking_queries);
+    }
+    if (generatedQueries.competitor_queries) {
+      queryArray.push(...generatedQueries.competitor_queries);
+    }
+    if (generatedQueries.industry_discussion_queries) {
+      queryArray.push(...generatedQueries.industry_discussion_queries);
+    }
+    
+    console.log('✅ AI-powered Reddit query generation completed:', queryArray.length, 'queries generated');
+    
+    res.json({
+      success: true,
+      queries: queryArray,
+      structured_queries: generatedQueries,
+      total_queries: queryArray.length,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('❌ Reddit query generation failed:', error.message);
+    res.status(500).json({ 
+      error: 'Reddit query generation failed: ' + error.message,
+      queries: [],
+      timestamp: new Date().toISOString()
+    });
+  }
+}
+
 module.exports = {
   discoverRelevantSubreddits,
   searchRedditDiscussions,
-  getRedditTrending
+  getRedditTrending,
+  generateRedditSearchQueries
 };
