@@ -159,7 +159,7 @@
     padding-bottom: 60px; /* Extra space for content generation section */
 }
 
-.content-briefs-tab .twitter-briefs-container {
+.content-briefs-tab .content-briefs-container {
     margin-bottom: 0; /* Remove bottom margin to connect with generation section */
 }
 

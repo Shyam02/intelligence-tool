@@ -140,11 +140,11 @@ async function executeSearch(query) {
     }
 }
 
-// Generate Twitter briefs from articles
-async function generateTwitterBriefsFromAPI(selectedArticles, businessContext) {
-    console.log('API: generateTwitterBriefsFromAPI called with', selectedArticles.length, 'articles');
+// Generate content briefs from articles
+async function generateContentBriefsFromAPI(selectedArticles, businessContext) {
+    console.log('API: generateContentBriefsFromAPI called with', selectedArticles.length, 'articles');
     try {
-        const response = await fetch('/api/generateTwitterBriefs', {
+        const response = await fetch('/api/generateContentBriefs', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -160,12 +160,12 @@ async function generateTwitterBriefsFromAPI(selectedArticles, businessContext) {
         }
         
         const briefs = await response.json();
-        console.log('Twitter briefs received from API:', briefs);
+        console.log('Content briefs received from API:', briefs);
         return briefs;
         
     } catch (error) {
-        console.error('Error generating Twitter briefs:', error);
-        throw new Error('Failed to generate Twitter briefs: ' + error.message);
+        console.error('Error generating content briefs:', error);
+        throw new Error('Failed to generate content briefs: ' + error.message);
     }
 }
 

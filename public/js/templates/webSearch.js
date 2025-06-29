@@ -58,8 +58,8 @@ function createArticlesDisplayTemplate(articles) {
     
     articlesHTML += `
             </div>
-            <div class="twitter-generation-section">
-                <button onclick="generateTwitterContentBriefs()" class="twitter-brief-btn">🐦 Generate Twitter Content Briefs</button>
+            <div class="content-generation-section">
+                <button onclick="generateContentBriefs()" class="content-brief-btn">📝 Generate Content Briefs</button>
             </div>
         </div>
     `;

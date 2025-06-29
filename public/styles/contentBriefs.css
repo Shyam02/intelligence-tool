@@ -1,13 +1,13 @@
-/* Twitter content briefs styles */
+/* Content briefs styles */
 
-.twitter-generation-section {
+.content-generation-section {
     margin-top: 20px;
     text-align: center;
     padding-top: 20px;
     border-top: 2px solid #e2e8f0;
 }
 
-.twitter-brief-btn {
+.content-brief-btn {
     background: linear-gradient(135deg, #1DA1F2 0%, #0d8bd9 100%);
     color: white;
     border: none;
@@ -19,17 +19,17 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.twitter-brief-btn:hover {
+.content-brief-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 20px rgba(29, 161, 242, 0.3);
 }
 
-.twitter-brief-btn:disabled {
+.content-brief-btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
 
-.twitter-briefs-container {
+.content-briefs-container {
     background: white;
     border-radius: 20px;
     padding: 40px;
@@ -37,7 +37,7 @@
     margin-top: 30px;
 }
 
-.twitter-briefs-container h3 {
+.content-briefs-container h3 {
     color: #1DA1F2;
     font-size: 1.8rem;
     margin-bottom: 20px;
@@ -76,7 +76,7 @@
     margin-bottom: 15px;
 }
 
-.twitter-brief-card {
+.content-brief-card {
     background: #f8f9fa;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
@@ -85,7 +85,7 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.twitter-brief-card:hover {
+.content-brief-card:hover {
     border-color: #1DA1F2;
     box-shadow: 0 4px 12px rgba(29, 161, 242, 0.1);
 }

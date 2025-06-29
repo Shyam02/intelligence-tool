@@ -1,19 +1,19 @@
-// Twitter content briefs controller
+// Content briefs controller
 const { callClaudeAPI } = require('../services/ai');
 const { content } = require('../prompts');
 
-// Generate Twitter content briefs from search results
-async function generateTwitterBriefs(req, res) {
+// Generate content briefs from search results
+async function generateContentBriefs(req, res) {
   try {
     const { articles, businessContext } = req.body;
-    console.log('🐦 Twitter brief generation request received');
+    console.log('�� Content brief generation request received');
     
     if (!articles || !Array.isArray(articles) || articles.length === 0) {
       return res.status(400).json({ error: 'Articles array is required' });
     }
     
     // Use extracted prompt instead of inline
-    const briefingPrompt = content.twitterBriefsPrompt(articles, businessContext);
+    const briefingPrompt = content.contentBriefsPrompt(articles, businessContext);
 
     const briefsResponse = await callClaudeAPI(briefingPrompt, false);
     
@@ -35,11 +35,11 @@ async function generateTwitterBriefs(req, res) {
     res.json(briefs);
     
   } catch (error) {
-    console.error('Twitter brief generation error:', error);
+    console.error('Content brief generation error:', error);
     res.status(500).json({ error: error.message });
   }
 }
 
 module.exports = {
-  generateTwitterBriefs
+  generateContentBriefs
 };

@@ -1,31 +1,31 @@
-// Twitter content briefs generation and display
+// Content briefs generation and display
 
-// Generate Twitter briefs from selected articles
-async function generateTwitterContentBriefs() {
+// Generate content briefs from selected articles
+async function generateContentBriefs() {
     const selectedArticles = window.appState.searchResults.filter(article => article.selected);
     
     if (selectedArticles.length === 0) {
-        alert('Please select at least one article to generate Twitter briefs');
+        alert('Please select at least one article to generate content briefs');
         return;
     }
     
-    const generateBtn = document.querySelector('.twitter-brief-btn');
+    const generateBtn = document.querySelector('.content-brief-btn');
     const originalText = generateBtn.textContent;
-    generateBtn.textContent = '⏳ Generating Twitter Briefs...';
+    generateBtn.textContent = '⏳ Generating Content Briefs...';
     generateBtn.disabled = true;
     
     try {
         // Prepare comprehensive business context from clean data sources
         const businessContext = createBusinessContext();
         
-        console.log('Generating Twitter briefs for', selectedArticles.length, 'articles');
+        console.log('Generating content briefs for', selectedArticles.length, 'articles');
         console.log('Business context:', businessContext);
         
-        const briefs = await generateTwitterBriefsFromAPI(selectedArticles, businessContext);
-        console.log('Twitter briefs received:', briefs);
+        const briefs = await generateContentBriefsFromAPI(selectedArticles, businessContext);
+        console.log('Content briefs received:', briefs);
         
         // Display the briefs
-        displayTwitterBriefs(briefs);
+        displayContentBriefs(briefs);
         
         // UPDATED: Mark content briefs tab as completed and switch to it
         markTabCompleted('contentBriefs');
@@ -34,11 +34,11 @@ async function generateTwitterContentBriefs() {
         // Update empty states
         updateEmptyStates();
         
-        console.log('✅ Twitter briefs generated and content briefs tab activated');
+        console.log('✅ Content briefs generated and content briefs tab activated');
         
     } catch (error) {
-        console.error('Error generating Twitter briefs:', error);
-        alert('Error generating Twitter briefs: ' + error.message);
+        console.error('Error generating content briefs:', error);
+        alert('Error generating content briefs: ' + error.message);
     } finally {
         generateBtn.textContent = originalText;
         generateBtn.disabled = false;
@@ -95,18 +95,18 @@ function createBusinessContext() {
     return businessContext;
 }
 
-// UPDATED: Display Twitter briefs with content generation integration
-function displayTwitterBriefs(briefsData) {
+// UPDATED: Display content briefs with content generation integration
+function displayContentBriefs(briefsData) {
     // Get the existing briefs container in the content briefs tab
-    let briefsContainer = document.getElementById('twitterBriefs');
+    let briefsContainer = document.getElementById('contentBriefs');
     
     if (!briefsContainer) {
-        console.error('Twitter briefs container not found');
+        console.error('Content briefs container not found');
         return;
     }
     
     // Use template function for briefs display
-    const briefsHTML = createTwitterBriefsTemplate(briefsData);
+    const briefsHTML = createContentBriefsTemplate(briefsData);
     
     // UPDATED: Add content generation section after briefs
     const contentGenerationSection = `
@@ -129,5 +129,5 @@ function displayTwitterBriefs(briefsData) {
         }
     }, 500);
     
-    console.log('✅ Twitter briefs displayed with content generation integration');
+    console.log('✅ Content briefs displayed with content generation integration');
 }

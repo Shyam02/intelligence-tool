@@ -6,7 +6,7 @@ const { businessAnalysisPrompt } = require('./intelligence/businessAnalysis');
 const { mainCrawlPrompt, fallbackCrawlPrompt, multiPageAnalysisPrompt } = require('./intelligence/websiteCrawling');
 const { linkSelectionPrompt } = require('./intelligence/linkSelection');
 const { competitorAnalysisPrompt } = require('./intelligence/competitorAnalysis');
-const { twitterBriefsPrompt } = require('./content/twitterBriefs');
+const { contentBriefsPrompt } = require('./content/contentBriefs');
 const { contentGenerationPrompt } = require('./content/contentGeneration');
 const { generateRedditSearchQueries } = require('./reddit/queryGeneration');
 
@@ -24,7 +24,7 @@ module.exports = {
   
   // Content prompts
   content: {
-    twitterBriefsPrompt,
+    contentBriefsPrompt,
     contentGenerationPrompt
   },
   

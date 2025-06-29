@@ -3,11 +3,11 @@ const express = require('express');
 const router = express.Router();
 
 // Import controllers
-const { generateTwitterBriefs } = require('../controllers/twitter');
+const { generateContentBriefs } = require('../controllers/contentBriefs');
 const { generateTwitterContent, regenerateContent } = require('../controllers/contentGeneration');
 
-// Twitter content routes
-router.post('/generateTwitterBriefs', generateTwitterBriefs);
+// Content brief routes
+router.post('/generateContentBriefs', generateContentBriefs);
 
 // NEW: Content generation routes
 router.post('/generateTwitterContent', generateTwitterContent);

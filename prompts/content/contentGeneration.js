@@ -54,7 +54,7 @@ CONTENT CREATION RULES:
 - Avoid generic marketing language
 - Make it immediately valuable to readers
 
-TWITTER BRIEFS TO TRANSFORM:
+CONTENT BRIEFS TO TRANSFORM:
 ${JSON.stringify(briefs, null, 2)}
 
 For each brief, determine if it should be a single tweet or thread based on:

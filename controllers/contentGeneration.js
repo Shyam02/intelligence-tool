@@ -1,7 +1,7 @@
 // Content generation controller
 const { generateContentFromBriefs } = require('../services/contentGenerator');
 
-// Generate final content from Twitter briefs
+// Generate final content from content briefs
 async function generateTwitterContent(req, res) {
   try {
     const { briefs, businessContext, regenerateOptions } = req.body;

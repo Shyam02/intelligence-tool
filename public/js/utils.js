@@ -145,11 +145,11 @@ function resetForm() {
         websiteSection.style.display = 'none';
     }
     
-    // Hide Twitter briefs if they exist
-    const twitterBriefs = document.getElementById('twitterBriefs');
-    if (twitterBriefs) {
-        twitterBriefs.style.display = 'none';
-        twitterBriefs.innerHTML = ''; // Clear content
+    // Hide content briefs if they exist
+    const contentBriefs = document.getElementById('contentBriefs');
+    if (contentBriefs) {
+        contentBriefs.style.display = 'none';
+        contentBriefs.innerHTML = ''; // Clear content
     }
     
     // Show form container

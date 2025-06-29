@@ -206,7 +206,7 @@ function createEmptyContentGenerationTemplate() {
     return `
         <div class="empty-content-generation">
             <h3>No Content Generated Yet</h3>
-            <p>Generate Twitter briefs first, then create final content from those briefs.</p>
+            <p>Generate content briefs first, then create final content from those briefs.</p>
             <div class="arrow">↑</div>
             <p>Use "Generate Final Content" button above</p>
         </div>

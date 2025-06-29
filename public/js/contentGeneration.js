@@ -1,12 +1,12 @@
 // Content Generation Frontend - Handle content generation UI and interactions
 
-// Generate content from Twitter briefs
+// Generate content from content briefs
 async function generateContentFromBriefs() {
-    // Get all briefs from the current Twitter briefs display
+    // Get all briefs from the current content briefs display
     const briefsData = extractBriefsFromCurrentDisplay();
     
     if (!briefsData || briefsData.length === 0) {
-        alert('No content briefs found. Please generate Twitter briefs first.');
+        alert('No content briefs found. Please generate content briefs first.');
         return;
     }
     
@@ -129,11 +129,11 @@ async function regenerateContent(contentId, variationRequest = null) {
     }
 }
 
-// Extract briefs from current Twitter briefs display
+// Extract briefs from current content briefs display
 function extractBriefsFromCurrentDisplay() {
     try {
-        // Look for existing Twitter briefs in the display
-        const briefElements = document.querySelectorAll('.twitter-brief-card');
+        // Look for existing content briefs in the display
+        const briefElements = document.querySelectorAll('.content-brief-card');
         const briefs = [];
         
         briefElements.forEach((element, index) => {
@@ -209,7 +209,7 @@ function displayGeneratedContent(generatedContent) {
 
 // Display content for specific brief
 function displayBriefSpecificContent(briefIndex, generatedContent) {
-    const briefCard = document.querySelector(`.twitter-brief-card:nth-child(${briefIndex + 1})`);
+    const briefCard = document.querySelector(`.content-brief-card:nth-child(${briefIndex + 1})`);
     if (!briefCard) return;
     
     // Create content display for this specific brief

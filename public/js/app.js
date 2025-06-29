@@ -137,9 +137,9 @@ function updateEmptyStates() {
     
     // Content Briefs empty state
     const contentBriefsEmpty = document.getElementById('contentBriefsEmpty');
-    const twitterBriefs = document.getElementById('twitterBriefs');
-    if (contentBriefsEmpty && twitterBriefs) {
-        if (twitterBriefs.style.display === 'none') {
+    const contentBriefs = document.getElementById('contentBriefs');
+    if (contentBriefsEmpty && contentBriefs) {
+        if (contentBriefs.style.display === 'none') {
             contentBriefsEmpty.style.display = 'block';
         } else {
             contentBriefsEmpty.style.display = 'none';
@@ -156,7 +156,7 @@ window.crawlWebsiteAPI = crawlWebsiteAPI;
 // Point directly to the webSearch.js function to avoid circular calls
 window.generateQueries = generateQueries;
 window.executeTestSearch = executeTestSearch;
-window.generateTwitterBriefs = generateTwitterContentBriefs;
+window.generateContentBriefs = generateContentBriefs;
 window.copyToClipboard = copyToClipboard;
 window.resetForm = resetForm;
 window.toggleArticleSelection = toggleArticleSelection;

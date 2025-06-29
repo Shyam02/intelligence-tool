@@ -5,8 +5,9 @@
 ├── controllers
 │   ├── businessIntelligence.js
 │   ├── competitorResearch.js
+│   ├── contentGeneration.js
 │   ├── reddit.js
-│   ├── twitter.js
+│   ├── contentBriefs.js
 │   ├── webSearch.js
 │   ├── webSearchQueries.js
 │   └── websiteCrawling.js
@@ -15,7 +16,8 @@
 ├── project-structure.txt
 ├── prompts
 │   ├── content
-│   │   └── twitterBriefs.js
+│   │   ├── contentGeneration.js
+│   │   └── contentBriefs.js
 │   ├── index.js
 │   ├── intelligence
 │   │   ├── businessAnalysis.js
@@ -29,11 +31,12 @@
 │   ├── js
 │   │   ├── api.js
 │   │   ├── app.js
+│   │   ├── contentGeneration.js
 │   │   ├── forms.js
 │   │   ├── reddit.js
 │   │   ├── results.js
 │   │   ├── templates
-│   │   ├── twitter.js
+│   │   ├── contentBriefs.js
 │   │   ├── utils.js
 │   │   └── webSearch.js
 │   ├── results.html
@@ -41,12 +44,13 @@
 │       ├── articles.css
 │       ├── base.css
 │       ├── components.css
+│       ├── contentGeneration.css
 │       ├── forms.css
 │       ├── layout.css
 │       ├── reddit.css
 │       ├── responsive.css
 │       ├── tabs.css
-│       └── twitterBriefs.css
+│       └── contentBriefs.css
 ├── routes
 │   ├── content.js
 │   ├── intelligence.js
@@ -56,9 +60,10 @@
 ├── server.js
 └── services
     ├── ai.js
+    ├── contentGenerator.js
     ├── htmlParser.js
     ├── reddit.js
     ├── webSearch.js
     └── websiteCrawler.js
 
-13 directories, 49 files
+13 directories, 54 files

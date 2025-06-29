@@ -1,10 +1,10 @@
-// Twitter Content Template Functions
-// File path: /public/js/templates/twitter.js
+// Content Briefs Template Functions
+// File path: /public/js/templates/contentBriefs.js
 
-// Template for Twitter briefs display
-function createTwitterBriefsTemplate(briefsData) {
+// Template for content briefs display
+function createContentBriefsTemplate(briefsData) {
     let briefsHTML = `
-        <h3>🐦 Twitter Content Briefs</h3>
+        <h3>📝 Content Briefs</h3>
         <div class="briefs-summary">
             <p><strong>Articles Evaluated:</strong> ${briefsData.evaluated_count}</p>
             <p><strong>Viable Articles:</strong> ${briefsData.viable_count}</p>
@@ -21,7 +21,7 @@ function createTwitterBriefsTemplate(briefsData) {
         if (result.viable) {
             result.briefs.forEach((brief, index) => {
                 briefsHTML += `
-                    <div class="twitter-brief-card">
+                    <div class="content-brief-card">
                         <div class="brief-header">
                             <span class="brief-angle">Angle ${index + 1}: ${brief.angle}</span>
                             <span class="brief-type">${brief.content_type}</span>
@@ -44,7 +44,7 @@ function createTwitterBriefsTemplate(briefsData) {
         } else {
             briefsHTML += `
                 <div class="rejection-notice">
-                    <p>❌ <strong>Not viable for Twitter:</strong> ${result.rejection_reason}</p>
+                    <p>❌ <strong>Not viable for content creation:</strong> ${result.rejection_reason}</p>
                 </div>
             `;
         }

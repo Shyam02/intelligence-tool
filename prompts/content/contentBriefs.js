@@ -1,6 +1,6 @@
-// Twitter Content Briefs Prompt for generating Twitter content from search results
+// Content Briefs Prompt for generating platform-agnostic content from search results
 
-const twitterBriefsPrompt = (articles, businessContext) => {
+const contentBriefsPrompt = (articles, businessContext) => {
     const contextPrompt = businessContext ? `
   Business Context:
   - Company: ${businessContext.companyName || 'Not specified'}
@@ -11,7 +11,7 @@ const twitterBriefsPrompt = (articles, businessContext) => {
   - Additional Info: ${JSON.stringify(businessContext)}
   ` : 'No business context provided.';
   
-    return `You are an expert content strategist creating Twitter content briefs. Your job is to evaluate search results and create HIGH-QUALITY Twitter content ONLY for ideas with real value.
+    return `You are an expert content strategist creating platform-agnostic content briefs. Your job is to evaluate search results and create HIGH-QUALITY content briefs ONLY for ideas with real value.
   
   ${contextPrompt}
   
@@ -35,12 +35,12 @@ const twitterBriefsPrompt = (articles, businessContext) => {
   - Lacking concrete details
   - Not relevant to business goals
   - Requiring fabricated information
-  - Poor fit for Twitter engagement
+  - Poor fit for content creation
   
   ARTICLES TO EVALUATE:
   ${JSON.stringify(articles, null, 2)}
   
-  For each article, determine if it's viable for Twitter content. For viable articles, create 2-3 different tweet briefs.
+  For each article, determine if it's viable for content creation. For viable articles, create 2-3 different content briefs.
   
   RESPOND WITH THIS EXACT JSON FORMAT:
   {
@@ -72,5 +72,5 @@ const twitterBriefsPrompt = (articles, businessContext) => {
   };
   
   module.exports = {
-    twitterBriefsPrompt
+    contentBriefsPrompt
   };
