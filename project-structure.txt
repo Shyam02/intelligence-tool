@@ -5,10 +5,10 @@
 ├── controllers
 │   ├── businessIntelligence.js
 │   ├── competitorResearch.js
-│   ├── queryGeneration.js
 │   ├── reddit.js
-│   ├── search.js
 │   ├── twitter.js
+│   ├── webSearch.js
+│   ├── webSearchQueries.js
 │   └── websiteCrawling.js
 ├── package-lock.json
 ├── package.json
@@ -32,9 +32,9 @@
 │   │   ├── forms.js
 │   │   ├── reddit.js
 │   │   ├── results.js
-│   │   ├── search.js
 │   │   ├── twitter.js
-│   │   └── utils.js
+│   │   ├── utils.js
+│   │   └── webSearch.js
 │   ├── results.html
 │   └── styles
 │       ├── articles.css
@@ -45,19 +45,19 @@
 │       ├── reddit.css
 │       ├── responsive.css
 │       ├── tabs.css
-│       └── twitter-briefs.css
+│       └── twitterBriefs.css
 ├── routes
 │   ├── content.js
 │   ├── intelligence.js
 │   ├── reddit.js
-│   ├── search.js
-│   └── testing.js
+│   ├── testing.js
+│   └── webSearch.js
 ├── server.js
 └── services
     ├── ai.js
     ├── htmlParser.js
     ├── reddit.js
-    ├── search.js
+    ├── webSearch.js
     └── websiteCrawler.js
 
 12 directories, 49 files
