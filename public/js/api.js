@@ -169,6 +169,68 @@ async function generateTwitterBriefsFromAPI(selectedArticles, businessContext) {
     }
 }
 
+// NEW: Generate Twitter content from briefs
+async function generateTwitterContentAPI(briefs, businessContext, regenerateOptions = null) {
+    console.log('API: generateTwitterContentAPI called with', briefs.length, 'briefs');
+    try {
+        const response = await fetch('/api/generateTwitterContent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                briefs: briefs,
+                businessContext: businessContext,
+                regenerateOptions: regenerateOptions
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
+        }
+        
+        const generatedContent = await response.json();
+        console.log('Generated content received from API:', generatedContent);
+        return generatedContent;
+        
+    } catch (error) {
+        console.error('Error generating Twitter content:', error);
+        throw new Error('Failed to generate Twitter content: ' + error.message);
+    }
+}
+
+// NEW: Regenerate specific content piece
+async function regenerateContentAPI(brief, businessContext, variationRequest = null) {
+    console.log('API: regenerateContentAPI called for brief:', brief.angle || 'Unknown');
+    try {
+        const response = await fetch('/api/regenerateContent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                brief: brief,
+                businessContext: businessContext,
+                variationRequest: variationRequest
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
+        }
+        
+        const regeneratedContent = await response.json();
+        console.log('Regenerated content received from API:', regeneratedContent);
+        return regeneratedContent;
+        
+    } catch (error) {
+        console.error('Error regenerating content:', error);
+        throw new Error('Failed to regenerate content: ' + error.message);
+    }
+}
+
 // NEW: Discover relevant subreddits
 async function discoverSubredditsAPI(foundationalIntelligence) {
     try {

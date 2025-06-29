@@ -32,6 +32,7 @@
 │   │   ├── forms.js
 │   │   ├── reddit.js
 │   │   ├── results.js
+│   │   ├── templates
 │   │   ├── twitter.js
 │   │   ├── utils.js
 │   │   └── webSearch.js
@@ -60,4 +61,4 @@
     ├── webSearch.js
     └── websiteCrawler.js
 
-12 directories, 49 files
+13 directories, 49 files

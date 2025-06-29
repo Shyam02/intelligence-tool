@@ -7,6 +7,7 @@ const { mainCrawlPrompt, fallbackCrawlPrompt, multiPageAnalysisPrompt } = requir
 const { linkSelectionPrompt } = require('./intelligence/linkSelection');
 const { competitorAnalysisPrompt } = require('./intelligence/competitorAnalysis');
 const { twitterBriefsPrompt } = require('./content/twitterBriefs');
+const { contentGenerationPrompt } = require('./content/contentGeneration');
 const { generateRedditSearchQueries } = require('./reddit/queryGeneration');
 
 // Export all prompts for easy importing
@@ -23,7 +24,8 @@ module.exports = {
   
   // Content prompts
   content: {
-    twitterBriefsPrompt
+    twitterBriefsPrompt,
+    contentGenerationPrompt
   },
   
   // Reddit prompts

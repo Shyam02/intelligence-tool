@@ -154,6 +154,31 @@
     color: #667eea;
 }
 
+/* UPDATED: Enhanced spacing for content generation sections */
+.content-briefs-tab .tab-content-container {
+    padding-bottom: 60px; /* Extra space for content generation section */
+}
+
+.content-briefs-tab .twitter-briefs-container {
+    margin-bottom: 0; /* Remove bottom margin to connect with generation section */
+}
+
+/* UPDATED: Content generation section integration */
+.content-generation-section {
+    border-top: 3px solid #10b981;
+    margin-top: 30px;
+    padding-top: 30px;
+}
+
+.content-generation-section h3 {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    margin: 0 -30px 20px -30px;
+    padding: 15px 30px;
+    border-radius: 0;
+    text-align: center;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .tab-buttons {
@@ -169,5 +194,15 @@
     
     .tab-content-container {
         padding: 25px;
+    }
+    
+    /* UPDATED: Mobile spacing for content generation */
+    .content-briefs-tab .tab-content-container {
+        padding-bottom: 40px;
+    }
+    
+    .content-generation-section h3 {
+        margin: 0 -25px 20px -25px;
+        padding: 15px 25px;
     }
 }

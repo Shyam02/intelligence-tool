@@ -95,7 +95,7 @@ function createBusinessContext() {
     return businessContext;
 }
 
-// UPDATED: Display Twitter briefs - NOW USES TEMPLATE
+// UPDATED: Display Twitter briefs with content generation integration
 function displayTwitterBriefs(briefsData) {
     // Get the existing briefs container in the content briefs tab
     let briefsContainer = document.getElementById('twitterBriefs');
@@ -105,11 +105,29 @@ function displayTwitterBriefs(briefsData) {
         return;
     }
     
-    // Use template function instead of inline HTML construction
+    // Use template function for briefs display
     const briefsHTML = createTwitterBriefsTemplate(briefsData);
     
-    briefsContainer.innerHTML = briefsHTML;
+    // UPDATED: Add content generation section after briefs
+    const contentGenerationSection = `
+        <div class="content-generation-section" id="contentGenerationSection" style="display: none;">
+            ${createGenerationButtonTemplate()}
+            <div id="generatedContentContainer">
+                ${createEmptyContentGenerationTemplate()}
+            </div>
+        </div>
+    `;
+    
+    briefsContainer.innerHTML = briefsHTML + contentGenerationSection;
     briefsContainer.style.display = 'block';
     
-    console.log('✅ Twitter briefs displayed in content briefs tab');
+    // Show the generation button section
+    setTimeout(() => {
+        const generationSection = document.getElementById('contentGenerationSection');
+        if (generationSection) {
+            generationSection.style.display = 'block';
+        }
+    }, 500);
+    
+    console.log('✅ Twitter briefs displayed with content generation integration');
 }
