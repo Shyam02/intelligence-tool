@@ -1,11 +1,17 @@
-// Results display management with clean data organization
+// Results display management with formatted data display
 
-// Display intelligence generation results with clear data separation
+// Display intelligence generation results with formatted displays
 function displayIntelligenceResults(userInput, websiteIntelligence, foundationalIntelligence) {
-    // Display 1: Pure User Input
+    // Display 1: Formatted User Input Display
+    const userInputDisplay = document.getElementById('userInputDisplay');
+    if (userInputDisplay) {
+        userInputDisplay.innerHTML = createUserInputDisplayTemplate(userInput);
+    }
+    
+    // Keep raw data for copy functionality (hidden)
     document.getElementById('onboardingDataOutput').textContent = JSON.stringify(userInput, null, 2);
     
-    // Display 2: AI-Extracted Website Intelligence  
+    // Display 2: AI-Extracted Website Intelligence (if available)
     if (websiteIntelligence) {
         // Create or update website intelligence section
         let websiteSection = document.getElementById('websiteIntelligenceSection');
@@ -16,9 +22,10 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
             websiteSection.id = 'websiteIntelligenceSection';
             websiteSection.innerHTML = `
                 <h3>AI-Extracted Website Intelligence</h3>
+                <div class="formatted-content" id="websiteIntelligenceDisplay"></div>
                 <div class="copy-section">
-                    <pre id="websiteIntelligenceOutput"></pre>
-                    <button class="copy-btn" onclick="copyToClipboard('websiteIntelligenceOutput', this)">📋 Copy Website Intelligence</button>
+                    <pre id="websiteIntelligenceOutput" style="display: none;"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('websiteIntelligenceOutput', this)">📋 Copy Raw Data</button>
                 </div>
             `;
             
@@ -27,6 +34,13 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
             firstSection.parentNode.insertBefore(websiteSection, firstSection.nextSibling);
         }
         
+        // Display formatted website intelligence
+        const websiteDisplay = document.getElementById('websiteIntelligenceDisplay');
+        if (websiteDisplay) {
+            websiteDisplay.innerHTML = createWebsiteIntelligenceTemplate(websiteIntelligence);
+        }
+        
+        // Keep raw data for copy functionality (hidden)
         document.getElementById('websiteIntelligenceOutput').textContent = JSON.stringify(websiteIntelligence, null, 2);
         websiteSection.style.display = 'block';
     } else {
@@ -37,23 +51,27 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
         }
     }
     
-    // Display 3: AI Foundational Intelligence (Strategic Analysis) - WITHOUT competitor data
+    // Display 3: Formatted Foundational Intelligence (WITHOUT competitor data)
     const foundationalWithoutCompetitor = { ...foundationalIntelligence };
     delete foundationalWithoutCompetitor.competitor_intelligence; // Remove competitor data for separate display
+    
+    const intelligenceDisplay = document.getElementById('intelligenceDisplay');
+    if (intelligenceDisplay) {
+        intelligenceDisplay.innerHTML = createFoundationalIntelligenceTemplate(foundationalWithoutCompetitor);
+    }
+    
+    // Keep raw data for copy functionality (hidden)
     document.getElementById('intelligenceOutput').textContent = JSON.stringify(foundationalWithoutCompetitor, null, 2);
     
-    // Display 4: Competitor Intelligence Analysis
-    displayCompetitorIntelligence(foundationalIntelligence.competitor_intelligence);
+    // Display 4: Competitor Intelligence Analysis (if available)
+    if (foundationalIntelligence.competitor_intelligence) {
+        displayCompetitorIntelligence(foundationalIntelligence.competitor_intelligence);
+    }
     
-    // Update section titles for clarity
-    updateSectionTitles();
-    
-    // NOTE: Results container visibility is now handled by the calling function
-    // to support tab navigation - no longer auto-scroll here
-    console.log('✅ Intelligence results displayed in setup tab');
+    console.log('✅ Intelligence results displayed with formatted templates');
 }
 
-// UPDATED: Display competitor intelligence section - NOW USES TEMPLATE
+// Display competitor intelligence section (keep existing template)
 function displayCompetitorIntelligence(competitorIntelligence) {
     // Create or update competitor intelligence section
     let competitorSection = document.getElementById('competitorIntelligenceSection');
@@ -65,29 +83,13 @@ function displayCompetitorIntelligence(competitorIntelligence) {
         competitorSection.id = 'competitorIntelligenceSection';
         
         // Insert after foundational intelligence section, before action buttons
-        const intelligenceSection = document.querySelector('#intelligenceOutput').closest('.result-section');
+        const intelligenceSection = document.querySelector('#intelligenceDisplay').closest('.result-section');
         intelligenceSection.parentNode.insertBefore(competitorSection, intelligenceSection.nextSibling);
     }
     
-    // Use template function instead of inline HTML construction
+    // Use existing competitor template function
     const competitorHTML = createCompetitorIntelligenceTemplate(competitorIntelligence);
     
     competitorSection.innerHTML = competitorHTML;
     competitorSection.style.display = 'block';
-}
-
-// Update section titles to be more descriptive
-function updateSectionTitles() {
-    // Update first section title
-    const firstSectionTitle = document.querySelector('.result-section h3');
-    if (firstSectionTitle && firstSectionTitle.textContent === 'Raw Onboarding Data') {
-        firstSectionTitle.textContent = 'Raw User Input';
-    }
-    
-    // Update third section title
-    const intelligenceSection = document.querySelector('#intelligenceOutput').closest('.result-section');
-    const intelligenceTitle = intelligenceSection.querySelector('h3');
-    if (intelligenceTitle) {
-        intelligenceTitle.textContent = 'AI Foundational Intelligence (Strategic Analysis)';
-    }
 }

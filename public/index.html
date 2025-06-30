@@ -165,17 +165,19 @@
                             
                             <div class="result-section">
                                 <h3>Raw User Input</h3>
+                                <div class="formatted-content" id="userInputDisplay"></div>
                                 <div class="copy-section">
-                                    <pre id="onboardingDataOutput"></pre>
-                                    <button class="copy-btn" onclick="copyToClipboard('onboardingDataOutput', this)">📋 Copy User Input</button>
+                                    <pre id="onboardingDataOutput" style="display: none;"></pre>
+                                    <button class="copy-btn" onclick="copyToClipboard('onboardingDataOutput', this)">📋 Copy Raw Data</button>
                                 </div>
                             </div>
 
                             <div class="result-section">
                                 <h3>AI Foundational Intelligence (Strategic Analysis)</h3>
+                                <div class="formatted-content" id="intelligenceDisplay"></div>
                                 <div class="copy-section">
-                                    <pre id="intelligenceOutput"></pre>
-                                    <button class="copy-btn" onclick="copyToClipboard('intelligenceOutput', this)">📋 Copy Intelligence Data</button>
+                                    <pre id="intelligenceOutput" style="display: none;"></pre>
+                                    <button class="copy-btn" onclick="copyToClipboard('intelligenceOutput', this)">📋 Copy Raw Data</button>
                                 </div>
                             </div>
 
@@ -203,25 +205,28 @@
                                 <div class="queries-container" id="queriesContainer" style="display: none;">
                                     <div class="query-section">
                                         <h4>Competitor Discovery Queries</h4>
+                                        <div class="formatted-content" id="competitorQueriesDisplay"></div>
                                         <div class="copy-section">
-                                            <pre id="competitorQueriesOutput"></pre>
-                                            <button class="copy-btn" onclick="copyToClipboard('competitorQueriesOutput', this)">📋 Copy Competitor Queries</button>
+                                            <pre id="competitorQueriesOutput" style="display: none;"></pre>
+                                            <button class="copy-btn" onclick="copyToClipboard('competitorQueriesOutput', this)">📋 Copy Raw Data</button>
                                         </div>
                                     </div>
 
                                     <div class="query-section">
                                         <h4>Keyword Intelligence Queries</h4>
+                                        <div class="formatted-content" id="keywordQueriesDisplay"></div>
                                         <div class="copy-section">
-                                            <pre id="keywordQueriesOutput"></pre>
-                                            <button class="copy-btn" onclick="copyToClipboard('keywordQueriesOutput', this)">📋 Copy Keyword Queries</button>
+                                            <pre id="keywordQueriesOutput" style="display: none;"></pre>
+                                            <button class="copy-btn" onclick="copyToClipboard('keywordQueriesOutput', this)">📋 Copy Raw Data</button>
                                         </div>
                                     </div>
 
                                     <div class="query-section">
                                         <h4>Content Discovery Queries</h4>
+                                        <div class="formatted-content" id="contentQueriesDisplay"></div>
                                         <div class="copy-section">
-                                            <pre id="contentQueriesOutput"></pre>
-                                            <button class="copy-btn" onclick="copyToClipboard('contentQueriesOutput', this)">📋 Copy Content Queries</button>
+                                            <pre id="contentQueriesOutput" style="display: none;"></pre>
+                                            <button class="copy-btn" onclick="copyToClipboard('contentQueriesOutput', this)">📋 Copy Raw Data</button>
                                         </div>
                                     </div>
 
@@ -254,13 +259,14 @@
                                     <!-- Subreddit Discovery Results -->
                                     <div id="subredditResults" style="display: none;"></div>
                                     
-                                    <!-- UPDATED: Reddit Queries Display -->
+                                    <!-- Reddit Queries Display -->
                                     <div class="reddit-queries-container" id="redditQueriesContainer" style="display: none;">
                                         <div class="query-section">
                                             <h4>Reddit Discussion Queries</h4>
+                                            <div class="formatted-content" id="redditQueriesDisplay"></div>
                                             <div class="copy-section">
-                                                <pre id="redditQueriesOutput"></pre>
-                                                <button class="copy-btn" onclick="copyToClipboard('redditQueriesOutput', this)">📋 Copy Reddit Queries</button>
+                                                <pre id="redditQueriesOutput" style="display: none;"></pre>
+                                                <button class="copy-btn" onclick="copyToClipboard('redditQueriesOutput', this)">📋 Copy Raw Data</button>
                                             </div>
                                         </div>
 
@@ -273,7 +279,7 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Reddit Search Results Summary (No longer shows full results) -->
+                                    <!-- Reddit Search Results Summary -->
                                     <div id="redditSearchResults" style="display: none;"></div>
                                 </div>
                             </div>
@@ -410,6 +416,7 @@
     <script src="js/templates/contentBriefs.js"></script>
     <script src="js/templates/webSearch.js"></script>
     <script src="js/templates/contentGeneration.js"></script>
+    <script src="js/templates/dataDisplay.js"></script>
     <!-- Load application files -->
     <script src="js/results.js"></script>
     <script src="js/forms.js"></script>

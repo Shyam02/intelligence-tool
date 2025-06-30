@@ -1,6 +1,6 @@
-// Reddit frontend functionality - FIXED: No auto-switching + better results handling
+// Reddit frontend functionality with formatted displays
 
-// NEW: Generate Reddit queries (called when "Generate Search Queries" is clicked)
+// Generate Reddit queries with formatted display
 async function generateRedditQueries() {
     if (!window.appState.foundationalIntelligence) {
         console.log('⚠️ No foundational intelligence available for Reddit query generation');
@@ -15,8 +15,8 @@ async function generateRedditQueries() {
         // Store in app state
         window.appState.redditQueries = redditQueries;
         
-        // Display the queries
-        displayRedditQueries(redditQueries);
+        // Display the formatted queries
+        displayFormattedRedditQueries(redditQueries);
         
         // Show the Reddit queries container
         const redditQueriesContainer = document.getElementById('redditQueriesContainer');
@@ -45,7 +45,26 @@ async function generateRedditQueries() {
     }
 }
 
-// FIXED: Execute single Reddit search (NO auto-switching, better error handling)
+// NEW: Display formatted Reddit queries using template
+function displayFormattedRedditQueries(queries) {
+    const redditDisplay = document.getElementById('redditQueriesDisplay');
+    if (redditDisplay) {
+        redditDisplay.innerHTML = createRedditQueriesTemplate(queries);
+    }
+    
+    // Keep raw data for copy functionality (hidden)
+    const formattedQueries = {
+        generated_reddit_queries: queries,
+        total_queries: queries.length,
+        usage_note: "Copy any query above and paste it in the test field below to search Reddit discussions"
+    };
+    
+    document.getElementById('redditQueriesOutput').textContent = JSON.stringify(formattedQueries, null, 2);
+    
+    console.log('📊 Formatted Reddit queries displayed:', queries.length, 'queries');
+}
+
+// Execute single Reddit search with better error handling
 async function executeTestRedditSearch() {
     const query = document.getElementById('testRedditQuery').value.trim();
     
@@ -67,7 +86,7 @@ async function executeTestRedditSearch() {
         
         console.log('📊 Reddit API response:', searchResponse);
         
-        // FIXED: Better error handling and results processing
+        // Better error handling and results processing
         if (!searchResponse || !searchResponse.success) {
             throw new Error('Reddit search API returned unsuccessful response');
         }
@@ -96,7 +115,7 @@ async function executeTestRedditSearch() {
         // Show search results container
         document.getElementById('searchResults').style.display = 'block';
         
-        // FIXED: Mark tab as completed but DON'T auto-switch
+        // Mark tab as completed but don't auto-switch
         markTabCompleted('ideaBank');
         updateEmptyStates();
         
@@ -111,7 +130,7 @@ async function executeTestRedditSearch() {
             redditStatus.textContent = `${totalDiscussions} new discussions found (${totalIdeas} total ideas in bank)`;
         }
         
-        // FIXED: Show success message instead of auto-switching
+        // Show success message instead of auto-switching
         alert(`✅ Success! Found ${searchResponse.articles.length} Reddit discussions.\n\nThey've been added to your Idea Bank. Switch to the Idea Bank tab to see and select them.`);
         
         console.log('✅ Reddit search completed successfully');
@@ -119,7 +138,7 @@ async function executeTestRedditSearch() {
     } catch (error) {
         console.error('❌ Reddit search failed:', error);
         
-        // FIXED: Better error messages
+        // Better error messages
         let errorMessage = 'Reddit search failed: ';
         if (error.message.includes('API')) {
             errorMessage += 'API connection issue. Check your internet connection.';
@@ -150,37 +169,18 @@ async function executeTestRedditSearch() {
     }
 }
 
-// NEW: Display generated Reddit queries (like search queries are displayed)
-function displayRedditQueries(queries) {
-    if (!queries || queries.length === 0) {
-        document.getElementById('redditQueriesOutput').textContent = 'No Reddit queries generated';
-        return;
-    }
-    
-    // Format queries for display
-    const formattedQueries = {
-        generated_reddit_queries: queries,
-        total_queries: queries.length,
-        usage_note: "Copy any query above and paste it in the test field below to search Reddit discussions"
-    };
-    
-    document.getElementById('redditQueriesOutput').textContent = JSON.stringify(formattedQueries, null, 2);
-    
-    console.log('📊 Reddit queries displayed:', queries.length, 'queries');
-}
-
-// UPDATED: Display search summary with better messaging - NOW USES TEMPLATE
+// Display search summary using existing template
 function displayRedditSearchSummary(searchResponse, query) {
     const resultsContainer = document.getElementById('redditSearchResults');
     
-    // Use template function instead of inline HTML
+    // Use existing template function
     const summaryHTML = createRedditSearchSummaryTemplate(searchResponse, query);
     
     resultsContainer.innerHTML = summaryHTML;
     resultsContainer.style.display = 'block';
 }
 
-// UPDATED: Discover relevant subreddits with better explanations - NOW USES TEMPLATE
+// Discover relevant subreddits using existing template
 async function discoverRelevantSubreddits() {
     if (!window.appState.foundationalIntelligence) {
         alert('Please complete the Setup tab first to generate business intelligence');
@@ -197,7 +197,7 @@ async function discoverRelevantSubreddits() {
         
         const response = await discoverSubredditsAPI(window.appState.foundationalIntelligence);
         
-        // Display discovered subreddits with better explanation - NOW USES TEMPLATE
+        // Display discovered subreddits using existing template
         displayDiscoveredSubreddits(response.subreddits, response.keywords_used);
         
         // Store subreddits in app state
@@ -226,18 +226,18 @@ async function discoverRelevantSubreddits() {
     }
 }
 
-// UPDATED: Display discovered subreddits with better explanation - NOW USES TEMPLATE
+// Display discovered subreddits using existing template
 function displayDiscoveredSubreddits(subreddits, keywordsUsed = []) {
     const resultsContainer = document.getElementById('subredditResults');
     
-    // Use template function instead of inline HTML
+    // Use existing template function
     const subredditsHTML = createDiscoveredSubredditsTemplate(subreddits, keywordsUsed);
     
     resultsContainer.innerHTML = subredditsHTML;
     resultsContainer.style.display = 'block';
 }
 
-// EXISTING: Initialize Reddit monitoring interface (NO CHANGES)
+// Initialize Reddit monitoring interface
 function initializeRedditMonitor() {
     // Show/hide Reddit monitor based on setup completion
     const redditSection = document.querySelector('.reddit-section');
@@ -252,7 +252,7 @@ function initializeRedditMonitor() {
     console.log('Reddit monitor initialized');
 }
 
-// UPDATED: Update Reddit monitor status
+// Update Reddit monitor status
 function updateRedditMonitorStatus() {
     const statusElement = document.getElementById('redditStatus');
     if (statusElement) {
@@ -270,7 +270,7 @@ function updateRedditMonitorStatus() {
     }
 }
 
-// DEBUGGING: Test Reddit API connection (NO CHANGES)
+// Test Reddit API connection
 async function testRedditConnection() {
     try {
         console.log('🧪 Testing Reddit API connection...');

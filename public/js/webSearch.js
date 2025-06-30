@@ -1,7 +1,6 @@
-// ===== public/js/webSearch.js =====
 // Web search functionality and article handling
 
-// UPDATED: Generate search queries AND Reddit queries from foundational intelligence data
+// Generate search queries AND Reddit queries with formatted display
 async function generateQueries() {
     if (!window.appState.foundationalIntelligence) {
         alert('No foundational intelligence data available');
@@ -21,16 +20,14 @@ async function generateQueries() {
         console.log('Queries structure:', queries);
         console.log('Has competitor_queries?', !!queries?.competitor_queries);
         
-        // Display search queries
-        document.getElementById('competitorQueriesOutput').textContent = JSON.stringify(queries.competitor_queries, null, 2);
-        document.getElementById('keywordQueriesOutput').textContent = JSON.stringify(queries.keyword_queries, null, 2);
-        document.getElementById('contentQueriesOutput').textContent = JSON.stringify(queries.content_queries, null, 2);
+        // Display formatted search queries instead of raw JSON
+        displayFormattedQueries(queries);
         
         // Show search queries container
         const queriesContainer = document.getElementById('queriesContainer');
         queriesContainer.style.display = 'block';
         
-        // UPDATED: Also generate Reddit queries
+        // Also generate Reddit queries
         try {
             console.log('🔍 Also generating Reddit queries...');
             await generateRedditQueries();
@@ -69,7 +66,35 @@ async function generateQueries() {
     }
 }
 
-// Execute test search (NO CHANGES)
+// NEW: Display formatted queries using templates
+function displayFormattedQueries(queries) {
+    // Display Competitor Queries
+    const competitorDisplay = document.getElementById('competitorQueriesDisplay');
+    if (competitorDisplay && queries.competitor_queries) {
+        competitorDisplay.innerHTML = createSearchQueriesTemplate(queries.competitor_queries, 'competitor');
+    }
+    
+    // Display Keyword Queries
+    const keywordDisplay = document.getElementById('keywordQueriesDisplay');
+    if (keywordDisplay && queries.keyword_queries) {
+        keywordDisplay.innerHTML = createSearchQueriesTemplate(queries.keyword_queries, 'keyword');
+    }
+    
+    // Display Content Queries
+    const contentDisplay = document.getElementById('contentQueriesDisplay');
+    if (contentDisplay && queries.content_queries) {
+        contentDisplay.innerHTML = createSearchQueriesTemplate(queries.content_queries, 'content');
+    }
+    
+    // Keep raw data for copy functionality (hidden)
+    document.getElementById('competitorQueriesOutput').textContent = JSON.stringify(queries.competitor_queries, null, 2);
+    document.getElementById('keywordQueriesOutput').textContent = JSON.stringify(queries.keyword_queries, null, 2);
+    document.getElementById('contentQueriesOutput').textContent = JSON.stringify(queries.content_queries, null, 2);
+    
+    console.log('✅ Formatted search queries displayed');
+}
+
+// Execute test search (unchanged)
 async function executeTestSearch() {
     const query = document.getElementById('testQuery').value.trim();
     
@@ -88,7 +113,7 @@ async function executeTestSearch() {
         
         // Store articles globally and display them
         if (searchData.articles && Array.isArray(searchData.articles)) {
-            // UPDATED: Merge with existing search results instead of replacing
+            // Merge with existing search results instead of replacing
             const existingResults = window.appState.searchResults || [];
             window.appState.searchResults = [...existingResults, ...searchData.articles];
             
@@ -120,19 +145,19 @@ async function executeTestSearch() {
     }
 }
 
-// UPDATED: Display articles with Reddit support (unified display) - NOW USES TEMPLATE
+// Display articles with Reddit support (unified display) - uses existing template
 function displayArticles(articles) {
     if (!articles || !Array.isArray(articles) || articles.length === 0) {
         document.getElementById('searchResultsOutput').innerHTML = '<p>No articles found.</p>';
         return;
     }
     
-    // Use template function instead of inline HTML construction
+    // Use existing template function
     const articlesHTML = createArticlesDisplayTemplate(articles);
     
     document.getElementById('searchResultsOutput').innerHTML = articlesHTML;
     
-    // DEBUGGING: Log article selection state
+    // Log article selection state
     console.log('📊 Article display state:', {
         totalArticles: articles.length,
         selectedArticles: articles.filter(a => a.selected).length,
@@ -141,9 +166,9 @@ function displayArticles(articles) {
     });
 }
 
-// UPDATED: Display API call information for debugging - NOW USES TEMPLATE
+// Display API call information for debugging - uses existing template
 function displayAPICallInfo(searchData) {
-    // Use template function instead of inline HTML construction
+    // Use existing template function
     const apiInfoHTML = createAPICallInfoTemplate(searchData);
     
     // Add API info before the articles
@@ -151,7 +176,7 @@ function displayAPICallInfo(searchData) {
     existingOutput.innerHTML = apiInfoHTML + existingOutput.innerHTML;
 }
 
-// FIXED: Article selection functions with proper ID handling (NO CHANGES)
+// Article selection functions (unchanged)
 function toggleArticleSelection(articleId) {
     // Ensure articleId is treated as string
     const targetId = String(articleId);
