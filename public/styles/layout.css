@@ -1,29 +1,131 @@
-/* Layout styles: Container, header, main sections */
+/* Layout styles: App container, sidebar, main content area */
 
-.container {
-    max-width: 1000px;
-    margin: 0 auto;
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     padding: 20px;
+    margin-left: 0;
+    overflow-x: hidden;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 40px;
+.main-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 25px 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    color: #2d3748;
+    font-size: 2rem;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.header-content p {
+    color: #718096;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Updated form container for tab structure */
+.export-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(72, 187, 120, 0.3);
+}
+
+/* Content Container */
+.content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sub-navigation for Business Profile */
+.sub-navigation {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.sub-nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.sub-nav-button {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #718096;
+    flex: 1;
+    text-align: center;
+}
+
+.sub-nav-button:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.sub-nav-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Updated form container for sidebar layout */
 .form-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+/* Tab content containers */
+.tab-content-container {
     background: transparent;
     border-radius: 0;
     padding: 0;
     box-shadow: none;
     margin-bottom: 30px;
-}
-
-/* Tab content containers replace the old form/results containers */
-.tab-content-container {
-    /* Styles moved to tabs.css */
 }
 
 .section {
@@ -33,10 +135,11 @@ header {
 .loading {
     text-align: center;
     padding: 60px 20px;
-    background: #f7fafc;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     margin-bottom: 30px;
     border: 2px solid #e2e8f0;
+    backdrop-filter: blur(10px);
 }
 
 .spinner {
@@ -49,12 +152,12 @@ header {
     margin: 0 auto 20px;
 }
 
-/* Updated results and queries containers for tab structure */
+/* Results and queries containers */
 .results-container, .queries-container {
-    background: transparent;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     margin-bottom: 30px;
 }
 
@@ -114,7 +217,7 @@ header {
     border-radius: 12px;
 }
 
-.test-search-section h3 {
+.test-search-section h3, .test-search-section h4 {
     margin-bottom: 15px;
     color: #2d3748;
     background: transparent;
@@ -164,4 +267,19 @@ header {
     color: #4a5568;
     line-height: 1.6;
     margin-bottom: 15px;
+}
+
+/* Legacy header styles (kept for compatibility) */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+    display: none; /* Hidden in sidebar layout */
+}
+
+/* Container max-width removed for sidebar layout */
+.container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
 }

@@ -92,7 +92,7 @@ function copyTweet(tweetText, button) {
     }
 }
 
-// UPDATED: Reset form and application state with Reddit support
+// UPDATED: Reset form and application state with sidebar navigation support
 function resetForm() {
     // Reset all form data
     const form = document.getElementById('onboardingForm');
@@ -110,7 +110,10 @@ function resetForm() {
             ideaSources: false,
             ideaBank: false,
             contentBriefs: false,
-            settings: true                  // Settings is always available
+            settings: true,                 // Settings is always available
+            calendar: false,                // Future features
+            performance: false,
+            config: true
         },
         // Reset Reddit state
         discoveredSubreddits: [],
@@ -155,13 +158,21 @@ function resetForm() {
     // Show form container
     document.querySelector('.form-container').style.display = 'block';
     
-    // UPDATED: Reset tab navigation to setup tab
+    // UPDATED: Reset sidebar navigation to setup tab
     switchTab('setup');
     updateTabAvailability();
     updateEmptyStates();
     
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Reset header content
+    updateHeaderContent('setup');
     
-    console.log('✅ Application state reset with clean data structure, tab navigation, and Reddit support');
+    // Scroll to top of main content
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    console.log('✅ Application state reset with clean data structure, sidebar navigation, and Reddit support');
 }

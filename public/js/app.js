@@ -12,22 +12,61 @@ window.appState = {
         ideaSources: false,
         ideaBank: false,
         contentBriefs: false,
-        settings: true                  // Settings is always available
+        settings: true,                 // Settings is always available
+        calendar: false,                // Future features
+        performance: false,
+        config: true
     },
     // Reddit-specific state
     discoveredSubreddits: [],           // Discovered relevant subreddits
     redditQueries: []                   // Generated Reddit search queries
 };
 
+// Tab configuration for header updates
+const tabConfig = {
+    setup: {
+        title: 'Business Profile',
+        subtitle: 'Set up your business foundation and strategic intelligence'
+    },
+    ideaSources: {
+        title: 'Content Discovery',
+        subtitle: 'Generate search queries and discover content ideas'
+    },
+    ideaBank: {
+        title: 'Idea Bank',
+        subtitle: 'Collect and manage your content ideas'
+    },
+    contentBriefs: {
+        title: 'Content Briefs',
+        subtitle: 'Transform ideas into strategic content plans'
+    },
+    settings: {
+        title: 'Content Studio',
+        subtitle: 'Generate and refine your final content'
+    },
+    calendar: {
+        title: 'Content Calendar',
+        subtitle: 'Schedule and manage your content timeline'
+    },
+    performance: {
+        title: 'Performance Analytics',
+        subtitle: 'Track your content performance and insights'
+    },
+    config: {
+        title: 'Settings',
+        subtitle: 'Configure your tools and preferences'
+    }
+};
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Application initializing with clean data structure and tab navigation...');
+    console.log('Application initializing with sidebar navigation and clean data structure...');
     
     // Initialize forms
     initializeForms();
     
-    // Initialize tab system
-    initializeTabs();
+    // Initialize sidebar navigation
+    initializeSidebar();
     
     // Initialize Reddit monitoring
     initializeRedditMonitor();
@@ -36,22 +75,23 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Clean state structure:', Object.keys(window.appState));
 });
 
-// Initialize tab system
-function initializeTabs() {
+// Initialize sidebar navigation system
+function initializeSidebar() {
     // Set initial tab state
     switchTab('setup');
     updateTabAvailability();
+    updateHeaderContent('setup');
     
-    console.log('Tab system initialized');
+    console.log('Sidebar navigation initialized');
 }
 
-// Switch between tabs
+// Switch between tabs with sidebar navigation
 function switchTab(tabName) {
     // Hide all tab contents
     hideAllTabs();
     
-    // Remove active class from all tab buttons
-    document.querySelectorAll('.tab-button').forEach(btn => {
+    // Remove active class from all sidebar buttons
+    document.querySelectorAll('.sidebar-button').forEach(btn => {
         btn.classList.remove('active');
     });
     
@@ -61,16 +101,36 @@ function switchTab(tabName) {
     // Update current tab in state
     window.appState.currentTab = tabName;
     
-    // Update tab button styling
+    // Update sidebar button styling
     const targetButton = document.getElementById(tabName + 'Tab');
     if (targetButton) {
         targetButton.classList.add('active');
     }
     
+    // Update header content
+    updateHeaderContent(tabName);
+    
     // Update empty states
     updateEmptyStates();
     
     console.log('Switched to tab:', tabName);
+}
+
+// Update header content based on active tab
+function updateHeaderContent(tabName) {
+    const config = tabConfig[tabName];
+    if (!config) return;
+    
+    const headerTitle = document.querySelector('.header-content h1');
+    const headerSubtitle = document.querySelector('.header-content p');
+    
+    if (headerTitle) {
+        headerTitle.textContent = config.title;
+    }
+    
+    if (headerSubtitle) {
+        headerSubtitle.textContent = config.subtitle;
+    }
 }
 
 // Show specific tab content
@@ -90,7 +150,7 @@ function hideAllTabs() {
 
 // Update tab availability based on completion status
 function updateTabAvailability() {
-    const tabs = ['setup', 'ideaSources', 'ideaBank', 'contentBriefs', 'settings'];
+    const tabs = ['setup', 'ideaSources', 'ideaBank', 'contentBriefs', 'settings', 'calendar', 'performance', 'config'];
     
     tabs.forEach(tabName => {
         const tabButton = document.getElementById(tabName + 'Tab');
@@ -174,3 +234,4 @@ window.executeTestRedditSearch = executeTestRedditSearch;
 window.switchTab = switchTab;
 window.markTabCompleted = markTabCompleted;
 window.updateEmptyStates = updateEmptyStates;
+window.updateHeaderContent = updateHeaderContent;

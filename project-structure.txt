@@ -5,9 +5,9 @@
 ├── controllers
 │   ├── businessIntelligence.js
 │   ├── competitorResearch.js
+│   ├── contentBriefs.js
 │   ├── contentGeneration.js
 │   ├── reddit.js
-│   ├── contentBriefs.js
 │   ├── webSearch.js
 │   ├── webSearchQueries.js
 │   └── websiteCrawling.js
@@ -16,8 +16,8 @@
 ├── project-structure.txt
 ├── prompts
 │   ├── content
-│   │   ├── contentGeneration.js
-│   │   └── contentBriefs.js
+│   │   ├── contentBriefs.js
+│   │   └── contentGeneration.js
 │   ├── index.js
 │   ├── intelligence
 │   │   ├── businessAnalysis.js
@@ -31,12 +31,12 @@
 │   ├── js
 │   │   ├── api.js
 │   │   ├── app.js
+│   │   ├── contentBriefs.js
 │   │   ├── contentGeneration.js
 │   │   ├── forms.js
 │   │   ├── reddit.js
 │   │   ├── results.js
 │   │   ├── templates
-│   │   ├── contentBriefs.js
 │   │   ├── utils.js
 │   │   └── webSearch.js
 │   ├── results.html
@@ -44,13 +44,13 @@
 │       ├── articles.css
 │       ├── base.css
 │       ├── components.css
+│       ├── contentBriefs.css
 │       ├── contentGeneration.css
 │       ├── forms.css
 │       ├── layout.css
 │       ├── reddit.css
 │       ├── responsive.css
-│       ├── tabs.css
-│       └── contentBriefs.css
+│       └── tabs.css
 ├── routes
 │   ├── content.js
 │   ├── intelligence.js
