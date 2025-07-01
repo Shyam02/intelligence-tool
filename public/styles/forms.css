@@ -9,7 +9,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--text-primary);
     font-size: 13px;
 }
 
@@ -18,25 +18,25 @@
 .form-group select {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light);
     border-radius: 8px;
     font-size: 16px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    background: white;
-    color: #2d3748;
+    background: var(--white);
+    color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-    color: #a0aec0;
+    color: var(--text-light);
     font-weight: 400;
 }
 
@@ -62,7 +62,7 @@
 /* Help Text Styling */
 .help-text {
     font-size: 14px;
-    color: #718096;
+    color: var(--text-muted);
     margin-top: 5px;
     line-height: 1.5;
     font-weight: 400;
@@ -71,7 +71,7 @@
 /* Category Indicator Styling */
 .category-indicator {
     background: #edf2f7;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -80,7 +80,7 @@
 }
 
 .category-indicator strong {
-    color: #2d3748;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -88,41 +88,41 @@
 .form-group.error input,
 .form-group.error textarea,
 .form-group.error select {
-    border-color: #f56565;
+    border-color: var(--error);
     box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
 }
 
 .form-group.success input,
 .form-group.success textarea,
 .form-group.success select {
-    border-color: #48bb78;
+    border-color: var(--success);
     box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
 }
 
 .form-group.warning input,
 .form-group.warning textarea,
 .form-group.warning select {
-    border-color: #ed8936;
+    border-color: var(--warning);
     box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.1);
 }
 
 /* Error, Success, and Warning Text */
 .error-text {
-    color: #f56565;
+    color: var(--error);
     font-size: 12px;
     margin-top: 4px;
     font-weight: 500;
 }
 
 .success-text {
-    color: #48bb78;
+    color: var(--success);
     font-size: 12px;
     margin-top: 4px;
     font-weight: 500;
 }
 
 .warning-text {
-    color: #ed8936;
+    color: var(--warning);
     font-size: 12px;
     margin-top: 4px;
     font-weight: 500;
@@ -150,7 +150,7 @@
 .form-group input[type="radio"] {
     width: auto;
     margin-right: 8px;
-    accent-color: #667eea;
+    accent-color: var(--primary);
     transform: scale(1.1);
 }
 
@@ -172,7 +172,7 @@
 /* Enhanced Required Field Indicators */
 .form-group label.required::after {
     content: " *";
-    color: #f56565;
+    color: var(--error);
     font-weight: 600;
 }
 
@@ -180,14 +180,14 @@
 .form-group input:disabled,
 .form-group textarea:disabled,
 .form-group select:disabled {
-    background-color: #f7fafc;
-    color: #a0aec0;
+    background-color: var(--bg-light);
+    color: var(--text-light);
     cursor: not-allowed;
-    border-color: #e2e8f0;
+    border-color: var(--border-light);
 }
 
 .form-group label.disabled {
-    color: #a0aec0;
+    color: var(--text-light);
     cursor: not-allowed;
 }
 
@@ -204,8 +204,8 @@
     right: 12px;
     width: 16px;
     height: 16px;
-    border: 2px solid #e2e8f0;
-    border-top: 2px solid #667eea;
+    border: 2px solid var(--border-light);
+    border-top: 2px solid var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     transform: translateY(-50%);
@@ -213,7 +213,7 @@
 
 /* Enhanced Form Container Styling */
 .form-container {
-    background: white;
+    background: var(--white);
     border-radius: 12px;
     padding: 30px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.06);
@@ -224,7 +224,7 @@
 .form-section {
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-light);
 }
 
 .form-section:last-child {
@@ -233,12 +233,12 @@
 }
 
 .form-section h3 {
-    color: #2d3748;
+    color: var(--text-primary);
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 15px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--border-light);
 }
 
 /* Enhanced Form Layout Utilities */
