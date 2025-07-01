@@ -5,23 +5,23 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-right: 8px;
-    margin-bottom: 8px;
+    margin-right: 6px;
+    margin-bottom: 6px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
 }
 
 .submit-btn:hover, .next-btn:hover, .reset-btn:hover, .test-btn:hover, .test-api-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
 }
 
 .submit-btn:active, .next-btn:active, .reset-btn:active, .test-btn:active, .test-api-btn:active {
@@ -35,32 +35,32 @@
 }
 
 .reset-btn:hover {
-    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3);
+    box-shadow: 0 3px 10px rgba(245, 101, 101, 0.3);
 }
 
 .test-api-btn {
-    margin-top: 8px;
-    padding: 8px 16px;
+    margin-top: 6px;
+    padding: 6px 14px;
     background: #4299e1;
     box-shadow: 0 2px 4px rgba(66, 153, 225, 0.2);
 }
 
 .test-api-btn:hover {
     background: #3182ce;
-    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+    box-shadow: 0 3px 10px rgba(66, 153, 225, 0.3);
 }
 
 /* Enhanced Copy Button Styles */
 .copy-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 6px;
+    right: 6px;
     background: #4299e1;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -70,16 +70,16 @@
 .copy-btn:hover {
     background: #3182ce;
     transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(66, 153, 225, 0.3);
+    box-shadow: 0 3px 6px rgba(66, 153, 225, 0.3);
 }
 
 .selection-btn {
     background: #4299e1;
     color: white;
     border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -89,16 +89,16 @@
 .selection-btn:hover {
     background: #3182ce;
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(66, 153, 225, 0.3);
+    box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
 }
 
 .copy-selected-btn {
     background: #48bb78;
     color: white;
     border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -108,16 +108,16 @@
 .copy-selected-btn:hover {
     background: #38a169;
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(72, 187, 120, 0.3);
+    box-shadow: 0 2px 5px rgba(72, 187, 120, 0.3);
 }
 
 .copy-tweet-btn {
     background: #4299e1;
     color: white;
     border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -127,13 +127,13 @@
 .copy-tweet-btn:hover {
     background: #3182ce;
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(66, 153, 225, 0.3);
+    box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
 }
 
 /* Enhanced Formatted Data Display Styles */
 .formatted-data-display {
     background: #fafbfc;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 0;
     font-family: inherit;
     border: 1px solid rgba(226, 232, 240, 0.4);
@@ -141,18 +141,18 @@
 
 .formatted-content {
     background: #fafbfc;
-    border-radius: 8px;
-    padding: 18px;
-    margin-bottom: 12px;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 10px;
     border: 1px solid rgba(226, 232, 240, 0.3);
 }
 
 .data-section {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 18px;
-    margin-bottom: 12px;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 10px;
     transition: border-color 0.2s ease;
 }
 
@@ -166,45 +166,45 @@
 
 .data-section h4 {
     color: #2d3748;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    margin-bottom: 12px;
-    padding-bottom: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
     border-bottom: 2px solid #f1f5f9;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 }
 
 .data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 12px;
-    margin-bottom: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .data-item {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 8px;
+    gap: 2px;
+    padding: 6px;
     background: #f8f9fa;
-    border-radius: 6px;
+    border-radius: 5px;
     border: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .data-item label {
     font-weight: 600;
     color: #4a5568;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .data-item span {
     color: #2d3748;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.4;
     font-weight: 500;
 }
@@ -224,31 +224,31 @@
 .description-text {
     color: #4a5568;
     line-height: 1.6;
-    font-size: 13px;
+    font-size: 12px;
     background: #f1f5f9;
-    padding: 12px;
-    border-radius: 6px;
+    padding: 10px;
+    border-radius: 5px;
     border-left: 3px solid #4299e1;
-    margin: 8px 0;
+    margin: 6px 0;
 }
 
 .feature-list, .problem-list {
-    margin: 8px 0;
-    padding-left: 18px;
+    margin: 6px 0;
+    padding-left: 16px;
     color: #4a5568;
 }
 
 .feature-list li, .problem-list li {
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     line-height: 1.4;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .inline-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin: 8px 0;
+    gap: 5px;
+    margin: 6px 0;
     padding: 0;
     list-style: none;
 }
@@ -256,9 +256,9 @@
 .inline-list li {
     background: #e2e8f0;
     color: #4a5568;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.3px;
 }
@@ -267,19 +267,19 @@
 .keywords-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .keyword-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .keyword-group label {
     font-weight: 600;
     color: #4a5568;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -287,13 +287,13 @@
 .keyword-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 3px;
 }
 
 .keyword-tag {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -325,10 +325,10 @@
 }
 
 .pain-point-item {
-    margin-bottom: 12px;
-    padding: 10px;
+    margin-bottom: 10px;
+    padding: 8px;
     background: #fafbfc;
-    border-radius: 6px;
+    border-radius: 5px;
     border: 1px solid #e2e8f0;
 }
 
@@ -339,29 +339,29 @@
 .pain-point-item label {
     font-weight: 600;
     color: #4a5568;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .social-links {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 
 .social-item {
-    font-size: 13px;
+    font-size: 12px;
     color: #4a5568;
-    padding: 4px 0;
+    padding: 3px 0;
 }
 
 .social-item a {
     color: #4299e1;
     text-decoration: none;
-    margin-left: 6px;
+    margin-left: 5px;
     font-weight: 500;
 }
 
@@ -372,71 +372,71 @@
 
 .extraction-details {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 6px;
     background: #f1f5f9;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 8px;
+    border-radius: 5px;
     border: 1px solid #e2e8f0;
 }
 
 .detail-item {
-    font-size: 11px;
+    font-size: 10px;
     color: #718096;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     font-weight: 500;
 }
 
 .subcategories, .demographics {
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .subcategories label, .demographics label {
     font-weight: 600;
     color: #4a5568;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .keywords-section {
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .keywords-section label {
     font-weight: 600;
     color: #4a5568;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 /* Enhanced Query Display Styles */
 .queries-header {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 18px;
-    margin-bottom: 16px;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 14px;
     text-align: center;
 }
 
 .queries-header h4 {
     color: #2d3748;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .queries-description {
     color: #718096;
-    font-size: 13px;
+    font-size: 12px;
     margin: 0;
     line-height: 1.5;
 }
@@ -444,9 +444,9 @@
 .query-category {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 12px;
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 10px;
     transition: border-color 0.2s ease;
 }
 
@@ -456,27 +456,27 @@
 
 .query-category h5 {
     color: #4a5568;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 12px;
-    padding-bottom: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
     border-bottom: 1px solid #f1f5f9;
 }
 
 .query-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .query-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: #fafbfc;
     border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 10px;
+    border-radius: 5px;
+    padding: 8px;
     transition: all 0.2s ease;
 }
 
@@ -492,13 +492,13 @@
 .query-number {
     background: #4299e1;
     color: white;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     flex-shrink: 0;
 }
@@ -510,12 +510,12 @@
 .query-text {
     flex: 1;
     color: #2d3748;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.4;
     font-family: 'Monaco', 'Consolas', monospace;
     background: white;
-    padding: 6px 10px;
-    border-radius: 4px;
+    padding: 5px 8px;
+    border-radius: 3px;
     border: 1px solid #e2e8f0;
 }
 
@@ -523,9 +523,9 @@
     background: #48bb78;
     color: white;
     border: none;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 9px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -536,20 +536,20 @@
 .copy-query-btn:hover {
     background: #38a169;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(72, 187, 120, 0.3);
+    box-shadow: 0 2px 3px rgba(72, 187, 120, 0.3);
 }
 
 .queries-usage {
     background: #f0fff4;
     border: 1px solid #9ae6b4;
-    border-radius: 8px;
-    padding: 12px;
-    margin-top: 16px;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 14px;
 }
 
 .usage-tip {
     color: #22543d;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.5;
     margin: 0;
 }
@@ -561,99 +561,99 @@
 /* Enhanced No Data State */
 .no-data {
     text-align: center;
-    padding: 30px 20px;
+    padding: 25px 16px;
     color: #718096;
     font-style: italic;
     background: #fafbfc;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px dashed #e2e8f0;
 }
 
 /* Enhanced API Information Display */
 .api-info-container {
     background: #f1f5f9;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 16px;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 14px;
     border: 1px solid #e2e8f0;
 }
 
 .api-info-container h4 {
     color: #2d3748;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
 }
 
 .api-info {
-    font-size: 13px;
+    font-size: 12px;
     color: #4a5568;
 }
 
 .api-info p {
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .api-info details {
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .api-info summary {
     cursor: pointer;
     font-weight: 600;
     color: #2d3748;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .api-info pre {
     background: #1a202c;
     color: #e2e8f0;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 6px;
+    border-radius: 5px;
+    font-size: 10px;
     overflow-x: auto;
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 /* Enhanced Competitor Intelligence Styles */
 .competitor-summary {
     background: #f8fafc;
     border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 16px;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 14px;
 }
 
 .competitor-stats {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
 }
 
 .competitor-stats span {
     color: #4a5568;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
 }
 
 .competitors-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 16px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
 }
 
 .competitor-card {
     background: #fafbfc;
     border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 14px;
     transition: all 0.2s ease;
 }
 
 .competitor-card:hover {
     border-color: #667eea;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.1);
     transform: translateY(-1px);
 }
 
@@ -661,22 +661,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .competitor-header h4 {
     color: #2d3748;
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
 }
 
 .relevance-badge {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -701,18 +701,18 @@
 }
 
 .competitor-details {
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.5;
 }
 
 .competitor-url {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .competitor-url a {
     color: #4299e1;
     text-decoration: none;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
 }
 
@@ -723,7 +723,7 @@
 
 .competitor-description {
     color: #4a5568;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-style: italic;
 }
 
@@ -732,7 +732,7 @@
 .competitor-features,
 .competitor-pricing,
 .competitor-stage {
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: #2d3748;
 }
 
@@ -747,92 +747,92 @@
 
 .competitive-insights {
     background: #f1f5f9;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 14px;
     border: 1px solid #e2e8f0;
 }
 
 .competitive-insights h4 {
     color: #2d3748;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-weight: 600;
 }
 
 .insights-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
 }
 
 .insight-card {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 12px;
+    border-radius: 5px;
+    padding: 10px;
 }
 
 .insight-card strong {
     color: #2d3748;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .insight-card ul {
     margin: 0;
-    padding-left: 16px;
+    padding-left: 14px;
 }
 
 .insight-card li {
     color: #4a5568;
-    margin-bottom: 3px;
-    font-size: 12px;
+    margin-bottom: 2px;
+    font-size: 11px;
 }
 
 .differentiation-opportunities {
     background: #f0fff4;
     border: 2px solid #9ae6b4;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 14px;
 }
 
 .differentiation-opportunities h4 {
     color: #22543d;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-weight: 600;
 }
 
 .opportunities-list {
     margin: 0;
-    padding-left: 18px;
+    padding-left: 16px;
 }
 
 .opportunities-list li {
     color: #2f855a;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     font-weight: 500;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .no-competitor-data {
     background: #fff5f5;
     border: 2px solid #feb2b2;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 6px;
+    padding: 14px;
     text-align: center;
 }
 
 .no-competitor-data p {
     color: #c53030;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .no-competitor-data .explanation {
     color: #744210;
-    font-size: 13px;
+    font-size: 12px;
     font-style: italic;
 }
 
@@ -854,7 +854,7 @@
     .query-item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 6px;
+        gap: 5px;
     }
     
     .query-text {
@@ -876,7 +876,7 @@
     
     .competitor-header {
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
         align-items: flex-start;
     }
     

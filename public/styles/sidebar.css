@@ -17,7 +17,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    padding: 25px 20px;
+    padding: 20px 18px;
     border-bottom: 1px solid rgba(226, 232, 240, 0.3);
     text-align: center;
     background: rgba(255, 255, 255, 0.98);
@@ -25,10 +25,10 @@
 }
 
 .sidebar-header h1 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #2d3748;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -36,7 +36,7 @@
 }
 
 .sidebar-header p {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #718096;
     margin: 0;
     font-weight: 500;
@@ -46,32 +46,32 @@
 /* Scrollable Sections Container */
 .sidebar-sections {
     flex: 1;
-    padding: 15px 0;
+    padding: 12px 0;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(160, 174, 192, 0.3) transparent;
 }
 
 .section-group {
-    margin-bottom: 30px;
-    padding: 0 20px;
+    margin-bottom: 25px;
+    padding: 0 16px;
 }
 
 .section-group:last-child {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .section-group h3 {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     letter-spacing: 1.2px;
     text-transform: uppercase;
     color: #a0aec0;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     padding: 0;
     background: none;
     border: none;
-    padding-left: 8px;
+    padding-left: 6px;
 }
 
 /* Enhanced Sidebar Buttons with Icons */
@@ -79,52 +79,52 @@
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 8px;
+    padding: 8px 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     background: transparent;
     color: #4a5568;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     position: relative;
     text-align: left;
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent;
 }
 
 .sidebar-button:hover {
     background: rgba(102, 126, 234, 0.06);
     color: #667eea;
     transform: translateX(1px);
-    border-left: 3px solid rgba(102, 126, 234, 0.2);
+    border-left: 2px solid rgba(102, 126, 234, 0.2);
 }
 
 .sidebar-button.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: 0 3px 12px rgba(102, 126, 234, 0.25);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
     transform: translateX(1px);
-    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-button.completed {
     background: rgba(72, 187, 120, 0.08);
     color: #38a169;
-    border-left: 3px solid #48bb78;
+    border-left: 2px solid #48bb78;
 }
 
 .sidebar-button.completed.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .button-icon {
-    font-size: 14px;
-    min-width: 18px;
+    font-size: 13px;
+    min-width: 16px;
     text-align: center;
     opacity: 0.8;
 }
@@ -139,8 +139,8 @@
 }
 
 .sidebar-status-indicator {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: #48bb78;
     opacity: 0;
@@ -156,17 +156,17 @@
     opacity: 1;
 }
 
-/* Enhanced Sub-navigation with Sticky Behavior */
+/* Enhanced Sub-navigation with Better Visibility */
 .sub-navigation {
     position: sticky;
     top: 0;
     z-index: 90;
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(20px);
-    border-radius: 10px;
-    padding: 6px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(226, 232, 240, 0.4);
 }
 
@@ -178,9 +178,9 @@
 .sub-nav-button {
     background: transparent;
     border: none;
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -191,7 +191,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
+    min-height: 32px;
 }
 
 .sub-nav-button:hover {
@@ -203,6 +204,7 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+    font-weight: 700;
 }
 
 .sub-nav-button.sub-tab-disabled {
@@ -229,48 +231,48 @@
 /* Enhanced Sub-tab Empty States */
 .sub-tab-empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 50px 16px;
     color: #718096;
     background: #fafbfc;
-    border-radius: 10px;
+    border-radius: 8px;
     border: 2px dashed #e2e8f0;
-    margin: 20px 0;
+    margin: 16px 0;
 }
 
 .sub-tab-empty-state .empty-state-icon {
-    font-size: 2.5rem;
-    margin-bottom: 16px;
+    font-size: 2.2rem;
+    margin-bottom: 14px;
     opacity: 0.7;
 }
 
 .sub-tab-empty-state h3 {
     color: #2d3748;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     background: none;
     padding: 0;
     border: none;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
 }
 
 .sub-tab-empty-state p {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
-    max-width: 400px;
-    margin: 0 auto 8px auto;
+    max-width: 350px;
+    margin: 0 auto 6px auto;
 }
 
 .sub-tab-empty-state .arrow {
-    font-size: 20px;
-    margin: 16px 0;
+    font-size: 18px;
+    margin: 14px 0;
     color: #667eea;
 }
 
 .sub-tab-empty-state .next-step {
     font-weight: 600;
     color: #667eea;
-    margin-top: 8px;
-    font-size: 13px;
+    margin-top: 6px;
+    font-size: 12px;
 }
 
 /* Tab Content Styles */
@@ -286,7 +288,7 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(6px);
     }
     to {
         opacity: 1;
@@ -297,11 +299,11 @@
 /* Tab Content Containers */
 .tab-content-container {
     background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-    min-height: 350px;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+    min-height: 300px;
     border: 1px solid rgba(226, 232, 240, 0.3);
 }
 
@@ -309,48 +311,48 @@
 .setup-tab h2 {
     color: #667eea;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 .idea-sources-tab h2 {
     color: #ed8936;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 .idea-bank-tab h2 {
     color: #38b2ac;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 .content-briefs-tab h2 {
     color: #1DA1F2;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 .settings-tab h2 {
     color: #718096;
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-weight: 600;
 }
 
 /* Enhanced Empty State Styles */
 .empty-state {
     text-align: center;
-    padding: 50px 20px;
+    padding: 40px 16px;
     color: #718096;
 }
 
 .empty-state h3 {
     color: #2d3748;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     background: none;
     padding: 0;
     border: none;
@@ -358,30 +360,30 @@
 }
 
 .empty-state p {
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.6;
-    max-width: 450px;
+    max-width: 400px;
     margin: 0 auto;
 }
 
 .empty-state .arrow {
-    font-size: 22px;
-    margin: 18px 0;
+    font-size: 20px;
+    margin: 16px 0;
     color: #667eea;
 }
 
 /* Content Generation Section Integration */
 .content-generation-section {
     border-top: 2px solid #10b981;
-    margin-top: 25px;
-    padding-top: 25px;
+    margin-top: 20px;
+    padding-top: 20px;
 }
 
 .content-generation-section h3 {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
-    margin: 0 -30px 18px -30px;
-    padding: 12px 30px;
+    margin: 0 -24px 16px -24px;
+    padding: 10px 24px;
     border-radius: 0;
     text-align: center;
     font-weight: 600;
@@ -389,7 +391,7 @@
 
 /* Enhanced Sidebar Scrollbar */
 .sidebar-sections::-webkit-scrollbar {
-    width: 4px;
+    width: 3px;
 }
 
 .sidebar-sections::-webkit-scrollbar-track {
@@ -408,25 +410,25 @@
 /* Responsive Design Enhancements */
 @media (max-width: 1024px) {
     .sidebar {
-        width: 260px;
+        width: 250px;
     }
     
     .sidebar-header {
-        padding: 20px 16px;
+        padding: 16px 14px;
     }
     
     .section-group {
-        padding: 0 16px;
+        padding: 0 14px;
     }
     
     .sidebar-button {
-        padding: 9px 10px;
-        font-size: 12px;
+        padding: 7px 8px;
+        font-size: 11px;
     }
     
     .sub-nav-button {
-        padding: 9px 12px;
-        font-size: 12px;
+        padding: 7px 10px;
+        font-size: 11px;
     }
 }
 
@@ -437,22 +439,22 @@
     
     .sidebar {
         width: 100%;
-        max-height: 180px;
+        max-height: 160px;
         overflow-y: auto;
         border-right: none;
         border-bottom: 1px solid rgba(226, 232, 240, 0.3);
     }
     
     .sidebar-header {
-        padding: 12px 16px;
+        padding: 10px 14px;
     }
     
     .sidebar-header h1 {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .sidebar-sections {
-        padding: 8px 0;
+        padding: 6px 0;
         display: flex;
         overflow-x: auto;
         overflow-y: hidden;
@@ -462,51 +464,51 @@
     .section-group {
         display: inline-flex;
         flex-direction: column;
-        margin-right: 16px;
-        padding: 0 12px;
-        min-width: 140px;
-    }
-    
-    .section-group h3 {
-        font-size: 9px;
-        margin-bottom: 6px;
-    }
-    
-    .sidebar-button {
-        padding: 6px 8px;
-        margin-bottom: 3px;
-        font-size: 11px;
+        margin-right: 14px;
+        padding: 0 10px;
         min-width: 120px;
     }
     
+    .section-group h3 {
+        font-size: 8px;
+        margin-bottom: 5px;
+    }
+    
+    .sidebar-button {
+        padding: 5px 7px;
+        margin-bottom: 2px;
+        font-size: 10px;
+        min-width: 110px;
+    }
+    
     .button-icon {
-        font-size: 12px;
-        min-width: 14px;
+        font-size: 11px;
+        min-width: 13px;
     }
     
     .sub-nav-buttons {
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
     }
     
     .sub-nav-button {
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 6px 10px;
+        font-size: 11px;
     }
     
     .sub-tab-empty-state {
-        padding: 40px 15px;
+        padding: 30px 12px;
     }
     
     .sub-tab-empty-state .empty-state-icon {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     
     .sub-tab-empty-state h3 {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
     
     .sub-tab-empty-state p {
-        font-size: 13px;
+        font-size: 12px;
     }
 }

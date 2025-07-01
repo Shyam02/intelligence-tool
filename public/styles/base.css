@@ -14,7 +14,7 @@ body {
     color: #2d3748;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -22,64 +22,64 @@ body {
 
 /* Enhanced Typography Hierarchy */
 h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     line-height: 1.2;
     color: #1a202c;
-    margin-bottom: 8px;
-    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    letter-spacing: -0.4px;
 }
 
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 600;
     line-height: 1.3;
-    color: #2d3748;
-    margin-bottom: 16px;
-    letter-spacing: -0.3px;
-}
-
-h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    line-height: 1.4;
     color: #2d3748;
     margin-bottom: 12px;
     letter-spacing: -0.2px;
 }
 
-h4 {
-    font-size: 1rem;
+h3 {
+    font-size: 1.1rem;
     font-weight: 600;
     line-height: 1.4;
     color: #2d3748;
     margin-bottom: 10px;
+    letter-spacing: -0.1px;
 }
 
-h5 {
-    font-size: 0.9rem;
+h4 {
+    font-size: 0.95rem;
     font-weight: 600;
     line-height: 1.4;
-    color: #4a5568;
+    color: #2d3748;
     margin-bottom: 8px;
 }
 
-h6 {
-    font-size: 0.8rem;
+h5 {
+    font-size: 0.85rem;
     font-weight: 600;
     line-height: 1.4;
     color: #4a5568;
     margin-bottom: 6px;
+}
+
+h6 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #4a5568;
+    margin-bottom: 5px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 /* Enhanced Paragraph and Text Styles */
 p {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.6;
     color: #4a5568;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     font-weight: 400;
 }
 
@@ -104,40 +104,40 @@ a:focus {
 
 /* Enhanced List Styles */
 ul, ol {
-    margin-bottom: 12px;
-    padding-left: 20px;
+    margin-bottom: 10px;
+    padding-left: 18px;
 }
 
 li {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.6;
     color: #4a5568;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 /* Enhanced Text Utilities */
 .text-xs {
-    font-size: 11px;
+    font-size: 10px;
 }
 
 .text-sm {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .text-base {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .text-lg {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .text-xl {
-    font-size: 18px;
+    font-size: 17px;
 }
 
 .text-2xl {
-    font-size: 20px;
+    font-size: 19px;
 }
 
 .font-light {
@@ -238,7 +238,7 @@ input:focus, textarea:focus, select:focus {
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(4px);
+        transform: translateY(3px);
     }
     to {
         opacity: 1;
@@ -249,7 +249,7 @@ input:focus, textarea:focus, select:focus {
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateX(-8px);
+        transform: translateX(-6px);
     }
     to {
         opacity: 1;
@@ -322,7 +322,7 @@ input:focus, textarea:focus, select:focus {
     body {
         background: white;
         color: black;
-        font-size: 12pt;
+        font-size: 11pt;
         line-height: 1.4;
     }
     
@@ -401,4 +401,55 @@ input:focus, textarea:focus, select:focus {
 ::-moz-selection {
     background: rgba(102, 126, 234, 0.2);
     color: #1a202c;
+}
+
+/* Additional Form Styling for Better Integration */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 13px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.help-text {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+.category-indicator {
+    background: #edf2f7;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.category-indicator strong {
+    color: #2d3748;
 }
