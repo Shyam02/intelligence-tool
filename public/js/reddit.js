@@ -181,7 +181,7 @@ function displayRedditSearchSummary(searchResponse, query) {
 }
 
 // Discover relevant subreddits using existing template
-async function discoverRelevantSubreddits() {
+async function discoverSubreddits() {
     if (!window.appState.foundationalIntelligence) {
         alert('Please complete the Setup tab first to generate business intelligence');
         return;

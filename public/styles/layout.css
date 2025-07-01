@@ -74,7 +74,7 @@ body {
     box-shadow: var(--shadow-md);
     height: var(--header-height);
     border-radius: 0 0 12px 12px;
-    margin: 0 8px 0 0;
+    margin: 0;
 }
 
 .header-content {
@@ -154,7 +154,7 @@ body {
     position: fixed;
     top: var(--header-height);
     left: var(--sidebar-width);
-    right: 8px;
+    right: 0;
     z-index: 85;
     height: var(--sub-nav-height);
     display: flex;

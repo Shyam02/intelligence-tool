@@ -11,11 +11,12 @@
     }
     
     .main-content {
-        padding: 15px;
+        padding: 0;  /* FIXED: Remove padding that creates gaps */
     }
     
     .main-header {
-        padding: 20px 25px;
+        padding: 20px 24px;
+        margin: 0;  /* ENSURE no margin on tablet */
     }
     
     .header-content h1 {
@@ -105,10 +106,9 @@
     }
     
     .main-header {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-        padding: 15px 20px;
+        padding: 20px 24px;
+        height: var(--header-height);
+        margin: 0;  /* FIXED: No margin for full width */
     }
     
     .header-content h1 {
@@ -130,9 +130,9 @@
     }
     
     .sub-navigation {
-        margin-bottom: 15px;
-        padding: 6px;
-    }
+        top: var(--header-height);
+        left: var(--sidebar-width);
+        right: 0;  /* FIXED: Full width to match header */
     
     .sub-nav-buttons {
         flex-direction: column;
