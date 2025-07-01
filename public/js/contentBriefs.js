@@ -1,4 +1,4 @@
-// Content briefs generation and display
+// Content briefs generation and display - cleaned up to redirect content generation properly
 
 // Generate content briefs from selected articles
 async function generateContentBriefs() {
@@ -95,7 +95,7 @@ function createBusinessContext() {
     return businessContext;
 }
 
-// UPDATED: Display content briefs with content generation integration
+// FIXED: Display content briefs without content generation integration
 function displayContentBriefs(briefsData) {
     // Get the existing briefs container in the content briefs tab
     let briefsContainer = document.getElementById('contentBriefs');
@@ -108,26 +108,20 @@ function displayContentBriefs(briefsData) {
     // Use template function for briefs display
     const briefsHTML = createContentBriefsTemplate(briefsData);
     
-    // UPDATED: Add content generation section after briefs
+    // FIXED: Add simple generation button section
     const contentGenerationSection = `
-        <div class="content-generation-section" id="contentGenerationSection" style="display: none;">
-            ${createGenerationButtonTemplate()}
-            <div id="generatedContentContainer">
-                ${createEmptyContentGenerationTemplate()}
-            </div>
+        <div class="content-generation-trigger">
+            <h3>📋 Ready for Content Generation</h3>
+            <p>Your content briefs are ready! Generate final Twitter content in the Content Studio.</p>
+            <button class="generate-content-btn" onclick="generateContentFromBriefs()">
+                🎨 Generate Twitter Content
+            </button>
+            <p class="generation-help">This will create ready-to-post Twitter content and take you to the Content Studio</p>
         </div>
     `;
     
     briefsContainer.innerHTML = briefsHTML + contentGenerationSection;
     briefsContainer.style.display = 'block';
     
-    // Show the generation button section
-    setTimeout(() => {
-        const generationSection = document.getElementById('contentGenerationSection');
-        if (generationSection) {
-            generationSection.style.display = 'block';
-        }
-    }, 500);
-    
-    console.log('✅ Content briefs displayed with content generation integration');
+    console.log('✅ Content briefs displayed with generation redirect');
 }

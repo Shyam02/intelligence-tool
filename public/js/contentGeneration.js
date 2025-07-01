@@ -1,4 +1,4 @@
-// Content Generation Frontend - Handle content generation UI and interactions
+// Content Generation Frontend - Handle content generation UI and interactions with proper routing
 
 // Generate content from content briefs
 async function generateContentFromBriefs() {
@@ -28,19 +28,20 @@ async function generateContentFromBriefs() {
         
         const generatedContent = await generateTwitterContentAPI(briefsData, businessContext);
         
-        // Display the generated content
-        displayGeneratedContent(generatedContent);
+        // FIXED: Store generated content in app state for Twitter sub-tab
+        window.appState.generatedTwitterContent = generatedContent;
         
-        // Show the content generation section
-        const contentGenerationSection = document.getElementById('contentGenerationSection');
-        if (contentGenerationSection) {
-            contentGenerationSection.style.display = 'block';
-        }
+        // FIXED: Switch to Content Studio → Twitter sub-tab
+        switchTab('settings');  // Switch to Content Studio tab
+        switchSubTab('settings', 'twitter');  // Switch to Twitter sub-tab
         
-        // Scroll to generated content
-        contentGenerationSection.scrollIntoView({ behavior: 'smooth' });
+        // FIXED: Display content in Twitter sub-tab
+        displayGeneratedContentInTwitterTab(generatedContent);
         
-        console.log('✅ Content generation completed successfully');
+        // FIXED: Mark Twitter sub-tab as completed
+        markSubTabCompleted('settings', 'twitter');
+        
+        console.log('✅ Content generation completed and redirected to Twitter tab');
         
     } catch (error) {
         console.error('Content generation failed:', error);
@@ -49,6 +50,53 @@ async function generateContentFromBriefs() {
         generateBtn.textContent = originalText;
         generateBtn.disabled = false;
     }
+}
+
+// FIXED: Display generated content in Twitter sub-tab
+function displayGeneratedContentInTwitterTab(generatedContent) {
+    const twitterSubTabContent = document.getElementById('twitterSubTabContent');
+    if (!twitterSubTabContent) {
+        console.error('Twitter sub-tab content container not found');
+        return;
+    }
+    
+    // Hide empty state
+    const emptyState = document.getElementById('twitterEmptyState');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    // Create content container if it doesn't exist
+    let contentContainer = document.getElementById('twitterContentContainer');
+    if (!contentContainer) {
+        contentContainer = document.createElement('div');
+        contentContainer.id = 'twitterContentContainer';
+        contentContainer.className = 'twitter-content-container';
+        
+        // Add header
+        const headerHTML = `
+            <div class="twitter-content-header">
+                <h3>🐦 Generated Twitter Content</h3>
+                <p>Ready-to-post Twitter content from your briefs</p>
+            </div>
+        `;
+        
+        contentContainer.innerHTML = headerHTML;
+        twitterSubTabContent.appendChild(contentContainer);
+    }
+    
+    // Display the generated content using existing template
+    const contentHTML = createGeneratedContentTemplate(generatedContent);
+    
+    // Add content after header
+    const existingHeader = contentContainer.querySelector('.twitter-content-header');
+    if (existingHeader) {
+        contentContainer.innerHTML = existingHeader.outerHTML + contentHTML;
+    } else {
+        contentContainer.innerHTML = contentHTML;
+    }
+    
+    console.log('✅ Generated content displayed in Twitter sub-tab');
 }
 
 // Generate content for a specific brief
@@ -192,7 +240,7 @@ function createBusinessContextForGeneration() {
     };
 }
 
-// Display generated content using templates
+// Display generated content using templates (for brief-specific generation)
 function displayGeneratedContent(generatedContent) {
     const contentContainer = document.getElementById('generatedContentContainer');
     if (!contentContainer) {
