@@ -1,191 +1,237 @@
-/* Layout styles: App container, sidebar, main content area */
+/* Enhanced Layout styles: App container, sidebar, main content area with sticky headers */
 
 .app-container {
     display: flex;
     min-height: 100vh;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* Main Content Area */
+/* Enhanced Main Content Area */
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 16px;
     margin-left: 0;
     overflow-x: hidden;
+    position: relative;
 }
 
+/* Enhanced Sticky Main Header */
 .main-header {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 25px 30px;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 80;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    backdrop-filter: blur(20px);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid rgba(226, 232, 240, 0.3);
 }
 
 .header-content h1 {
     color: #2d3748;
-    font-size: 2rem;
-    margin-bottom: 5px;
+    font-size: 1.8rem;
+    margin-bottom: 4px;
     font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .header-content p {
     color: #718096;
-    font-size: 1.1rem;
+    font-size: 1rem;
     margin: 0;
+    font-weight: 500;
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .export-btn {
     background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 10px 18px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .export-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(72, 187, 120, 0.3);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
 }
 
-/* Content Container */
+/* Enhanced Content Container */
 .content-container {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
-/* Sub-navigation for Business Profile */
+/* Enhanced Sub-navigation (Sticky within content area) */
 .sub-navigation {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    padding: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 70;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 10px;
+    padding: 6px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.4);
 }
 
 .sub-nav-buttons {
     display: flex;
-    gap: 4px;
+    gap: 2px;
 }
 
 .sub-nav-button {
     background: transparent;
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     color: #718096;
     flex: 1;
     text-align: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .sub-nav-button:hover {
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(102, 126, 234, 0.08);
     color: #667eea;
 }
 
 .sub-nav-button.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
 }
 
-/* Updated form container for sidebar layout */
+.sub-nav-button.sub-tab-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    color: #cbd5e0;
+}
+
+.sub-nav-button.sub-tab-disabled:hover {
+    background: transparent;
+    color: #cbd5e0;
+}
+
+/* Enhanced Form Container */
 .form-container {
     background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+    border: 1px solid rgba(226, 232, 240, 0.3);
 }
 
-/* Tab content containers */
+/* Tab Content Containers */
 .tab-content-container {
     background: transparent;
     border-radius: 0;
     padding: 0;
     box-shadow: none;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .section {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
+/* Enhanced Loading State */
 .loading {
     text-align: center;
-    padding: 60px 20px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    margin-bottom: 30px;
-    border: 2px solid #e2e8f0;
+    padding: 50px 20px;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(226, 232, 240, 0.3);
     backdrop-filter: blur(10px);
 }
 
 .spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #667eea;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
+    margin: 0 auto 16px;
 }
 
-/* Results and queries containers */
+.loading p {
+    color: #4a5568;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Enhanced Results and Queries Containers */
 .results-container, .queries-container {
     background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+    border: 1px solid rgba(226, 232, 240, 0.3);
 }
 
 .results-container h2, .queries-container h2 {
     color: #4a5568;
-    margin-bottom: 30px;
-    font-size: 1.5rem;
+    margin-bottom: 25px;
+    font-size: 1.4rem;
     text-align: center;
+    font-weight: 600;
 }
 
 .results-container h3, .queries-container h3 {
-    background: #f7fafc;
-    padding: 15px 20px;
-    margin: 0 0 20px 0;
+    background: #f8f9fa;
+    padding: 12px 18px;
+    margin: 0 0 18px 0;
     color: #2d3748;
-    font-size: 1.1rem;
+    font-size: 1rem;
     border-bottom: 1px solid #e2e8f0;
     border-radius: 8px;
+    font-weight: 600;
 }
 
 .result-section, .query-section {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
     background: white;
 }
 
+/* Enhanced Copy Section */
 .copy-section {
     position: relative;
 }
@@ -193,93 +239,262 @@
 .copy-section pre {
     background: #1a202c;
     color: #e2e8f0;
-    padding: 20px;
+    padding: 18px;
     overflow-x: auto;
     font-family: 'Monaco', 'Consolas', monospace;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
     margin: 0;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
 
+/* Enhanced Action Buttons */
 .action-buttons {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 25px;
+    padding-top: 18px;
     border-top: 1px solid #e2e8f0;
 }
 
+/* Enhanced Test Search Section */
 .test-search-section {
-    margin-top: 30px;
-    padding: 20px;
-    background: #f7fafc;
-    border-radius: 12px;
+    margin-top: 25px;
+    padding: 18px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
 }
 
 .test-search-section h3, .test-search-section h4 {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: #2d3748;
     background: transparent;
     padding: 0;
     border: none;
     border-radius: 0;
+    font-weight: 600;
 }
 
 .search-test {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    align-items: center;
 }
 
 .search-test input {
     flex: 1;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border: 2px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 14px;
+    transition: border-color 0.2s ease;
 }
 
+.search-test input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Enhanced Search Results */
 .search-results {
-    margin-top: 20px;
+    margin-top: 18px;
 }
 
 .search-results h4 {
     margin-bottom: 10px;
     color: #2d3748;
+    font-weight: 600;
 }
 
-/* Section styling within tabs */
+/* Section Styling Within Tabs */
 .tab-content-container .section {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .tab-content-container .section h3 {
     color: #2d3748;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     font-size: 1.1rem;
     background: transparent;
     padding: 0;
     border: none;
+    font-weight: 600;
 }
 
 .tab-content-container .section p {
     color: #4a5568;
     line-height: 1.6;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
-/* Legacy header styles (kept for compatibility) */
+/* Legacy Header Styles (Hidden in Sidebar Layout) */
 header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     color: white;
     display: none; /* Hidden in sidebar layout */
 }
 
-/* Container max-width removed for sidebar layout */
+/* Container Styles for Sidebar Layout */
 .container {
     max-width: none;
     margin: 0;
     padding: 0;
+}
+
+/* Enhanced Scrolling Behavior */
+.content-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(160, 174, 192, 0.3) transparent;
+}
+
+.content-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.content-container::-webkit-scrollbar-thumb {
+    background: rgba(160, 174, 192, 0.3);
+    border-radius: 3px;
+}
+
+.content-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(160, 174, 192, 0.5);
+}
+
+/* Responsive Design Enhancements */
+@media (max-width: 1024px) {
+    .main-content {
+        padding: 12px;
+    }
+    
+    .main-header {
+        padding: 16px 20px;
+    }
+    
+    .header-content h1 {
+        font-size: 1.6rem;
+    }
+    
+    .form-container {
+        padding: 25px;
+    }
+    
+    .results-container, .queries-container {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .main-content {
+        padding: 10px;
+    }
+    
+    .main-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 14px 18px;
+    }
+    
+    .header-content h1 {
+        font-size: 1.4rem;
+    }
+    
+    .header-content p {
+        font-size: 0.9rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .export-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+    
+    .sub-navigation {
+        margin-bottom: 12px;
+        padding: 4px;
+    }
+    
+    .sub-nav-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .sub-nav-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .form-container {
+        padding: 20px;
+    }
+    
+    .results-container, .queries-container {
+        padding: 20px;
+    }
+    
+    .search-test {
+        flex-direction: column;
+    }
+    
+    .search-test input {
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 8px;
+    }
+    
+    .main-header {
+        padding: 12px 14px;
+    }
+    
+    .header-content h1 {
+        font-size: 1.2rem;
+    }
+    
+    .header-content p {
+        font-size: 0.85rem;
+    }
+    
+    .export-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+    
+    .sub-navigation {
+        padding: 3px;
+        margin-bottom: 10px;
+    }
+    
+    .sub-nav-button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .form-container {
+        padding: 16px;
+    }
+    
+    .results-container, .queries-container {
+        padding: 16px;
+    }
 }
