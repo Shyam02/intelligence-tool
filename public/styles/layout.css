@@ -598,10 +598,7 @@ header {
 .reddit-content {
     word-wrap: break-word;
     overflow-wrap: break-word;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    /* Line clamp removed - was clipping entire subreddit grid */
 }
 
 /* BUTTON LAYOUT FIXES - Consistent button positioning in content cards */
