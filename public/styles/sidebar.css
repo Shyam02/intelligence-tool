@@ -1,4 +1,4 @@
-/* Sidebar Navigation Styles */
+/* Sidebar Navigation Styles with Sub-navigation Support */
 
 .sidebar {
     width: 280px;
@@ -134,6 +134,111 @@
     background: rgba(255, 255, 255, 0.8);
 }
 
+/* Sub-navigation Styles */
+.sub-navigation {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.sub-nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.sub-nav-button {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #718096;
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.sub-nav-button:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.sub-nav-button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.sub-nav-button.sub-tab-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #a0aec0;
+}
+
+.sub-nav-button.sub-tab-disabled:hover {
+    background: transparent;
+    color: #a0aec0;
+}
+
+/* Sub-tab Content Styles */
+.sub-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.sub-tab-content.active {
+    display: block;
+}
+
+/* Sub-tab Empty States */
+.sub-tab-empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #718096;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+}
+
+.sub-tab-empty-state .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.6;
+}
+
+.sub-tab-empty-state h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    background: none;
+    padding: 0;
+    border: none;
+    font-size: 1.2rem;
+}
+
+.sub-tab-empty-state p {
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto 10px auto;
+}
+
+.sub-tab-empty-state .arrow {
+    font-size: 24px;
+    margin: 20px 0;
+    color: #667eea;
+}
+
+.sub-tab-empty-state .next-step {
+    font-weight: 600;
+    color: #667eea;
+    margin-top: 10px;
+}
+
 /* Tab Content Styles */
 .tab-content {
     display: none;
@@ -196,7 +301,7 @@
     margin-bottom: 30px;
 }
 
-/* Empty State Styles */
+/* Empty State Styles (for main tabs) */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -285,6 +390,11 @@
         padding: 10px 14px;
         font-size: 13px;
     }
+    
+    .sub-nav-button {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -369,5 +479,21 @@
     .sub-nav-button {
         padding: 10px 16px;
         font-size: 13px;
+    }
+    
+    .sub-tab-empty-state {
+        padding: 60px 15px;
+    }
+    
+    .sub-tab-empty-state .empty-state-icon {
+        font-size: 2.5rem;
+    }
+    
+    .sub-tab-empty-state h3 {
+        font-size: 1.1rem;
+    }
+    
+    .sub-tab-empty-state p {
+        font-size: 14px;
     }
 }

@@ -1,4 +1,4 @@
-// Data Display Template Functions - Human-readable formatting for all data types
+// Data Display Template Functions - Human-readable formatting for all data types with sub-tab support
 // File path: /public/js/templates/dataDisplay.js
 
 // Template for Raw User Input display
@@ -412,6 +412,65 @@ function createRedditQueriesTemplate(queries) {
     `;
 }
 
+// NEW: Template for sub-tab empty states (reusable across all sub-tabs)
+function createSubTabEmptyStateTemplate(subTabName, dependencies) {
+    const emptyStateConfig = {
+        businessSetup: {
+            icon: '📋',
+            title: 'Business Setup',
+            description: 'Start by completing your business information to unlock other features.',
+            nextStep: 'Fill out the form above to begin'
+        },
+        competitors: {
+            icon: '🏆',
+            title: 'Competitor Analysis Awaiting',
+            description: 'Complete Business Setup first to discover and analyze your competitors automatically.',
+            nextStep: 'Go to Business Setup to begin'
+        },
+        strategicIntelligence: {
+            icon: '🧠',
+            title: 'Strategic Intelligence Awaiting',
+            description: 'Complete Business Setup first to generate your strategic market analysis and intelligence.',
+            nextStep: 'Go to Business Setup to begin'
+        },
+        searchIntelligence: {
+            icon: '🔍',
+            title: 'Search Intelligence Awaiting',
+            description: 'Complete Business Profile setup to generate strategic search queries and discover content opportunities.',
+            nextStep: 'Complete Business Profile first'
+        },
+        redditIntelligence: {
+            icon: '💬',
+            title: 'Reddit Intelligence Awaiting',
+            description: 'Complete Business Profile setup to discover Reddit communities and generate discussion queries.',
+            nextStep: 'Complete Business Profile first'
+        },
+        twitter: {
+            icon: '🐦',
+            title: 'Twitter Content Awaiting',
+            description: 'Generate content briefs first to create Twitter content.',
+            nextStep: 'Complete previous steps to unlock Twitter content generation'
+        }
+    };
+
+    const config = emptyStateConfig[subTabName] || {
+        icon: '⏳',
+        title: 'Content Awaiting',
+        description: 'Complete previous steps to unlock this feature.',
+        nextStep: 'Check previous tabs'
+    };
+
+    return `
+        <div class="sub-tab-empty-state">
+            <div class="empty-state-icon">${config.icon}</div>
+            <h3>${config.title}</h3>
+            <p>${config.description}</p>
+            <div class="arrow">←</div>
+            <p class="next-step">${config.nextStep}</p>
+        </div>
+    `;
+}
+
 // Helper function to format category names
 function formatCategoryName(category) {
     return category
@@ -437,3 +496,4 @@ function copyQueryToClipboard(queryText, button) {
 
 // Export functions for global access
 window.copyQueryToClipboard = copyQueryToClipboard;
+window.createSubTabEmptyStateTemplate = createSubTabEmptyStateTemplate;

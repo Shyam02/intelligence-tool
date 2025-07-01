@@ -98,104 +98,133 @@
 
             <!-- Tab Content Container -->
             <div class="content-container">
-                <!-- Tab 1: Setup -->
+                <!-- Tab 1: Setup (Business Profile) -->
                 <div id="setupTabContent" class="tab-content active">
                     <div class="tab-content-container setup-tab">
+                        <!-- Business Profile Sub-navigation -->
                         <div class="sub-navigation">
                             <div class="sub-nav-buttons">
-                                <button class="sub-nav-button active">
+                                <button class="sub-nav-button active" onclick="switchSubTab('setup', 'businessSetup')" id="businessSetupSubTab">
                                     📋 Business Setup
                                 </button>
-                                <button class="sub-nav-button">
+                                <button class="sub-nav-button sub-tab-disabled" onclick="switchSubTab('setup', 'competitors')" id="competitorsSubTab">
                                     🏆 Competitors
                                 </button>
-                                <button class="sub-nav-button">
+                                <button class="sub-nav-button sub-tab-disabled" onclick="switchSubTab('setup', 'strategicIntelligence')" id="strategicIntelligenceSubTab">
                                     🧠 Strategic Intelligence
                                 </button>
                             </div>
                         </div>
                         
-                        <div class="form-container">
-                            <h2>Business Setup & Intelligence</h2>
-                            <form id="onboardingForm">
-                                <div class="section">
-                                    <h2>Universal Questions</h2>
-                                    
-                                    <div class="form-group">
-                                        <label for="launchDate">What is your product/business launch date?</label>
-                                        <input type="date" id="launchDate" name="launchDate" required>
-                                        <p class="help-text">This can be a past date (if you've already launched) or a future date (if you're planning to launch). Even a tentative date helps us create the right content strategy for your business stage.</p>
+                        <!-- Business Setup Sub-tab -->
+                        <div id="businessSetupSubTabContent" class="sub-tab-content active">
+                            <div class="form-container">
+                                <h2>Business Setup & Intelligence</h2>
+                                <form id="onboardingForm">
+                                    <div class="section">
+                                        <h2>Universal Questions</h2>
+                                        
+                                        <div class="form-group">
+                                            <label for="launchDate">What is your product/business launch date?</label>
+                                            <input type="date" id="launchDate" name="launchDate" required>
+                                            <p class="help-text">This can be a past date (if you've already launched) or a future date (if you're planning to launch). Even a tentative date helps us create the right content strategy for your business stage.</p>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="targetGeography">What's your target geographic market?</label>
+                                            <input type="text" id="targetGeography" name="targetGeography" placeholder="e.g., US and Canada, Global, Europe">
+                                            <p class="help-text">Where do your customers come from? Examples: Global, United States, US and Canada, English-speaking countries, California only, India, Europe, Southeast Asia, New York City</p>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="websiteUrl">What's your website URL?</label>
+                                            <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://example.com">
+                                            <p class="help-text">Leave this blank if you don't have a website yet - we'll work with that!</p>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="businessSpecifics">Tell us anything specific about your business that would help us create better content</label>
+                                            <textarea id="businessSpecifics" name="businessSpecifics" rows="4" placeholder="Top 3 competitors, social media handles, unique features..."></textarea>
+                                            <p class="help-text">This helps us understand your unique situation. You can mention things like: Top 3 competitors (names or website URLs), Your social media handles (if you have them), Unique features or selling points, Target industries or customer types, Recent milestones or achievements, Challenges you're facing, Anything else that makes your business unique</p>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="targetGeography">What's your target geographic market?</label>
-                                        <input type="text" id="targetGeography" name="targetGeography" placeholder="e.g., US and Canada, Global, Europe">
-                                        <p class="help-text">Where do your customers come from? Examples: Global, United States, US and Canada, English-speaking countries, California only, India, Europe, Southeast Asia, New York City</p>
+                                    <div class="section" id="categorySpecificSection" style="display: none;">
+                                        <h2>Additional Information</h2>
+                                        <div id="categoryQuestions"></div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="websiteUrl">What's your website URL?</label>
-                                        <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://example.com">
-                                        <p class="help-text">Leave this blank if you don't have a website yet - we'll work with that!</p>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="businessSpecifics">Tell us anything specific about your business that would help us create better content</label>
-                                        <textarea id="businessSpecifics" name="businessSpecifics" rows="4" placeholder="Top 3 competitors, social media handles, unique features..."></textarea>
-                                        <p class="help-text">This helps us understand your unique situation. You can mention things like: Top 3 competitors (names or website URLs), Your social media handles (if you have them), Unique features or selling points, Target industries or customer types, Recent milestones or achievements, Challenges you're facing, Anything else that makes your business unique</p>
-                                    </div>
-                                </div>
-
-                                <div class="section" id="categorySpecificSection" style="display: none;">
-                                    <h2>Additional Information</h2>
-                                    <div id="categoryQuestions"></div>
-                                </div>
-
-                                <button type="submit" class="submit-btn">Generate Intelligence</button>
-                            </form>
-                        </div>
-
-                        <div class="loading" id="loading" style="display: none;">
-                            <div class="spinner"></div>
-                            <p>Generating foundational intelligence...</p>
-                        </div>
-
-                        <div class="results-container" id="resultsContainer" style="display: none;">
-                            <h2>🧠 Foundational Intelligence Generated</h2>
-                            
-                            <div class="result-section">
-                                <h3>Raw User Input</h3>
-                                <div class="formatted-content" id="userInputDisplay"></div>
-                                <div class="copy-section">
-                                    <pre id="onboardingDataOutput" style="display: none;"></pre>
-                                    <button class="copy-btn" onclick="copyToClipboard('onboardingDataOutput', this)">📋 Copy Raw Data</button>
-                                </div>
+                                    <button type="submit" class="submit-btn">Generate Intelligence</button>
+                                </form>
                             </div>
 
-                            <div class="result-section">
-                                <h3>AI Foundational Intelligence (Strategic Analysis)</h3>
-                                <div class="formatted-content" id="intelligenceDisplay"></div>
-                                <div class="copy-section">
-                                    <pre id="intelligenceOutput" style="display: none;"></pre>
-                                    <button class="copy-btn" onclick="copyToClipboard('intelligenceOutput', this)">📋 Copy Raw Data</button>
-                                </div>
+                            <div class="loading" id="loading" style="display: none;">
+                                <div class="spinner"></div>
+                                <p>Generating foundational intelligence...</p>
                             </div>
 
-                            <div class="action-buttons">
-                                <button class="next-btn" onclick="generateQueries()">🔍 Generate Search Queries</button>
-                                <button class="reset-btn" onclick="resetForm()">🔄 Start Over</button>
+                            <div class="results-container" id="resultsContainer" style="display: none;">
+                                <h2>🧠 Business Setup Results</h2>
+                                
+                                <div class="result-section">
+                                    <h3>Raw User Input</h3>
+                                    <div class="formatted-content" id="userInputDisplay"></div>
+                                    <div class="copy-section">
+                                        <pre id="onboardingDataOutput" style="display: none;"></pre>
+                                        <button class="copy-btn" onclick="copyToClipboard('onboardingDataOutput', this)">📋 Copy Raw Data</button>
+                                    </div>
+                                </div>
+
+                                <div class="action-buttons">
+                                    <button class="next-btn" onclick="generateQueries()">🔍 Generate Search Queries</button>
+                                    <button class="reset-btn" onclick="resetForm()">🔄 Start Over</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Competitors Sub-tab -->
+                        <div id="competitorsSubTabContent" class="sub-tab-content">
+                            <div id="competitorIntelligenceContainer"></div>
+                            <div id="competitorsEmptyState" class="sub-tab-empty-state">
+                                <h3>Competitor Analysis Awaiting</h3>
+                                <p>Complete Business Setup first to discover and analyze your competitors automatically.</p>
+                                <div class="arrow">←</div>
+                                <p>Go to Business Setup to begin</p>
+                            </div>
+                        </div>
+
+                        <!-- Strategic Intelligence Sub-tab -->
+                        <div id="strategicIntelligenceSubTabContent" class="sub-tab-content">
+                            <div id="strategicIntelligenceContainer"></div>
+                            <div id="strategicIntelligenceEmptyState" class="sub-tab-empty-state">
+                                <h3>Strategic Intelligence Awaiting</h3>
+                                <p>Complete Business Setup first to generate your strategic market analysis and intelligence.</p>
+                                <div class="arrow">←</div>
+                                <p>Go to Business Setup to begin</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab 2: Idea Sources -->
+                <!-- Tab 2: Idea Sources (Content Discovery) -->
                 <div id="ideaSourcesTabContent" class="tab-content">
                     <div class="tab-content-container idea-sources-tab">
-                        <h2>💡 Idea Generation Sources</h2>
+                        <h2>💡 Content Discovery</h2>
                         
-                        <div class="idea-sources-layout">
-                            <!-- Search Intelligence Section -->
+                        <!-- Content Discovery Sub-navigation -->
+                        <div class="sub-navigation">
+                            <div class="sub-nav-buttons">
+                                <button class="sub-nav-button active" onclick="switchSubTab('ideaSources', 'searchIntelligence')" id="searchIntelligenceSubTab">
+                                    🔍 Search Intelligence
+                                </button>
+                                <button class="sub-nav-button" onclick="switchSubTab('ideaSources', 'redditIntelligence')" id="redditIntelligenceSubTab">
+                                    💬 Reddit Intelligence
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Search Intelligence Sub-tab -->
+                        <div id="searchIntelligenceSubTabContent" class="sub-tab-content active">
                             <div class="source-section search-section">
                                 <div class="source-header">
                                     <h3>🔍 Search Intelligence</h3>
@@ -238,9 +267,18 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Reddit Intelligence Section -->
+                                <div id="searchIntelligenceEmptyState" class="sub-tab-empty-state">
+                                    <h3>Search Intelligence Awaiting</h3>
+                                    <p>Complete Business Profile setup to generate strategic search queries and discover content opportunities.</p>
+                                    <div class="arrow">←</div>
+                                    <p>Complete Business Profile first</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reddit Intelligence Sub-tab -->
+                        <div id="redditIntelligenceSubTabContent" class="sub-tab-content">
                             <div class="source-section reddit-section">
                                 <div class="source-header">
                                     <h3>💬 Reddit Intelligence</h3>
@@ -282,14 +320,14 @@
                                     <!-- Reddit Search Results Summary -->
                                     <div id="redditSearchResults" style="display: none;"></div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="empty-state" id="ideaSourcesEmpty">
-                            <h3>Ready to Generate Content Ideas</h3>
-                            <p>Complete the Setup tab first to generate search queries and start collecting content ideas.</p>
-                            <div class="arrow">↤</div>
-                            <p>Go to Setup tab to begin</p>
+                                <div id="redditIntelligenceEmptyState" class="sub-tab-empty-state">
+                                    <h3>Reddit Intelligence Awaiting</h3>
+                                    <p>Complete Business Profile setup to discover Reddit communities and generate discussion queries.</p>
+                                    <div class="arrow">←</div>
+                                    <p>Complete Business Profile first</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="action-buttons">
@@ -312,9 +350,9 @@
 
                         <div class="empty-state" id="ideaBankEmpty">
                             <h3>No Ideas Collected Yet</h3>
-                            <p>Execute searches from the Idea Sources tab to start collecting content ideas here.</p>
+                            <p>Execute searches from the Content Discovery tab to start collecting content ideas here.</p>
                             <div class="arrow">↤</div>
-                            <p>Use the test search in Idea Sources to get started</p>
+                            <p>Use the test search in Content Discovery to get started</p>
                         </div>
                     </div>
                 </div>
@@ -342,20 +380,28 @@
                     <div class="tab-content-container settings-tab">
                         <h2>🎨 Content Studio</h2>
                         
-                        <div class="section">
-                            <h3>Content Generation</h3>
-                            <p>Transform your content briefs into ready-to-post content.</p>
+                        <!-- Content Studio Sub-navigation -->
+                        <div class="sub-navigation">
+                            <div class="sub-nav-buttons">
+                                <button class="sub-nav-button active" onclick="switchSubTab('settings', 'twitter')" id="twitterSubTab">
+                                    🐦 Twitter
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="section">
-                            <h3>Brand Voice Settings</h3>
-                            <p>Configure your brand voice and content style preferences.</p>
-                        </div>
+                        <!-- Twitter Sub-tab -->
+                        <div id="twitterSubTabContent" class="sub-tab-content active">
+                            <div class="section">
+                                <h3>Twitter Content Generation</h3>
+                                <p>Transform your content briefs into ready-to-post Twitter content.</p>
+                            </div>
 
-                        <div class="section">
-                            <h3>API Configuration</h3>
-                            <p>Test your API connections to ensure everything is working properly.</p>
-                            <button onclick="testAPI()" class="test-api-btn">Test API Connection</button>
+                            <div id="twitterEmptyState" class="sub-tab-empty-state">
+                                <h3>Twitter Content Awaiting</h3>
+                                <p>Generate content briefs first to create Twitter content.</p>
+                                <div class="arrow">↤</div>
+                                <p>Complete previous steps to unlock Twitter content generation</p>
+                            </div>
                         </div>
                     </div>
                 </div>

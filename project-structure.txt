@@ -50,7 +50,7 @@
 │       ├── layout.css
 │       ├── reddit.css
 │       ├── responsive.css
-│       └── tabs.css
+│       └── sidebar.css
 ├── routes
 │   ├── content.js
 │   ├── intelligence.js

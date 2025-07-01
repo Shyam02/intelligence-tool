@@ -1,8 +1,28 @@
-// Results display management with formatted data display
+// Results display management with formatted data display and sub-tab distribution
 
-// Display intelligence generation results with formatted displays
+// Display intelligence generation results with sub-tab distribution
 function displayIntelligenceResults(userInput, websiteIntelligence, foundationalIntelligence) {
-    // Display 1: Formatted User Input Display
+    // Display 1: User Input in Business Setup sub-tab
+    displayBusinessSetupResults(userInput, websiteIntelligence);
+    
+    // Display 2: Competitor Intelligence in Competitors sub-tab
+    if (foundationalIntelligence.competitor_intelligence) {
+        displayCompetitorResults(foundationalIntelligence.competitor_intelligence);
+        markSubTabCompleted('setup', 'competitors');
+    }
+    
+    // Display 3: Foundational Intelligence in Strategic Intelligence sub-tab
+    const foundationalWithoutCompetitor = { ...foundationalIntelligence };
+    delete foundationalWithoutCompetitor.competitor_intelligence;
+    displayStrategicIntelligenceResults(foundationalWithoutCompetitor);
+    markSubTabCompleted('setup', 'strategicIntelligence');
+    
+    console.log('✅ Intelligence results distributed across sub-tabs');
+}
+
+// Display business setup results in Business Setup sub-tab
+function displayBusinessSetupResults(userInput, websiteIntelligence) {
+    // Display user input
     const userInputDisplay = document.getElementById('userInputDisplay');
     if (userInputDisplay) {
         userInputDisplay.innerHTML = createUserInputDisplayTemplate(userInput);
@@ -11,12 +31,12 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
     // Keep raw data for copy functionality (hidden)
     document.getElementById('onboardingDataOutput').textContent = JSON.stringify(userInput, null, 2);
     
-    // Display 2: AI-Extracted Website Intelligence (if available)
+    // Display website intelligence if available (in Business Setup)
     if (websiteIntelligence) {
-        // Create or update website intelligence section
+        // Create or update website intelligence section in Business Setup
         let websiteSection = document.getElementById('websiteIntelligenceSection');
         if (!websiteSection) {
-            // Create the new section
+            // Create the new section in Business Setup
             websiteSection = document.createElement('div');
             websiteSection.className = 'result-section';
             websiteSection.id = 'websiteIntelligenceSection';
@@ -29,8 +49,9 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
                 </div>
             `;
             
-            // Insert after the first section
-            const firstSection = document.querySelector('.result-section');
+            // Insert after the user input section in Business Setup
+            const resultsContainer = document.getElementById('resultsContainer');
+            const firstSection = resultsContainer.querySelector('.result-section');
             firstSection.parentNode.insertBefore(websiteSection, firstSection.nextSibling);
         }
         
@@ -43,53 +64,78 @@ function displayIntelligenceResults(userInput, websiteIntelligence, foundational
         // Keep raw data for copy functionality (hidden)
         document.getElementById('websiteIntelligenceOutput').textContent = JSON.stringify(websiteIntelligence, null, 2);
         websiteSection.style.display = 'block';
-    } else {
-        // Hide website intelligence section if no data
-        const websiteSection = document.getElementById('websiteIntelligenceSection');
-        if (websiteSection) {
-            websiteSection.style.display = 'none';
-        }
     }
     
-    // Display 3: Formatted Foundational Intelligence (WITHOUT competitor data)
-    const foundationalWithoutCompetitor = { ...foundationalIntelligence };
-    delete foundationalWithoutCompetitor.competitor_intelligence; // Remove competitor data for separate display
+    console.log('✅ Business setup results displayed');
+}
+
+// Display competitor intelligence in Competitors sub-tab
+function displayCompetitorResults(competitorIntelligence) {
+    const competitorContainer = document.getElementById('competitorIntelligenceContainer');
+    if (!competitorContainer) return;
     
-    const intelligenceDisplay = document.getElementById('intelligenceDisplay');
-    if (intelligenceDisplay) {
-        intelligenceDisplay.innerHTML = createFoundationalIntelligenceTemplate(foundationalWithoutCompetitor);
+    // Use existing competitor template function
+    const competitorHTML = `
+        <div class="results-container">
+            <h2>🏢 Competitor Intelligence Analysis</h2>
+            ${createCompetitorIntelligenceTemplate(competitorIntelligence)}
+        </div>
+    `;
+    
+    competitorContainer.innerHTML = competitorHTML;
+    
+    // Hide empty state
+    const emptyState = document.getElementById('competitorsEmptyState');
+    if (emptyState) {
+        emptyState.style.display = 'none';
+    }
+    
+    console.log('✅ Competitor results displayed in Competitors sub-tab');
+}
+
+// Display strategic intelligence in Strategic Intelligence sub-tab
+function displayStrategicIntelligenceResults(foundationalIntelligence) {
+    const strategicContainer = document.getElementById('strategicIntelligenceContainer');
+    if (!strategicContainer) return;
+    
+    // Create strategic intelligence display
+    const strategicHTML = `
+        <div class="results-container">
+            <h2>🧠 Strategic Intelligence Analysis</h2>
+            <div class="result-section">
+                <h3>Foundational Business Intelligence</h3>
+                <div class="formatted-content" id="strategicIntelligenceDisplay"></div>
+                <div class="copy-section">
+                    <pre id="strategicIntelligenceOutput" style="display: none;"></pre>
+                    <button class="copy-btn" onclick="copyToClipboard('strategicIntelligenceOutput', this)">📋 Copy Raw Data</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    strategicContainer.innerHTML = strategicHTML;
+    
+    // Display formatted foundational intelligence
+    const strategicDisplay = document.getElementById('strategicIntelligenceDisplay');
+    if (strategicDisplay) {
+        strategicDisplay.innerHTML = createFoundationalIntelligenceTemplate(foundationalIntelligence);
     }
     
     // Keep raw data for copy functionality (hidden)
-    document.getElementById('intelligenceOutput').textContent = JSON.stringify(foundationalWithoutCompetitor, null, 2);
+    document.getElementById('strategicIntelligenceOutput').textContent = JSON.stringify(foundationalIntelligence, null, 2);
     
-    // Display 4: Competitor Intelligence Analysis (if available)
-    if (foundationalIntelligence.competitor_intelligence) {
-        displayCompetitorIntelligence(foundationalIntelligence.competitor_intelligence);
+    // Hide empty state
+    const emptyState = document.getElementById('strategicIntelligenceEmptyState');
+    if (emptyState) {
+        emptyState.style.display = 'none';
     }
     
-    console.log('✅ Intelligence results displayed with formatted templates');
+    console.log('✅ Strategic intelligence results displayed in Strategic Intelligence sub-tab');
 }
 
-// Display competitor intelligence section (keep existing template)
+// Legacy function for backward compatibility
 function displayCompetitorIntelligence(competitorIntelligence) {
-    // Create or update competitor intelligence section
-    let competitorSection = document.getElementById('competitorIntelligenceSection');
-    
-    if (!competitorSection) {
-        // Create the new section
-        competitorSection = document.createElement('div');
-        competitorSection.className = 'result-section';
-        competitorSection.id = 'competitorIntelligenceSection';
-        
-        // Insert after foundational intelligence section, before action buttons
-        const intelligenceSection = document.querySelector('#intelligenceDisplay').closest('.result-section');
-        intelligenceSection.parentNode.insertBefore(competitorSection, intelligenceSection.nextSibling);
-    }
-    
-    // Use existing competitor template function
-    const competitorHTML = createCompetitorIntelligenceTemplate(competitorIntelligence);
-    
-    competitorSection.innerHTML = competitorHTML;
-    competitorSection.style.display = 'block';
+    // This function is called from other parts of the codebase
+    // Redirect to the new sub-tab function
+    displayCompetitorResults(competitorIntelligence);
 }
