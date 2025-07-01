@@ -101,29 +101,8 @@ body {
     line-height: 1.4;
 }
 
-.header-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
 
-.export-btn {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: var(--white);
-    border: none;
-    padding: 14px 28px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
-}
 
-.export-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-}
 
 /* FIXED Content Container - Scrollable area below fixed header and tabs */
 .content-container {
@@ -741,37 +720,6 @@ header {
         font-size: 14px;
     }
     
-    .export-btn {
-        padding: 12px 24px;
-    }
-    
-    .sub-navigation {
-        top: var(--header-height);
-        left: var(--sidebar-width);
-        right: 4px;
-        height: var(--sub-nav-height);
-        padding: 6px 12px;
-    }
-    
-    .sub-nav-button {
-        padding: 8px 16px;
-        font-size: 13px;
-        min-height: 36px;
-    }
-    
-    .button-group {
-        justify-content: center;
-    }
-    
-    .article-card {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .article-checkbox {
-        align-self: center;
-    }
-}
 
 @media (max-width: 768px) {
     :root {
@@ -807,57 +755,6 @@ header {
         font-size: 13px;
     }
     
-    .export-btn {
-        padding: 10px 20px;
-    }
-    
-    .sub-navigation {
-        top: var(--header-height);
-        left: 0;
-        right: 0;
-        height: var(--sub-nav-height);
-        padding: 4px 8px;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-    }
-    
-    .sub-nav-button {
-        padding: 6px 12px;
-        font-size: 12px;
-        min-height: 32px;
-    }
-    
-    .section {
-        padding: 16px;
-    }
-    
-    .content-card-header {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .content-card-actions {
-        align-self: stretch;
-    }
-    
-    .button-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .article-card {
-        padding: 16px;
-    }
-    
-    .article-title {
-        font-size: 1rem;
-    }
-    
-    .article-preview {
-        -webkit-line-clamp: 2;
-    }
-}
 
 /* Enhanced Scrolling Behavior */
 .content-container {
