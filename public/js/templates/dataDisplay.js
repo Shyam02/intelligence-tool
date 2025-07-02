@@ -433,6 +433,12 @@ function createSubTabEmptyStateTemplate(subTabName, dependencies) {
             description: 'Complete Business Setup first to generate your strategic market analysis and intelligence.',
             nextStep: 'Go to Business Setup to begin'
         },
+        contentStrategy: {
+            icon: '📋',
+            title: 'Content Strategy Awaiting',
+            description: 'Complete Business Setup first to generate your comprehensive content strategy.',
+            nextStep: 'Go to Business Setup to begin'
+        },
         searchIntelligence: {
             icon: '🔍',
             title: 'Search Intelligence Awaiting',

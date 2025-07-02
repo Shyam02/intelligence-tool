@@ -22,12 +22,13 @@ window.appState = {
         performance: false,
         config: true
     },
-    subTabsCompleted: {                 // Track which sub-tabs have been completed
-        setup: {
-            businessSetup: false,
-            competitors: false,
-            strategicIntelligence: false
-        },
+            subTabsCompleted: {                 // Track which sub-tabs have been completed
+            setup: {
+                businessSetup: false,
+                competitors: false,
+                strategicIntelligence: false,
+                contentStrategy: false
+            },
         ideaSources: {
             searchIntelligence: false,
             redditIntelligence: false
@@ -185,6 +186,15 @@ function switchSubTab(parentTab, subTab) {
     updateSubTabEmptyStates(parentTab, subTab);
     
     console.log('Switched to sub-tab:', parentTab, '->', subTab);
+    
+    // Add this logic to the switchSubTab function, after showing the sub-tab content:
+    if (parentTab === 'setup' && subTab === 'contentStrategy') {
+        if (window.appState.contentStrategy) {
+            displayContentStrategy(window.appState.contentStrategy);
+        } else if (typeof showContentStrategyEmptyState === 'function') {
+            showContentStrategyEmptyState();
+        }
+    }
 }
 
 // Hide all sub-tab contents for a parent tab
@@ -263,6 +273,7 @@ function updateSubTabAvailability() {
     // Business Profile sub-tabs
     updateSubTabButton('competitorsSubTab', businessSetupCompleted);
     updateSubTabButton('strategicIntelligenceSubTab', businessSetupCompleted);
+    updateSubTabButton('contentStrategySubTab', businessSetupCompleted);
     
     // Content Discovery sub-tabs (both depend on business setup)
     updateSubTabButton('searchIntelligenceSubTab', businessSetupCompleted);
@@ -313,6 +324,10 @@ function updateSubTabEmptyStates(parentTab, subTab) {
         case 'setup.strategicIntelligence':
             showEmptyState = !businessSetupCompleted;
             emptyStateId = 'strategicIntelligenceEmptyState';
+            break;
+        case 'setup.contentStrategy':
+            showEmptyState = !businessSetupCompleted;
+            emptyStateId = 'contentStrategyEmptyState';
             break;
         case 'ideaSources.searchIntelligence':
             showEmptyState = !businessSetupCompleted;
@@ -428,3 +443,7 @@ window.markSubTabCompleted = markSubTabCompleted;
 window.updateEmptyStates = updateEmptyStates;
 window.updateSubTabAvailability = updateSubTabAvailability;
 window.updateHeaderContent = updateHeaderContent;
+
+// At the end of forms.js (or wherever displayContentStrategy and showContentStrategyEmptyState are defined):
+window.displayContentStrategy = displayContentStrategy;
+window.showContentStrategyEmptyState = showContentStrategyEmptyState;

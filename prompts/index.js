@@ -6,6 +6,7 @@ const { businessAnalysisPrompt } = require('./intelligence/businessAnalysis');
 const { mainCrawlPrompt, fallbackCrawlPrompt, multiPageAnalysisPrompt } = require('./intelligence/websiteCrawling');
 const { linkSelectionPrompt } = require('./intelligence/linkSelection');
 const { competitorAnalysisPrompt } = require('./intelligence/competitorAnalysis');
+const { contentStrategyPrompt } = require('./intelligence/contentStrategy');
 const { contentBriefsPrompt } = require('./content/contentBriefs');
 const { contentGenerationPrompt } = require('./content/contentGeneration');
 const { generateRedditSearchQueries } = require('./reddit/queryGeneration');
@@ -19,7 +20,8 @@ module.exports = {
     fallbackCrawlPrompt,
     linkSelectionPrompt,
     multiPageAnalysisPrompt,
-    competitorAnalysisPrompt
+    competitorAnalysisPrompt,
+    contentStrategyPrompt
   },
   
   // Content prompts

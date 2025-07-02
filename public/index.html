@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="styles/contentGeneration.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/reddit.css">
+    <link rel="stylesheet" href="styles/contentStrategy.css">
     <link rel="stylesheet" href="styles/responsive.css">
 </head>
 <body>
@@ -110,6 +111,9 @@
                                 <button class="sub-nav-button sub-tab-disabled" onclick="switchSubTab('setup', 'strategicIntelligence')" id="strategicIntelligenceSubTab">
                                     🧠 Strategic Intelligence
                                 </button>
+                                <button class="sub-nav-button sub-tab-disabled" onclick="switchSubTab('setup', 'contentStrategy')" id="contentStrategySubTab">
+                                    📋 Content Strategy
+                                </button>
                             </div>
                         </div>
                         
@@ -196,6 +200,17 @@
                             <div id="strategicIntelligenceEmptyState" class="sub-tab-empty-state">
                                 <h3>Strategic Intelligence Awaiting</h3>
                                 <p>Complete Business Setup first to generate your strategic market analysis and intelligence.</p>
+                                <div class="arrow">←</div>
+                                <p>Go to Business Setup to begin</p>
+                            </div>
+                        </div>
+
+                        <!-- Content Strategy Sub-tab -->
+                        <div id="contentStrategySubTabContent" class="sub-tab-content">
+                            <div id="contentStrategyContainer"></div>
+                            <div id="contentStrategyEmptyState" class="sub-tab-empty-state">
+                                <h3>Content Strategy Awaiting</h3>
+                                <p>Complete Business Setup first to generate your comprehensive content strategy.</p>
                                 <div class="arrow">←</div>
                                 <p>Go to Business Setup to begin</p>
                             </div>
@@ -460,9 +475,10 @@
     <script src="js/templates/webSearch.js"></script>
     <script src="js/templates/contentGeneration.js"></script>
     <script src="js/templates/dataDisplay.js"></script>
+    <script src="js/templates/contentStrategy.js"></script>
+    <script src="js/forms.js"></script>
     <!-- Load application files -->
     <script src="js/results.js"></script>
-    <script src="js/forms.js"></script>
     <script src="js/webSearch.js"></script>
     <script src="js/contentBriefs.js"></script>
     <script src="js/reddit.js"></script>

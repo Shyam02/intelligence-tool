@@ -169,6 +169,37 @@ async function generateContentBriefsFromAPI(selectedArticles, businessContext) {
     }
 }
 
+// Generate content strategy
+async function generateContentStrategyAPI(businessContext, availableData) {
+    try {
+        console.log('📋 Generating content strategy...');
+        
+        const response = await fetch('/api/generateContentStrategy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                businessContext: businessContext,
+                availableData: availableData
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP ${response.status}: ${errorData.error || 'Unknown error'}`);
+        }
+        
+        const strategy = await response.json();
+        console.log('Content strategy received from API:', strategy);
+        return strategy;
+        
+    } catch (error) {
+        console.error('Error generating content strategy:', error);
+        throw new Error('Failed to generate content strategy: ' + error.message);
+    }
+}
+
 // NEW: Generate Twitter content from briefs
 async function generateTwitterContentAPI(briefs, businessContext, regenerateOptions = null) {
     console.log('API: generateTwitterContentAPI called with', briefs.length, 'briefs');

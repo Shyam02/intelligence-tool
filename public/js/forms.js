@@ -176,6 +176,13 @@ async function handleFormSubmission(e) {
         // UPDATED: Mark setup tab as completed and enable idea sources tab
         markTabCompleted('setup');
         
+        // Generate content strategy after intelligence is complete
+        try {
+            await generateContentStrategy();
+        } catch (strategyError) {
+            console.warn('Content strategy generation failed, continuing without it:', strategyError);
+        }
+        
         // Show the "Generate Search Queries" button by making results container visible
         document.getElementById('resultsContainer').style.display = 'block';
         
@@ -199,6 +206,63 @@ async function handleFormSubmission(e) {
         // Reset loading text
         if (loadingText) {
             loadingText.textContent = 'Generating foundational intelligence...';
+        }
+    }
+}
+
+// Generate content strategy after intelligence completion
+async function generateContentStrategy() {
+    try {
+        console.log('📋 Generating content strategy...');
+        
+        // Collect business context from app state
+        const businessContext = {
+            business_profile: window.appState.userInput || {},
+            competitor_analysis: window.appState.foundationalIntelligence?.competitor_intelligence || {},
+            industry_insights: window.appState.searchResults || [],
+            website_data: window.appState.websiteIntelligence || {},
+            business_goals: window.appState.userInput?.businessGoals || "general growth",
+            current_presence: window.appState.userInput?.existingSocialAccounts || {}
+        };
+        
+        // Assess data availability
+        const availableData = {
+            has_business_profile: !!window.appState.userInput,
+            has_competitor_data: !!window.appState.foundationalIntelligence?.competitor_intelligence,
+            has_industry_insights: window.appState.searchResults?.length > 0,
+            has_website_data: !!window.appState.websiteIntelligence
+        };
+        
+        // Generate strategy using API
+        const strategyResponse = await generateContentStrategyAPI(businessContext, availableData);
+        
+        if (strategyResponse.success) {
+            window.appState.contentStrategy = strategyResponse.strategy;
+            displayContentStrategy(strategyResponse.strategy);
+            markSubTabCompleted('setup', 'contentStrategy');
+            console.log('✅ Content strategy generated and displayed');
+        } else {
+            throw new Error(strategyResponse.error || 'Failed to generate content strategy');
+        }
+        
+    } catch (error) {
+        console.error('❌ Content strategy generation failed:', error);
+        throw error;
+    }
+}
+
+// Display content strategy in the UI
+function displayContentStrategy(strategy) {
+    const container = document.getElementById('contentStrategyContainer');
+    if (container) {
+        const template = createContentStrategyTemplate(strategy);
+        container.innerHTML = template;
+        container.style.display = 'block';
+        
+        // Hide empty state
+        const emptyState = document.getElementById('contentStrategyEmptyState');
+        if (emptyState) {
+            emptyState.style.display = 'none';
         }
     }
 }
