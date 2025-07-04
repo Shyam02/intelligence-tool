@@ -4,8 +4,14 @@ const { config } = require('../config/config');
 const systemLogger = require('./systemLogger');
 
 // Helper function to call Claude API
-async function callClaudeAPI(prompt, useWebSearch = false) {
-  const debugId = systemLogger.startOperation('Claude AI Call', { useWebSearch });
+async function callClaudeAPI(prompt, useWebSearch = false, masterId = null, stepLabel = 'AI Call') {
+  if (masterId) systemLogger.logStep(masterId, {
+    step: `${stepLabel}: request`,
+    prompt,
+    useWebSearch,
+    logic: 'Send prompt to Claude AI API.',
+    next: 'Await AI response.'
+  });
   try {
     const tools = useWebSearch ? [
       {
@@ -69,12 +75,14 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
         'anthropic-version': config.claude.anthropicVersion
       }
     });
-
-    console.log('Claude API response:', {
+    if (masterId) systemLogger.logStep(masterId, {
+      step: `${stepLabel}: response`,
       status: response.status,
       contentLength: response.data.content?.length,
       contentTypes: response.data.content?.map(c => c.type),
-      stopReason: response.data.stop_reason
+      stopReason: response.data.stop_reason,
+      logic: 'Received response from Claude AI API.',
+      next: 'Extract result.'
     });
 
     // Handle tool use if Claude wants to use web search
@@ -162,12 +170,11 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
     }
 
     console.log('Final result length:', result.length);
-    systemLogger.endOperation(debugId, {
-      request: { prompt, useWebSearch },
-      response: result,
-      background: null,
-      tokens: null,
-      cost: null
+    if (masterId) systemLogger.logStep(masterId, {
+      step: `${stepLabel}: result`,
+      result,
+      logic: 'Final result extracted from Claude AI response.',
+      next: 'Return result to caller.'
     });
     return result.trim();
     
@@ -188,13 +195,11 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
     } else {
       throw new Error(`Claude API Error: ${error.response?.data?.error?.message || error.message}`);
     }
-    systemLogger.endOperation(debugId, {
-      request: { prompt, useWebSearch },
-      response: null,
-      background: null,
-      tokens: null,
-      cost: null,
-      error: error.message
+    if (masterId) systemLogger.logStep(masterId, {
+      step: `${stepLabel}: error`,
+      error: error.message,
+      logic: 'Error during Claude AI API call.',
+      next: 'Throw error to caller.'
     });
   }
 }

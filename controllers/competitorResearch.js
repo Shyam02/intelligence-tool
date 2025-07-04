@@ -11,8 +11,13 @@ function delay(ms) {
 }
 
 // FIXED: Perform competitor research with sequential API calls and simple homepage crawling
-async function performCompetitorResearch(competitorQueries, businessContext) {
-  const debugId = systemLogger.startOperation('Competitor Research');
+async function performCompetitorResearch(competitorQueries, businessContext, masterId = null) {
+  if (masterId) systemLogger.logStep(masterId, {
+    step: 'Competitor research: started',
+    competitorQueries,
+    logic: 'Begin competitor research with provided queries.',
+    next: 'Run web search for each query.'
+  });
   try {
     console.log('🔍 Starting competitor research with queries:', competitorQueries);
     console.log('⏱️ Using sequential requests to respect API rate limits...');
@@ -22,12 +27,27 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
     
     for (let i = 0; i < competitorQueries.length; i++) {
       const query = competitorQueries[i];
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Competitor research: executing search',
+        query,
+        index: i,
+        logic: 'Run web search for competitor discovery.',
+        next: 'Store search results.'
+      });
       console.log(`🔍 Executing search ${i + 1}/${competitorQueries.length}: ${query}`);
       
       try {
         const result = await searchBrave(query, 3);
         searchResults.push(result);
         console.log(`✅ Search ${i + 1} completed successfully`);
+        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: search completed',
+          query,
+          result,
+          logic: 'Search completed successfully.',
+          next: 'Continue to next query or extract competitor URLs.'
+        });
         
         // Add delay between requests (1.1 seconds to be safe with 1 req/sec limit)
         if (i < competitorQueries.length - 1) {
@@ -39,6 +59,14 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
         console.error(`❌ Search ${i + 1} failed:`, searchError.message);
         // Add empty result for failed search
         searchResults.push({ web: { results: [] } });
+        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: search failed',
+          query,
+          error: searchError.message,
+          logic: 'Search failed, storing empty result.',
+          next: 'Continue to next query.'
+        });
         
         // Still wait before next request to respect rate limits
         if (i < competitorQueries.length - 1) {
@@ -68,7 +96,19 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
     
     console.log(`📊 Found ${competitorUrls.length} potential competitors to analyze`);
     
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Competitor research: extracted competitor URLs',
+      competitorUrls,
+      logic: 'Extracted up to 6 competitor URLs from search results.',
+      next: 'Crawl competitor homepages.'
+    });
+    
     if (competitorUrls.length === 0) {
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Competitor research: no competitors found',
+        logic: 'No competitors found in search results.',
+        next: 'Return empty competitor intelligence.'
+      });
       return {
         discovery_queries_used: competitorQueries,
         competitors_found: 0,
@@ -94,6 +134,12 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
     const competitorCrawlResults = [];
     for (const competitor of competitorUrls) {
       try {
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: crawling competitor homepage',
+          competitor,
+          logic: 'Crawl homepage of competitor for data extraction.',
+          next: 'Extract and store crawl data.'
+        });
         console.log(`🏠 Crawling competitor homepage: ${competitor.title} (${competitor.url})`);
         const crawledData = await crawlHomepageOnly(competitor.url);
         competitorCrawlResults.push({
@@ -101,6 +147,14 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
           crawled_data: crawledData
         });
         console.log(`✅ Successfully crawled homepage: ${crawledData.company_name || competitor.title}`);
+        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: crawl success',
+          competitor,
+          crawledData,
+          logic: 'Successfully crawled competitor homepage.',
+          next: 'Continue to next competitor.'
+        });
         
         // Add small delay between crawls to be respectful to competitor sites
         await delay(500);
@@ -113,13 +167,39 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
           crawled_data: null,
           error: crawlError.message
         });
+        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: crawl failed',
+          competitor,
+          error: crawlError.message,
+          logic: 'Failed to crawl competitor homepage.',
+          next: 'Continue to next competitor.'
+        });
       }
     }
     
     // STEP 4: AI analysis of competitor data
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Competitor research: analyzing competitor data with AI',
+      competitorCrawlResults,
+      logic: 'Prepare prompt and send to AI for competitor analysis.',
+      next: 'Parse AI response.'
+    });
     console.log('🤖 Analyzing competitor data with AI...');
     const competitorAnalysisPrompt = intelligence.competitorAnalysisPrompt(businessContext, competitorCrawlResults);
-    const competitorAnalysisResponse = await callClaudeAPI(competitorAnalysisPrompt);
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Competitor research: AI prompt',
+      competitorAnalysisPrompt,
+      logic: 'Prompt constructed for AI competitor analysis.',
+      next: 'Send prompt to AI.'
+    });
+    const competitorAnalysisResponse = await callClaudeAPI(competitorAnalysisPrompt, false, masterId, 'AI: Competitor Analysis');
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Competitor research: AI response',
+      competitorAnalysisResponse,
+      logic: 'AI response received for competitor analysis.',
+      next: 'Parse AI response.'
+    });
     
     // Parse competitor analysis
     let competitorAnalysis;
@@ -129,12 +209,24 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
         competitorAnalysis = JSON.parse(jsonMatch[0]);
         competitorAnalysis.discovery_queries_used = competitorQueries;
         competitorAnalysis.competitors_found = competitorUrls.length;
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: parsed AI analysis',
+          competitorAnalysis,
+          logic: 'Extracted JSON from AI competitor analysis response.',
+          next: 'Return competitor intelligence.'
+        });
       } else {
         throw new Error('No JSON found in competitor analysis response');
       }
     } catch (parseError) {
       console.error('Failed to parse competitor analysis:', parseError);
       // Return basic structure if parsing fails
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Competitor research: AI parse error',
+        error: parseError.message,
+        logic: 'Failed to extract JSON from AI competitor analysis response.',
+        next: 'Return fallback competitor intelligence.'
+      });
       return {
         discovery_queries_used: competitorQueries,
         competitors_found: competitorUrls.length,
@@ -156,16 +248,20 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
       };
     }
     
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Competitor research: complete',
+      competitorAnalysis,
+      logic: 'Final competitor intelligence ready.',
+      next: 'Return to business profile flow.'
+    });
     return competitorAnalysis;
   } catch (error) {
     console.error('Competitor research failed:', error);
-    systemLogger.endOperation(debugId, {
-      request: { competitorQueries, businessContext },
-      response: null,
-      background: null,
-      tokens: null,
-      cost: null,
-      error: error.message
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Competitor research: error',
+      error: error.message,
+      logic: 'Unhandled error during competitor research.',
+      next: 'Return fallback competitor intelligence.'
     });
     throw error;
   }

@@ -3,6 +3,7 @@ const axios = require('axios');
 const { callClaudeAPI } = require('./ai');
 const { intelligence } = require('../prompts');
 const { extractCleanText, extractAllLinks, filterRelevantLinks } = require('./htmlParser');
+const systemLogger = require('./systemLogger');
 
 // ENHANCED: Fetch website HTML content with better error handling
 async function fetchWebsiteHTML(websiteUrl) {
@@ -90,8 +91,14 @@ async function crawlHomepageOnly(websiteUrl) {
 }
 
 // ENHANCED: Fetch and analyze multiple pages with flexible 0-10 page selection
-async function fetchMultiplePages(websiteUrl) {
+async function fetchMultiplePages(websiteUrl, masterId = null) {
   try {
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Crawling: starting multi-page analysis',
+      websiteUrl,
+      logic: 'Begin enhanced multi-page analysis for the provided URL.',
+      next: 'Fetch homepage and additional pages.'
+    });
     console.log('🔍 Starting enhanced multi-page analysis for:', websiteUrl);
     
     // Step 1: Fetch and analyze homepage
@@ -216,20 +223,27 @@ async function fetchMultiplePages(websiteUrl) {
 }
 
 // ENHANCED: Main website crawling function with flexible page support (FOR MAIN BUSINESS ONLY)
-async function crawlWebsite(websiteUrl) {
+async function crawlWebsite(websiteUrl, masterId = null) {
   try {
-    console.log('🌐 Starting enhanced website crawl for:', websiteUrl);
-    
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Crawling: started',
+      websiteUrl,
+      logic: 'Begin enhanced website crawl for the provided URL.',
+      next: 'Try enhanced multi-page crawling.'
+    });
     let crawlResult;
     let crawlData;
-    
     // Step 1: Try enhanced multi-page crawling (0-10 pages)
     try {
-      crawlData = await fetchMultiplePages(websiteUrl);
-      
+      crawlData = await fetchMultiplePages(websiteUrl, masterId);
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Crawling: multi-page analysis complete',
+        crawlData,
+        logic: 'Fetched homepage and additional pages, applied link selection and AI analysis.',
+        next: 'Prepare prompt for AI multi-page analysis.'
+      });
       // Create comprehensive prompt with all page content
       let combinedContent = `HOMEPAGE CONTENT:\n${crawlData.homepageContent}\n\n`;
-      
       if (crawlData.additionalPages.length > 0) {
         combinedContent += 'ADDITIONAL PAGES:\n';
         crawlData.additionalPages.forEach((page, index) => {
@@ -240,40 +254,73 @@ async function crawlWebsite(websiteUrl) {
           }
         });
       }
-      
-      // Use imported prompt for multi-page analysis
       const enhancedCrawlPrompt = intelligence.multiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData);
-      crawlResult = await callClaudeAPI(enhancedCrawlPrompt, false);
-      
-      console.log('✅ Enhanced multi-page analysis completed successfully');
-      
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Crawling: AI multi-page analysis prompt',
+        prompt: enhancedCrawlPrompt,
+        logic: 'Prompt constructed for AI multi-page analysis.',
+        next: 'Send prompt to AI.'
+      });
+      crawlResult = await callClaudeAPI(enhancedCrawlPrompt, false, masterId, 'AI: Multi-Page Analysis');
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Crawling: AI multi-page analysis result',
+        aiResponse: crawlResult,
+        logic: 'AI response received for multi-page analysis.',
+        next: 'Parse AI response.'
+      });
     } catch (multiPageError) {
-      console.log('⚠️ Enhanced multi-page crawling failed, falling back to single page:', multiPageError.message);
-      
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Crawling: multi-page analysis failed',
+        error: multiPageError.message,
+        logic: 'Enhanced multi-page crawling failed, falling back to single page.',
+        next: 'Try single page fallback.'
+      });
       // Fallback: Try single page with clean text extraction
       try {
         const singlePageHtml = await fetchWebsiteHTML(websiteUrl);
         const cleanText = extractCleanText(singlePageHtml);
-        
         const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
-        crawlResult = await callClaudeAPI(crawlPrompt, false);
-        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Crawling: single page analysis prompt',
+          prompt: crawlPrompt,
+          logic: 'Prompt constructed for AI single page analysis.',
+          next: 'Send prompt to AI.'
+        });
+        crawlResult = await callClaudeAPI(crawlPrompt, false, masterId, 'AI: Single Page Analysis');
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Crawling: AI single page analysis result',
+          aiResponse: crawlResult,
+          logic: 'AI response received for single page analysis.',
+          next: 'Parse AI response.'
+        });
         crawlData = {
           homepageContent: cleanText,
           additionalPages: [],
           analysisMethod: 'single_page_fallback',
           pagesSelected: 0
         };
-        
-        console.log('✅ Single-page fallback completed');
-        
       } catch (singlePageError) {
-        console.log('⚠️ Single-page fallback failed, using URL-only analysis:', singlePageError.message);
-        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Crawling: single page analysis failed',
+          error: singlePageError.message,
+          logic: 'Single-page fallback failed, using URL-only analysis.',
+          next: 'Try URL-only fallback.'
+        });
         // Final fallback: URL-based analysis
         const fallbackPrompt = intelligence.fallbackCrawlPrompt(websiteUrl);
-        crawlResult = await callClaudeAPI(fallbackPrompt, false);
-        
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Crawling: URL-only analysis prompt',
+          prompt: fallbackPrompt,
+          logic: 'Prompt constructed for AI URL-only analysis.',
+          next: 'Send prompt to AI.'
+        });
+        crawlResult = await callClaudeAPI(fallbackPrompt, false, masterId, 'AI: URL-Only Analysis');
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Crawling: AI URL-only analysis result',
+          aiResponse: crawlResult,
+          logic: 'AI response received for URL-only analysis.',
+          next: 'Parse AI response.'
+        });
         crawlData = {
           homepageContent: '',
           additionalPages: [],
@@ -282,33 +329,30 @@ async function crawlWebsite(websiteUrl) {
         };
       }
     }
-    
-    console.log('Raw crawl response length:', crawlResult.length);
-    
     // Parse JSON response
     let extractedData;
     try {
       const jsonMatch = crawlResult.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         extractedData = JSON.parse(jsonMatch[0]);
-        console.log('✅ Successfully parsed JSON from crawl response');
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Crawling: parsed AI response',
+          extractedData,
+          logic: 'Extracted JSON from AI crawl response.',
+          next: 'Return extracted data.'
+        });
       } else {
         throw new Error('No JSON structure found in response');
       }
-      
     } catch (parseError) {
-      console.error('JSON Parse Error from crawl:', parseError);
-      console.log('Full raw crawl response:', crawlResult);
-      
-      // Use existing fallback logic
+      if (masterId) systemLogger.logStep(masterId, {
+        step: 'Crawling: JSON parse error',
+        error: parseError.message,
+        logic: 'Failed to extract JSON from AI crawl response.',
+        next: 'Return fallback data.'
+      });
       extractedData = createFallbackData(websiteUrl, crawlResult, parseError.message);
     }
-    
-    // Ensure we have a company name
-    if (!extractedData.company_name || extractedData.company_name === 'Not found' || extractedData.company_name === '') {
-      extractedData.company_name = extractCompanyNameFromUrl(websiteUrl);
-    }
-    
     // Add enhanced metadata
     extractedData.extraction_method = crawlData.analysisMethod;
     extractedData.extraction_timestamp = new Date().toISOString();
@@ -317,26 +361,23 @@ async function crawlWebsite(websiteUrl) {
     extractedData.external_pages_analyzed = crawlData.additionalPages ? crawlData.additionalPages.filter(p => p.isExternal && !p.error).length : 0;
     extractedData.total_content_length = crawlData.homepageContent.length + 
       (crawlData.additionalPages ? crawlData.additionalPages.reduce((sum, page) => sum + (page.error ? 0 : page.contentLength), 0) : 0);
-    
     if (crawlData.selectionStrategy) {
       extractedData.ai_selection_strategy = crawlData.selectionStrategy;
     }
-    
-    console.log('✅ Enhanced website extraction complete for:', extractedData.company_name);
-    console.log('📊 Extraction summary:', {
-      method: extractedData.extraction_method,
-      pages: extractedData.pages_analyzed,
-      selected: extractedData.pages_selected,
-      external: extractedData.external_pages_analyzed,
-      contentLength: extractedData.total_content_length
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Crawling: complete',
+      extractedData,
+      logic: 'Final extracted data from crawling.',
+      next: 'Return to business profile flow.'
     });
-    
     return extractedData;
-    
   } catch (error) {
-    console.error('Website crawling error:', error);
-    
-    // Return structured fallback data
+    if (masterId) systemLogger.logStep(masterId, {
+      step: 'Crawling: error',
+      error: error.message,
+      logic: 'Unhandled error during crawling.',
+      next: 'Return fallback data.'
+    });
     return createFallbackData(websiteUrl, null, error.message);
   }
 }

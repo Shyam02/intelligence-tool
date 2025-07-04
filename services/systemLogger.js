@@ -45,8 +45,16 @@ function clearLogs() {
     logs.length = 0;
 }
 
+function logStep(id, step) {
+    const entry = logs.find(l => l.id === id);
+    if (!entry) return;
+    if (!entry.background) entry.background = [];
+    entry.background.push(step);
+}
+
 module.exports = {
     startOperation,
+    logStep,
     endOperation,
     getLogs,
     clearLogs
