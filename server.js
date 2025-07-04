@@ -11,6 +11,7 @@ const intelligenceRoutes = require('./routes/intelligence');
 const contentRoutes = require('./routes/content');
 const webSearchRoutes = require('./routes/webSearch');
 const redditRoutes = require('./routes/reddit');
+const systemDebugRoutes = require('./routes/systemDebug');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api', intelligenceRoutes);
 app.use('/api', contentRoutes);
 app.use('/api', webSearchRoutes);
 app.use('/api', redditRoutes);
+app.use('/api/systemDebug', systemDebugRoutes);
 
 // Serve the main page
 app.get('/', (req, res) => {
@@ -53,4 +55,5 @@ app.listen(config.port, () => {
   console.log('   - Content routes');
   console.log('   - Web search routes');
   console.log('   - Reddit routes');
+  console.log('   - System Debug routes');
 });

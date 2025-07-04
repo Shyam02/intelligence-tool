@@ -7,6 +7,7 @@
 │   ├── competitorResearch.js
 │   ├── contentBriefs.js
 │   ├── contentGeneration.js
+│   ├── contentStrategy.js
 │   ├── reddit.js
 │   ├── webSearch.js
 │   ├── webSearchQueries.js
@@ -22,6 +23,7 @@
 │   ├── intelligence
 │   │   ├── businessAnalysis.js
 │   │   ├── competitorAnalysis.js
+│   │   ├── contentStrategy.js
 │   │   ├── linkSelection.js
 │   │   └── websiteCrawling.js
 │   └── reddit
@@ -46,6 +48,7 @@
 │       ├── components.css
 │       ├── contentBriefs.css
 │       ├── contentGeneration.css
+│       ├── contentStrategy.css
 │       ├── forms.css
 │       ├── layout.css
 │       ├── reddit.css
@@ -66,4 +69,4 @@
     ├── webSearch.js
     └── websiteCrawler.js
 
-13 directories, 54 files
+13 directories, 57 files

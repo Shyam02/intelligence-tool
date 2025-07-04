@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="styles/reddit.css">
     <link rel="stylesheet" href="styles/contentStrategy.css">
     <link rel="stylesheet" href="styles/responsive.css">
+    <link rel="stylesheet" href="styles/systemDebug.css">
 </head>
 <body>
     <div class="app-container">
@@ -391,7 +392,6 @@
                 <div id="settingsTabContent" class="tab-content">
                     <div class="tab-content-container settings-tab">
                         <h2>🎨 Content Studio</h2>
-                        
                         <!-- Content Studio Sub-navigation -->
                         <div class="sub-navigation">
                             <div class="sub-nav-buttons">
@@ -400,14 +400,12 @@
                                 </button>
                             </div>
                         </div>
-
                         <!-- Twitter Sub-tab -->
                         <div id="twitterSubTabContent" class="sub-tab-content active">
                             <div class="section">
                                 <h3>Twitter Content Generation</h3>
                                 <p>Transform your content briefs into ready-to-post Twitter content.</p>
                             </div>
-
                             <div id="twitterEmptyState" class="sub-tab-empty-state">
                                 <h3>Twitter Content Awaiting</h3>
                                 <p>Generate content briefs first to create Twitter content.</p>
@@ -442,21 +440,37 @@
                 <div id="configTabContent" class="tab-content">
                     <div class="tab-content-container">
                         <h2>⚙️ Settings</h2>
-                        
-                        <div class="section">
-                            <h3>API Configuration</h3>
-                            <p>Test your API connections to ensure everything is working properly.</p>
-                            <button onclick="testAPI()" class="test-api-btn">Test API Connection</button>
+                        <div class="sub-navigation">
+                            <div class="sub-nav-buttons">
+                                <button class="sub-nav-button active" onclick="switchSubTab('config', 'apiConfig')" id="apiConfigSubTab">
+                                    🔌 API Configuration
+                                </button>
+                                <button class="sub-nav-button" onclick="switchSubTab('config', 'systemDebug')" id="systemDebugSubTab">
+                                    📊 System Debug
+                                </button>
+                            </div>
                         </div>
-
-                        <div class="section">
-                            <h3>Business Profile</h3>
-                            <p>Your business profile and intelligence are configured in the Business Profile tab.</p>
+                        <div id="apiConfigSubTabContent" class="sub-tab-content active">
+                            <div class="section">
+                                <h3>API Configuration</h3>
+                                <p>Test your API connections to ensure everything is working properly.</p>
+                                <button onclick="testAPI()" class="test-api-btn">Test API Connection</button>
+                            </div>
+                            <div class="section">
+                                <h3>Business Profile</h3>
+                                <p>Your business profile and intelligence are configured in the Business Profile tab.</p>
+                            </div>
+                            <div class="section">
+                                <h3>System Information</h3>
+                                <p>This tool generates foundational intelligence for content marketing strategy using AI-powered analysis and search capabilities.</p>
+                            </div>
                         </div>
-
-                        <div class="section">
-                            <h3>System Information</h3>
-                            <p>This tool generates foundational intelligence for content marketing strategy using AI-powered analysis and search capabilities.</p>
+                        <div id="systemDebugSubTabContent" class="sub-tab-content">
+                            <div class="debug-header">
+                                <button onclick="clearDebugLogs()" class="btn btn-warning" style="float:right;">Clear Logs</button>
+                                <h2>System Debug Logs</h2>
+                            </div>
+                            <div id="systemDebugContainer"></div>
                         </div>
                     </div>
                 </div>
@@ -476,6 +490,7 @@
     <script src="js/templates/contentGeneration.js"></script>
     <script src="js/templates/dataDisplay.js"></script>
     <script src="js/templates/contentStrategy.js"></script>
+    <script src="js/templates/systemDebug.js"></script>
     <script src="js/forms.js"></script>
     <!-- Load application files -->
     <script src="js/results.js"></script>
@@ -484,5 +499,6 @@
     <script src="js/reddit.js"></script>
     <script src="js/contentGeneration.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/systemDebug.js"></script>
 </body>
 </html>

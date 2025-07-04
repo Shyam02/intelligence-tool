@@ -3,6 +3,7 @@ const { callClaudeAPI } = require('../services/ai');
 const { crawlHomepageOnly } = require('../services/websiteCrawler');
 const { searchBrave } = require('../services/webSearch');
 const { intelligence } = require('../prompts');
+const systemLogger = require('../services/systemLogger');
 
 // Helper function to delay execution
 function delay(ms) {
@@ -11,6 +12,7 @@ function delay(ms) {
 
 // FIXED: Perform competitor research with sequential API calls and simple homepage crawling
 async function performCompetitorResearch(competitorQueries, businessContext) {
+  const debugId = systemLogger.startOperation('Competitor Research');
   try {
     console.log('🔍 Starting competitor research with queries:', competitorQueries);
     console.log('⏱️ Using sequential requests to respect API rate limits...');
@@ -155,9 +157,16 @@ async function performCompetitorResearch(competitorQueries, businessContext) {
     }
     
     return competitorAnalysis;
-    
   } catch (error) {
     console.error('Competitor research failed:', error);
+    systemLogger.endOperation(debugId, {
+      request: { competitorQueries, businessContext },
+      response: null,
+      background: null,
+      tokens: null,
+      cost: null,
+      error: error.message
+    });
     throw error;
   }
 }

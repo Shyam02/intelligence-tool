@@ -3,9 +3,11 @@ const { callClaudeAPI } = require('../services/ai');
 const { crawlWebsite } = require('../services/websiteCrawler');
 const { performCompetitorResearch } = require('./competitorResearch');
 const { intelligence } = require('../prompts');
+const systemLogger = require('../services/systemLogger');
 
 // ENHANCED: Generate foundational intelligence with competitor research
 async function generateIntelligence(req, res) {
+  const debugId = systemLogger.startOperation('Generate Intelligence');
   try {
     const onboardingData = req.body;
     
@@ -65,10 +67,25 @@ async function generateIntelligence(req, res) {
     };
     
     console.log('✅ Enhanced intelligence generation completed');
+    systemLogger.endOperation(debugId, {
+      request: req.body,
+      response: enhancedIntelligence,
+      background: { foundationalIntelligence, competitorIntelligence },
+      tokens: null,
+      cost: null
+    });
     res.json(enhancedIntelligence);
     
   } catch (error) {
     console.error('Error generating intelligence:', error);
+    systemLogger.endOperation(debugId, {
+      request: req.body,
+      response: null,
+      background: null,
+      tokens: null,
+      cost: null,
+      error: error.message
+    });
     res.status(500).json({ error: error.message });
   }
 }

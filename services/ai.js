@@ -1,9 +1,11 @@
 // AI service - Pure AI communication functionality
 const axios = require('axios');
 const { config } = require('../config/config');
+const systemLogger = require('./systemLogger');
 
 // Helper function to call Claude API
 async function callClaudeAPI(prompt, useWebSearch = false) {
+  const debugId = systemLogger.startOperation('Claude AI Call', { useWebSearch });
   try {
     const tools = useWebSearch ? [
       {
@@ -160,6 +162,13 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
     }
 
     console.log('Final result length:', result.length);
+    systemLogger.endOperation(debugId, {
+      request: { prompt, useWebSearch },
+      response: result,
+      background: null,
+      tokens: null,
+      cost: null
+    });
     return result.trim();
     
   } catch (error) {
@@ -179,6 +188,14 @@ async function callClaudeAPI(prompt, useWebSearch = false) {
     } else {
       throw new Error(`Claude API Error: ${error.response?.data?.error?.message || error.message}`);
     }
+    systemLogger.endOperation(debugId, {
+      request: { prompt, useWebSearch },
+      response: null,
+      background: null,
+      tokens: null,
+      cost: null,
+      error: error.message
+    });
   }
 }
 

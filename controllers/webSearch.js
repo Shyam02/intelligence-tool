@@ -2,9 +2,11 @@
 // Web search functionality controller
 const { searchBrave } = require('../services/webSearch');
 const { config } = require('../config/config');
+const systemLogger = require('../services/systemLogger');
 
 // Execute search queries using Brave Search API
 async function executeSearch(req, res) {
+  const debugId = systemLogger.startOperation('Web Search');
   try {
     const { query } = req.body;
     console.log('🔍 Search request received for query:', query);
@@ -112,6 +114,13 @@ async function executeSearch(req, res) {
     };
     
     res.json(response);
+    systemLogger.endOperation(debugId, {
+      request: req.body,
+      response,
+      background: { articles, method, apiCalls },
+      tokens: null,
+      cost: null
+    });
     
   } catch (error) {
     console.error('Search execution error:', error);
@@ -124,6 +133,15 @@ async function executeSearch(req, res) {
       timestamp: new Date().toISOString(),
       api_calls: []
     };
+    
+    systemLogger.endOperation(debugId, {
+      request: req.body,
+      response: null,
+      background: null,
+      tokens: null,
+      cost: null,
+      error: error.message
+    });
     
     res.status(500).json(errorResponse);
   }

@@ -10,7 +10,8 @@ window.appState = {
     currentSubTabs: {                   // Current active sub-tabs for each main tab
         setup: 'businessSetup',
         ideaSources: 'searchIntelligence',
-        settings: 'twitter'
+        settings: 'twitter',
+        config: 'apiConfig'
     },
     tabsCompleted: {                    // Track which tabs have been completed
         setup: false,
@@ -35,11 +36,16 @@ window.appState = {
         },
         settings: {
             twitter: false
+        },
+        config: {
+            apiConfig: false,
+            systemDebug: false
         }
     },
     // Reddit-specific state
     discoveredSubreddits: [],           // Discovered relevant subreddits
-    redditQueries: []                   // Generated Reddit search queries
+    redditQueries: [],                   // Generated Reddit search queries
+    debugLogs: []
 };
 
 // Tab configuration for header updates
@@ -114,6 +120,7 @@ function initializeSubTabs() {
     switchSubTab('setup', 'businessSetup');
     switchSubTab('ideaSources', 'searchIntelligence');
     switchSubTab('settings', 'twitter');
+    switchSubTab('config', 'apiConfig');
     
     // Update sub-tab availability based on current state
     updateSubTabAvailability();
@@ -194,6 +201,10 @@ function switchSubTab(parentTab, subTab) {
         } else if (typeof showContentStrategyEmptyState === 'function') {
             showContentStrategyEmptyState();
         }
+    }
+    
+    if (parentTab === 'config' && subTab === 'systemDebug') {
+        fetchDebugLogs();
     }
 }
 
