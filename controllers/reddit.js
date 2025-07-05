@@ -216,7 +216,7 @@ async function generateRedditSearchQueries(req, res) {
     
     // Use the sophisticated AI prompt for Reddit query generation
     const redditQueryPrompt = reddit.generateRedditSearchQueries(foundationalIntelligence);
-    const redditQueriesResponse = await callClaudeAPI(redditQueryPrompt);
+    const redditQueriesResponse = await callClaudeAPI(redditQueryPrompt, false, null, 'AI: Reddit Queries');
     
     // Parse the AI response
     let generatedQueries;

@@ -16,7 +16,7 @@ async function generateContentFromBriefs(briefs, businessContext, regenerateOpti
     
     // Use content generation prompt
     const contentPrompt = content.contentGenerationPrompt(briefs, generationContext);
-    const contentResponse = await callClaudeAPI(contentPrompt, false);
+    const contentResponse = await callClaudeAPI(contentPrompt, false, null, 'Content Generation');
     
     // Parse the response
     let generatedContent;

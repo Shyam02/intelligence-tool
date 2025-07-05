@@ -15,7 +15,7 @@ async function generateContentBriefs(req, res) {
     // Use extracted prompt instead of inline
     const briefingPrompt = content.contentBriefsPrompt(articles, businessContext);
 
-    const briefsResponse = await callClaudeAPI(briefingPrompt, false);
+    const briefsResponse = await callClaudeAPI(briefingPrompt, false, null, 'AI: Content Briefs');
     
     // Parse the response
     let briefs;

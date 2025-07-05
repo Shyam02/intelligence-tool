@@ -48,7 +48,7 @@ async function crawlHomepageOnly(websiteUrl) {
     
     // Step 2: Simple AI analysis (homepage only)
     const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
-    const crawlResult = await callClaudeAPI(crawlPrompt, false);
+    const crawlResult = await callClaudeAPI(crawlPrompt, false, masterId, 'AI: Homepage Analysis');
     
     console.log('🤖 AI analysis completed for competitor homepage');
     
@@ -107,6 +107,96 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
     const allLinks = extractAllLinks(homepageHtml, websiteUrl);
     const relevantLinks = filterRelevantLinks(allLinks);
     
+    // Collect debug data for homepage analysis
+    const homepageDebugData = {
+      step: 'homepage_analysis',
+      timestamp: new Date().toISOString(),
+      rawData: {
+        originalHtmlLength: homepageHtml.length,
+        cleanTextLength: homepageCleanText.length,
+        allLinksFound: allLinks.length,
+        relevantLinksFound: relevantLinks.length,
+        externalLinks: relevantLinks.filter(l => l.isExternal).length
+      },
+      processedData: {
+        cleanText: homepageCleanText, // Full content
+        allLinks: allLinks.map(l => ({ url: l.url, text: l.text, isExternal: l.isExternal, type: l.type, domain: l.domain })),
+        relevantLinks: relevantLinks.map(l => ({ url: l.url, text: l.text, isExternal: l.isExternal, type: l.type, domain: l.domain }))
+      },
+      // Add the logic details
+      logic: {
+        textCleaning: {
+          description: 'Enhanced clean text extraction that preserves ALL business content',
+          sourceFile: 'services/htmlParser.js',
+          functionName: 'extractCleanText()',
+          steps: [
+            'Remove script and style elements (non-business content)',
+            'Remove HTML comments',
+            'Keep ALL navigation, headers, footers, forms (contain business info)',
+            'Remove SVG and canvas elements (keep alt text)',
+            'Extract alt text from images',
+            'Extract placeholder text from inputs',
+            'Remove HTML tags while preserving content structure',
+            'Decode HTML entities (&nbsp;, &amp;, &lt;, &gt;, &quot;, &#39;)',
+            'Clean up whitespace and trim',
+            'Add extracted alt texts and placeholders to final content'
+          ],
+          originalLength: homepageHtml.length,
+          cleanLength: homepageCleanText.length,
+          compressionRatio: Math.round((1 - homepageCleanText.length / homepageHtml.length) * 100) + '%'
+        },
+        linkExtraction: {
+          description: 'Extract ALL links with minimal filtering - let AI decide what\'s valuable',
+          sourceFile: 'services/htmlParser.js',
+          functionName: 'extractAllLinks()',
+          steps: [
+            'Match all anchor tags with href attributes using regex',
+            'Extract link text and clean HTML tags from it',
+            'Skip only invalid links: javascript:, #, empty text',
+            'Convert relative URLs to absolute URLs',
+            'Skip fragment URLs (same page sections)',
+            'Include ALL domains - no restrictions',
+            'Categorize links for AI information (about, services, products, etc.)',
+            'Remove duplicate URLs',
+            'Mark internal vs external domains'
+          ],
+          totalLinksFound: allLinks.length,
+          uniqueLinks: allLinks.length,
+          externalDomains: allLinks.filter(l => l.isExternal).length,
+          internalPages: allLinks.filter(l => !l.isExternal).length
+        },
+        linkFiltering: {
+          description: 'NO HARD-CODED FILTERING - Pass all links to AI for decision making',
+          sourceFile: 'services/htmlParser.js',
+          functionName: 'filterRelevantLinks()',
+          steps: [
+            'No filtering applied',
+            'All extracted links passed to AI',
+            'AI will decide which links are valuable for business intelligence',
+            'This ensures no valuable business information is lost'
+          ],
+          linksPassedToAI: relevantLinks.length,
+          filteringLogic: 'NO FILTERING - All links passed'
+        }
+      }
+    };
+    
+    // Store debug data globally for frontend access
+    if (typeof global !== 'undefined') {
+      if (!global.crawlDebugData) {
+        global.crawlDebugData = {
+          timestamp: new Date().toISOString(),
+          websiteUrl: websiteUrl,
+          steps: [],
+          rawData: {},
+          processedData: {},
+          aiInteractions: [],
+          finalResult: null
+        };
+      }
+      global.crawlDebugData.homepageAnalysis = homepageDebugData;
+    }
+    
     console.log('📄 Homepage analysis complete:', {
       originalHtmlLength: homepageHtml.length,
       cleanTextLength: homepageCleanText.length,
@@ -130,12 +220,33 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
     const companyName = extractCompanyNameFromUrl(websiteUrl);
     const linkSelectionPrompt = intelligence.linkSelectionPrompt(relevantLinks, companyName, websiteUrl);
     
+    // Add prompt source information
+    const promptSourceInfo = {
+      sourceFile: 'prompts/intelligence/linkSelection.js',
+      functionName: 'linkSelectionPrompt()',
+      description: 'AI prompt for intelligent link selection based on business value'
+    };
+    
+    // Collect debug data for AI link selection
+    const linkSelectionDebugData = {
+      step: 'ai_link_selection',
+      timestamp: new Date().toISOString(),
+      prompt: linkSelectionPrompt,
+      relevantLinksCount: relevantLinks.length,
+      companyName: companyName,
+      promptSource: promptSourceInfo
+    };
+    
     let selectedLinksData;
+    let selectionResponse = null;
     try {
-      const selectionResponse = await callClaudeAPI(linkSelectionPrompt, false);
+      selectionResponse = await callClaudeAPI(linkSelectionPrompt, false, masterId, 'AI: Link Selection');
       const jsonMatch = selectionResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         selectedLinksData = JSON.parse(jsonMatch[0]);
+        linkSelectionDebugData.aiResponse = selectionResponse;
+        linkSelectionDebugData.parsedData = selectedLinksData;
+        linkSelectionDebugData.success = true;
       } else {
         throw new Error('No JSON found in AI response');
       }
@@ -152,6 +263,24 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
         total_selected: fallbackCount,
         selection_strategy: 'Fallback - most relevant links due to AI selection error'
       };
+      
+      linkSelectionDebugData.error = aiError.message;
+      linkSelectionDebugData.fallbackUsed = true;
+      linkSelectionDebugData.fallbackData = selectedLinksData;
+    }
+    
+    // Store link selection debug data
+    if (typeof global !== 'undefined' && global.crawlDebugData) {
+      global.crawlDebugData.linkSelection = linkSelectionDebugData;
+      // Always add AI interaction, even if no links were selected
+      global.crawlDebugData.aiInteractions.push({
+        step: 'link_selection',
+        timestamp: new Date().toISOString(),
+        prompt: linkSelectionPrompt,
+        response: selectionResponse || 'No response (fallback used)',
+        parsedData: selectedLinksData,
+        promptSource: promptSourceInfo
+      });
     }
     
     console.log('🎯 AI selected', selectedLinksData.total_selected, 'links:', 
@@ -159,6 +288,30 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
     
     // Step 4: Fetch content from selected pages (handle both internal and external)
     const additionalPages = [];
+    const pageCrawlDebugData = {
+      step: 'page_crawling',
+      timestamp: new Date().toISOString(),
+      selectedLinks: selectedLinksData.selected_links,
+      crawledPages: [],
+      logic: {
+        description: 'Post-AI crawling of selected pages using same enhanced logic as homepage',
+        sourceFile: 'services/websiteCrawler.js',
+        functionName: 'fetchMultiplePages() - page crawling loop',
+        steps: [
+          'For each AI-selected link:',
+          '  - Fetch HTML content using same enhanced fetchWebsiteHTML function',
+          '  - Apply same extractCleanText logic (preserve ALL business content)',
+          '  - Handle both internal and external domains',
+          '  - Continue crawling even if one page fails (don\'t fail entire process)',
+          '  - Store full content and metadata for each page',
+          '  - Track success/failure status for each page'
+        ],
+        crawlingMethod: 'enhanced_multi_page_crawling',
+        errorHandling: 'Continue on individual page failures',
+        contentProcessing: 'Same extractCleanText logic as homepage'
+      }
+    };
+    
     for (const selectedLink of selectedLinksData.selected_links) {
       try {
         console.log('📄 Fetching page:', selectedLink.text, '→', selectedLink.url);
@@ -171,7 +324,7 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
         const pageHtml = await fetchWebsiteHTML(selectedLink.url);
         const pageCleanText = extractCleanText(pageHtml);
         
-        additionalPages.push({
+        const pageData = {
           url: selectedLink.url,
           title: selectedLink.text,
           content: pageCleanText,
@@ -179,6 +332,20 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
           contentLength: pageCleanText.length,
           isExternal: isExternal,
           domain: linkDomain
+        };
+        
+        additionalPages.push(pageData);
+        
+        // Add to debug data
+        pageCrawlDebugData.crawledPages.push({
+          url: selectedLink.url,
+          title: selectedLink.text,
+          originalHtmlLength: pageHtml.length,
+          cleanTextLength: pageCleanText.length,
+          isExternal: isExternal,
+          domain: linkDomain,
+          success: true,
+          content: pageCleanText // Full content
         });
         
         console.log('✅ Successfully processed page:', selectedLink.text, 
@@ -187,7 +354,7 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
       } catch (pageError) {
         console.log('⚠️ Failed to fetch page:', selectedLink.url, '→', pageError.message);
         // Continue with other pages - don't fail entire process for one bad link
-        additionalPages.push({
+        const failedPageData = {
           url: selectedLink.url,
           title: selectedLink.text,
           content: `Failed to fetch content: ${pageError.message}`,
@@ -196,8 +363,26 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
           isExternal: new URL(selectedLink.url).hostname !== new URL(websiteUrl).hostname,
           domain: new URL(selectedLink.url).hostname,
           error: true
+        };
+        
+        additionalPages.push(failedPageData);
+        
+        // Add to debug data
+        pageCrawlDebugData.crawledPages.push({
+          url: selectedLink.url,
+          title: selectedLink.text,
+          error: true,
+          errorMessage: pageError.message,
+          isExternal: new URL(selectedLink.url).hostname !== new URL(websiteUrl).hostname,
+          domain: new URL(selectedLink.url).hostname,
+          success: false
         });
       }
+    }
+    
+    // Store page crawling debug data
+    if (typeof global !== 'undefined' && global.crawlDebugData) {
+      global.crawlDebugData.pageCrawling = pageCrawlDebugData;
     }
     
     console.log('🎉 Enhanced multi-page crawling complete:', {
@@ -224,6 +409,17 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
 
 // ENHANCED: Main website crawling function with flexible page support (FOR MAIN BUSINESS ONLY)
 async function crawlWebsite(websiteUrl, masterId = null) {
+  // Initialize debug data collection
+  const debugData = {
+    timestamp: new Date().toISOString(),
+    websiteUrl: websiteUrl,
+    steps: [],
+    rawData: {},
+    processedData: {},
+    aiInteractions: [],
+    finalResult: null
+  };
+  
   try {
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Crawling: started',
@@ -231,6 +427,13 @@ async function crawlWebsite(websiteUrl, masterId = null) {
       logic: 'Begin enhanced website crawl for the provided URL.',
       next: 'Try enhanced multi-page crawling.'
     });
+    
+    debugData.steps.push({
+      step: 'crawl_started',
+      timestamp: new Date().toISOString(),
+      websiteUrl: websiteUrl
+    });
+    
     let crawlResult;
     let crawlData;
     // Step 1: Try enhanced multi-page crawling (0-10 pages)
@@ -329,12 +532,102 @@ async function crawlWebsite(websiteUrl, masterId = null) {
         };
       }
     }
+    // Store AI interaction for final analysis
+    let finalAnalysisPrompt;
+    let finalAnalysisPromptSource;
+    
+    if (crawlData.analysisMethod === 'enhanced_multi_page_analysis') {
+      // Create comprehensive prompt with all page content
+      let combinedContent = `HOMEPAGE CONTENT:\n${crawlData.homepageContent}\n\n`;
+      if (crawlData.additionalPages.length > 0) {
+        combinedContent += 'ADDITIONAL PAGES:\n';
+        crawlData.additionalPages.forEach((page, index) => {
+          if (!page.error) {
+            combinedContent += `\nPage ${index + 1}: ${page.title} ${page.isExternal ? '(External Domain: ' + page.domain + ')' : '(Internal Page)'}\nURL: ${page.url}\nContent: ${page.content}\n`;
+          } else {
+            combinedContent += `\nPage ${index + 1}: ${page.title} (Failed to fetch from ${page.domain})\n`;
+          }
+        });
+      }
+      finalAnalysisPrompt = intelligence.multiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData);
+      finalAnalysisPromptSource = {
+        sourceFile: 'prompts/intelligence/websiteCrawling.js',
+        functionName: 'multiPageAnalysisPrompt()',
+        description: 'AI prompt for comprehensive multi-page business analysis'
+      };
+    } else if (crawlData.analysisMethod === 'single_page_fallback') {
+      finalAnalysisPrompt = intelligence.mainCrawlPrompt(websiteUrl, crawlData.homepageContent);
+      finalAnalysisPromptSource = {
+        sourceFile: 'prompts/intelligence/websiteCrawling.js',
+        functionName: 'mainCrawlPrompt()',
+        description: 'AI prompt for single-page business analysis'
+      };
+    } else {
+      finalAnalysisPrompt = intelligence.fallbackCrawlPrompt(websiteUrl);
+      finalAnalysisPromptSource = {
+        sourceFile: 'prompts/intelligence/websiteCrawling.js',
+        functionName: 'fallbackCrawlPrompt()',
+        description: 'AI prompt for URL-only business analysis'
+      };
+    }
+    
+    // Add final analysis logic details
+    const finalAnalysisLogic = {
+      description: 'Consolidate all crawled data and extract comprehensive business intelligence',
+      sourceFile: 'services/websiteCrawler.js',
+      functionName: 'crawlWebsite() - final analysis section',
+      steps: [
+        'Combine homepage content with all additional page content',
+        'Create comprehensive prompt with all available business information',
+        'Send consolidated data to AI for business intelligence extraction',
+        'Parse AI response to extract structured business data',
+        'Add metadata (extraction method, timestamps, page counts)',
+        'Store final result for Business Profile sections'
+      ],
+      dataUsage: {
+        businessSetupSection: [
+          'Company Name',
+          'Business Description', 
+          'Value Proposition',
+          'Main Product/Service',
+          'Pricing Information',
+          'Business Stage',
+          'Industry Category',
+          'Team Size',
+          'Funding Information',
+          'Company Mission',
+          'Team Background'
+        ],
+        strategicIntelligenceSection: [
+          'Target Customer',
+          'Key Features',
+          'Unique Selling Points',
+          'Competitors Mentioned',
+          'Recent Updates',
+          'Social Media Presence',
+          'Additional Notes'
+        ]
+      }
+    };
+    
+    debugData.aiInteractions.push({
+      step: 'final_analysis',
+      timestamp: new Date().toISOString(),
+      prompt: finalAnalysisPrompt,
+      response: crawlResult,
+      parsedData: null, // Will be set after parsing
+      promptSource: finalAnalysisPromptSource,
+      logic: finalAnalysisLogic
+    });
+    
     // Parse JSON response
     let extractedData;
     try {
       const jsonMatch = crawlResult.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         extractedData = JSON.parse(jsonMatch[0]);
+        // Update the parsed data in the AI interaction
+        debugData.aiInteractions[debugData.aiInteractions.length - 1].parsedData = extractedData;
         if (masterId) systemLogger.logStep(masterId, {
           step: 'Crawling: parsed AI response',
           extractedData,
@@ -363,6 +656,40 @@ async function crawlWebsite(websiteUrl, masterId = null) {
       (crawlData.additionalPages ? crawlData.additionalPages.reduce((sum, page) => sum + (page.error ? 0 : page.contentLength), 0) : 0);
     if (crawlData.selectionStrategy) {
       extractedData.ai_selection_strategy = crawlData.selectionStrategy;
+    }
+    
+    // Collect final debug data
+    debugData.finalResult = extractedData;
+    debugData.steps.push({
+      step: 'crawl_completed',
+      timestamp: new Date().toISOString()
+    });
+    
+    // Store raw and processed data
+    debugData.rawData = {
+      homepageContent: crawlData.homepageContent,
+      additionalPages: crawlData.additionalPages,
+      analysisMethod: crawlData.analysisMethod
+    };
+    
+    debugData.processedData = {
+      extractedData: extractedData,
+      crawlResult: crawlResult
+    };
+    
+    // Store debug data globally for frontend access
+    if (typeof global !== 'undefined') {
+      // Preserve any existing AI interactions from link selection
+      if (global.crawlDebugData && global.crawlDebugData.aiInteractions) {
+        debugData.aiInteractions = [...global.crawlDebugData.aiInteractions, ...debugData.aiInteractions];
+      }
+      // Preserve link selection and page crawling data
+      if (global.crawlDebugData) {
+        debugData.linkSelection = global.crawlDebugData.linkSelection;
+        debugData.pageCrawling = global.crawlDebugData.pageCrawling;
+        debugData.homepageAnalysis = global.crawlDebugData.homepageAnalysis;
+      }
+      global.crawlDebugData = debugData;
     }
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Crawling: complete',

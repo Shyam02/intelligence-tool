@@ -18,10 +18,14 @@ async function crawlWebsiteController(req, res) {
     
     console.log('✅ Website crawling completed for:', crawledData.company_name || 'Unknown');
     
+    // Get debug data from global storage
+    const debugData = global.crawlDebugData || null;
+    
     res.json({
       success: true,
       website_url: websiteUrl,
       crawled_data: crawledData,
+      debug_data: debugData,
       timestamp: new Date().toISOString()
     });
     

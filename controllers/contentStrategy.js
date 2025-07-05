@@ -22,7 +22,7 @@ async function generateContentStrategy(req, res) {
     const prompt = intelligence.contentStrategyPrompt(strategyContext, dataCompleteness);
     
     // Get AI response
-    const response = await callClaudeAPI(prompt);
+    const response = await callClaudeAPI(prompt, false, null, 'AI: Content Strategy');
     
     // Parse strategy response
     const strategy = parseStrategyResponse(response);

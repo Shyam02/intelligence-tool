@@ -216,7 +216,7 @@ async function testClaudeAPI() {
     }
     
     const testPrompt = 'Say "Claude API test successful" and nothing else.';
-    const result = await callClaudeAPI(testPrompt, false);
+    const result = await callClaudeAPI(testPrompt, false, null, 'AI: Test Call');
     return { status: 'success', message: 'API key working', response: result };
     
   } catch (error) {

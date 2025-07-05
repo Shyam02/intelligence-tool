@@ -127,6 +127,11 @@ async function handleFormSubmission(e) {
     // Store pure user input separately
     window.appState.userInput = userInput;
     
+    // Refresh form debug data
+    if (typeof refreshFormDebug === 'function') {
+        refreshFormDebug();
+    }
+    
     // Prepare combined data for API
     const combinedDataForAPI = { ...userInput };
     
@@ -152,6 +157,15 @@ async function handleFormSubmission(e) {
             const crawlResult = await crawlWebsiteAPI(websiteUrl);
             window.appState.websiteIntelligence = crawlResult.crawled_data;
             combinedDataForAPI.crawledData = crawlResult.crawled_data;
+            
+            // Store debug data for website crawl
+            if (crawlResult.debug_data) {
+                window.crawlDebugData = crawlResult.debug_data;
+                // Auto-refresh website crawl debug if it's open
+                if (typeof refreshWebsiteCrawlDebug === 'function') {
+                    refreshWebsiteCrawlDebug();
+                }
+            }
             
             console.log('✅ Website crawling completed during form submission');
             

@@ -468,9 +468,44 @@
                         <div id="systemDebugSubTabContent" class="sub-tab-content">
                             <div class="section">
                                 <h3>System Debug</h3>
-                                <p>System debugging and monitoring tools will be available here.</p>
-                                <div class="debug-placeholder">
-                                    <p>Debug functionality coming soon...</p>
+                                <p>System debugging and monitoring tools.</p>
+                                
+                                <!-- Form Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('formDebug')">
+                                        <h4>📝 Form Debug</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="formDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshFormDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearFormDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Form Data</h5>
+                                            <pre id="formDebugOutput">No form data available</pre>
+                                            <button onclick="copyToClipboard('formDebugOutput', this)" class="copy-btn">📋 Copy Form Data</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Business Website Crawl Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('websiteCrawlDebug')">
+                                        <h4>🌐 Business Website Crawl</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="websiteCrawlDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshWebsiteCrawlDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearWebsiteCrawlDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Website Crawl Data</h5>
+                                            <pre id="websiteCrawlDebugOutput">No website crawl data available</pre>
+                                            <button onclick="copyToClipboard('websiteCrawlDebugOutput', this)" class="copy-btn">📋 Copy Crawl Data</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
