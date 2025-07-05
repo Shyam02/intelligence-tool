@@ -1,12 +1,12 @@
 // Content strategy generation controller
 const { callClaudeAPI } = require('../services/ai');
 const { intelligence } = require('../prompts');
-const systemLogger = require('../services/systemLogger');
+// systemLogger removed for simplified approach
 
 
 // Generate comprehensive content strategy
 async function generateContentStrategy(req, res) {
-  const debugId = systemLogger.startOperation('Content Strategy');
+  // Debug logging removed for simplified approach
   try {
     const { businessContext, availableData } = req.body;
     
@@ -34,23 +34,10 @@ async function generateContentStrategy(req, res) {
       data_completeness: strategy.content_strategy.data_completeness
     });
     
-    systemLogger.endOperation(debugId, {
-      request: req.body,
-      response: strategy,
-      background: { strategyContext, dataCompleteness },
-      tokens: null,
-      cost: null
-    });
+    // Debug logging removed for simplified approach
   } catch (error) {
     console.error('❌ Content strategy generation failed:', error);
-    systemLogger.endOperation(debugId, {
-      request: req.body,
-      response: null,
-      background: null,
-      tokens: null,
-      cost: null,
-      error: error.message
-    });
+    // Error logging removed for simplified approach
     res.status(500).json({
       success: false,
       error: error.message

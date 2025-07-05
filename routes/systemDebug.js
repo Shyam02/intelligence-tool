@@ -1,9 +1,14 @@
-// systemDebug.js - Debug API route
+// systemDebug.js - Debug API route (placeholder)
 const express = require('express');
 const router = express.Router();
-const { getDebugLogs, clearDebugLogs } = require('../controllers/systemDebug');
 
-router.get('/logs', getDebugLogs);
-router.post('/logs/clear', clearDebugLogs);
+// Placeholder route for future debug functionality
+router.get('/status', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'System debug routes are available',
+    timestamp: new Date().toISOString()
+  });
+});
 
 module.exports = router;

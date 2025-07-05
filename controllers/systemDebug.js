@@ -1,26 +1,18 @@
-const systemLogger = require('../services/systemLogger');
+// systemDebug.js - Debug controller (placeholder)
 
-// Serve debug logs
-function getDebugLogs(req, res) {
+// Placeholder function for future debug functionality
+function getDebugStatus(req, res) {
     try {
-        const logs = systemLogger.getLogs();
-        res.json({ success: true, logs });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-}
-
-// Clear debug logs
-function clearDebugLogs(req, res) {
-    try {
-        systemLogger.clearLogs();
-        res.json({ success: true });
+        res.json({ 
+            success: true, 
+            message: 'Debug system is ready',
+            timestamp: new Date().toISOString()
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 }
 
 module.exports = {
-    getDebugLogs,
-    clearDebugLogs
+    getDebugStatus
 };

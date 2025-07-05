@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="styles/reddit.css">
     <link rel="stylesheet" href="styles/contentStrategy.css">
     <link rel="stylesheet" href="styles/responsive.css">
-    <link rel="stylesheet" href="styles/systemDebug.css">
+    <!-- systemDebug.css removed - placeholder functionality only -->
 </head>
 <body>
     <div class="app-container">
@@ -446,7 +446,7 @@
                                     🔌 API Configuration
                                 </button>
                                 <button class="sub-nav-button" onclick="switchSubTab('config', 'systemDebug')" id="systemDebugSubTab">
-                                    📊 System Debug
+                                    🛠️ System Debug
                                 </button>
                             </div>
                         </div>
@@ -466,11 +466,13 @@
                             </div>
                         </div>
                         <div id="systemDebugSubTabContent" class="sub-tab-content">
-                            <div class="debug-header">
-                                <button onclick="clearDebugLogs()" class="btn btn-warning" style="float:right;">Clear Logs</button>
-                                <h2>System Debug Logs</h2>
+                            <div class="section">
+                                <h3>System Debug</h3>
+                                <p>System debugging and monitoring tools will be available here.</p>
+                                <div class="debug-placeholder">
+                                    <p>Debug functionality coming soon...</p>
+                                </div>
                             </div>
-                            <div id="systemDebugContainer"></div>
                         </div>
                     </div>
                 </div>
@@ -490,7 +492,6 @@
     <script src="js/templates/contentGeneration.js"></script>
     <script src="js/templates/dataDisplay.js"></script>
     <script src="js/templates/contentStrategy.js"></script>
-    <script src="js/templates/systemDebug.js"></script>
     <script src="js/forms.js"></script>
     <!-- Load application files -->
     <script src="js/results.js"></script>
@@ -499,6 +500,5 @@
     <script src="js/reddit.js"></script>
     <script src="js/contentGeneration.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/systemDebug.js"></script>
 </body>
 </html>

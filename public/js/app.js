@@ -203,9 +203,7 @@ function switchSubTab(parentTab, subTab) {
         }
     }
     
-    if (parentTab === 'config' && subTab === 'systemDebug') {
-        fetchDebugLogs();
-    }
+    // System Debug tab handling will be added here when needed
 }
 
 // Hide all sub-tab contents for a parent tab

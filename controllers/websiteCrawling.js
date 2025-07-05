@@ -1,10 +1,10 @@
 // Website crawling controller
 const { crawlWebsite } = require('../services/websiteCrawler');
-const systemLogger = require('../services/systemLogger');
+// systemLogger removed for simplified approach
 
 // NEW FUNCTION: Crawl website and extract business information
 async function crawlWebsiteController(req, res) {
-  const debugId = systemLogger.startOperation('Website Crawling');
+  // Debug logging removed for simplified approach
   try {
     const { websiteUrl } = req.body;
     
@@ -25,23 +25,10 @@ async function crawlWebsiteController(req, res) {
       timestamp: new Date().toISOString()
     });
     
-    systemLogger.endOperation(debugId, {
-      request: req.body,
-      response: { crawledData },
-      background: null,
-      tokens: null,
-      cost: null
-    });
+    // Debug logging removed for simplified approach
   } catch (error) {
     console.error('Website crawling controller error:', error);
-    systemLogger.endOperation(debugId, {
-      request: req.body,
-      response: null,
-      background: null,
-      tokens: null,
-      cost: null,
-      error: error.message
-    });
+    // Error logging removed for simplified approach
     res.status(500).json({ 
       error: 'Website crawling failed: ' + error.message,
       website_url: req.body.websiteUrl || 'unknown',
