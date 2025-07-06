@@ -545,6 +545,44 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Web Search Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('webSearchDebug')">
+                                        <h4>🔍 Web Search</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="webSearchDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshWebSearchDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearWebSearchDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Web Search Data</h5>
+                                            <div id="webSearchDebugOutput">No web search data available</div>
+                                            <button onclick="copyToClipboard('webSearchDebugOutput', this)" class="copy-btn">📋 Copy Search Data</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reddit Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('redditDebug')">
+                                        <h4>🤖 Reddit</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="redditDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshRedditDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearRedditDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Reddit Data</h5>
+                                            <div id="redditDebugOutput">No reddit data available</div>
+                                            <button onclick="copyToClipboard('redditDebugOutput', this)" class="copy-btn">📋 Copy Reddit Data</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

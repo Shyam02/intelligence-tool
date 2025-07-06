@@ -1474,3 +1474,401 @@ async function collectCompetitorIntelligenceDebugData() {
         };
     }
 }
+
+// Web Search Debug Functions
+async function refreshWebSearchDebug() {
+    console.log('🔄 Refreshing web search debug...');
+    const webSearchData = await collectWebSearchDebugData();
+    console.log('📋 Web search data:', webSearchData);
+    const output = document.getElementById('webSearchDebugOutput');
+    
+    if (webSearchData.message) {
+        output.innerHTML = webSearchData.message;
+        return;
+    }
+    
+    let html = '<div class="debug-detailed-section">';
+    
+    // Basic info
+    html += `<h4>🔍 Web Search Debug - Complete Details</h4>`;
+    html += `<p><strong>Started:</strong> ${webSearchData.timestamp}</p>`;
+    html += `<p><strong>Debug Generated:</strong> ${new Date().toISOString()}</p>`;
+
+    // Query Generation
+    if (webSearchData.queryGeneration) {
+        html += '<h5>📝 Search Query Generation:</h5>';
+        html += '<div class="debug-query-generation-detailed">';
+        html += `<p><strong>Step:</strong> ${webSearchData.queryGeneration.step}</p>`;
+        html += `<p><strong>Timestamp:</strong> ${webSearchData.queryGeneration.timestamp}</p>`;
+        html += `<p><strong>Competitor Names Found:</strong> ${webSearchData.queryGeneration.competitorNamesFound || 0}</p>`;
+        html += `<p><strong>Total Queries Generated:</strong> ${webSearchData.queryGeneration.totalQueriesGenerated || 0}</p>`;
+        
+        // Add logic information
+        if (webSearchData.queryGeneration.logic) {
+            html += '<details><summary>🔧 Generation Logic</summary>';
+            html += `<p><strong>Description:</strong> ${formatContentForDisplay(webSearchData.queryGeneration.logic.description)}</p>`;
+            html += `<p><strong>Source:</strong> <code>${webSearchData.queryGeneration.logic.sourceFile}</code> - <code>${webSearchData.queryGeneration.logic.functionName}</code></p>`;
+            html += '<p><strong>Steps:</strong></p><ul>';
+            webSearchData.queryGeneration.logic.steps.forEach(step => {
+                html += `<li>${formatContentForDisplay(step)}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+        }
+        
+        if (webSearchData.queryGeneration.inputData) {
+            html += '<details><summary>View Input Data</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(webSearchData.queryGeneration.inputData, null, 2)}</pre>`;
+            html += '</details>';
+        }
+        
+        if (webSearchData.queryGeneration.outputData) {
+            html += '<details><summary>View Generated Queries</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(webSearchData.queryGeneration.outputData, null, 2)}</pre>`;
+            html += '</details>';
+        }
+        
+        html += '</div>';
+    }
+
+    // Search Executions
+    if (webSearchData.searchExecutions && webSearchData.searchExecutions.length > 0) {
+        html += '<h5>🔍 Search Executions:</h5>';
+        html += '<div class="debug-search-executions-detailed">';
+        webSearchData.searchExecutions.forEach((execution, index) => {
+            html += `<div class="debug-search-execution-detailed">
+                <h6>Search ${index + 1}: ${execution.query}</h6>
+                <p><strong>Step:</strong> ${execution.step}</p>
+                <p><strong>Timestamp:</strong> ${execution.timestamp}</p>`;
+            
+            // Add logic information
+            if (execution.logic) {
+                html += '<details><summary>🔧 Search Logic</summary>';
+                html += `<p><strong>Description:</strong> ${formatContentForDisplay(execution.logic.description)}</p>`;
+                html += `<p><strong>Source:</strong> <code>${execution.logic.sourceFile}</code> - <code>${execution.logic.functionName}</code></p>`;
+                html += '<p><strong>Steps:</strong></p><ul>';
+                execution.logic.steps.forEach(step => {
+                    html += `<li>${formatContentForDisplay(step)}</li>`;
+                });
+                html += '</ul>';
+                html += '</details>';
+            }
+            
+            if (execution.apiCalls && execution.apiCalls.length > 0) {
+                html += '<details><summary>View API Calls</summary>';
+                html += '<div class="debug-api-calls">';
+                execution.apiCalls.forEach((apiCall, callIndex) => {
+                    html += `<div class="debug-api-call">
+                        <strong>Call ${callIndex + 1}:</strong> ${apiCall.type}
+                        <br><strong>Query:</strong> ${apiCall.query}
+                        <br><strong>Results:</strong> ${apiCall.results_count}
+                        <br><strong>Timestamp:</strong> ${apiCall.timestamp}`;
+                    
+                    if (apiCall.logic) {
+                        html += '<details><summary>API Logic</summary>';
+                        html += `<p><strong>Description:</strong> ${formatContentForDisplay(apiCall.logic.description)}</p>`;
+                        html += `<p><strong>Source:</strong> <code>${apiCall.logic.sourceFile}</code> - <code>${apiCall.logic.functionName}</code></p>`;
+                        html += '<p><strong>Steps:</strong></p><ul>';
+                        apiCall.logic.steps.forEach(step => {
+                            html += `<li>${formatContentForDisplay(step)}</li>`;
+                        });
+                        html += '</ul>';
+                        html += '</details>';
+                    }
+                    
+                    html += '</div>';
+                });
+                html += '</div></details>';
+            }
+            
+            if (execution.results) {
+                html += '<details><summary>View Search Results</summary>';
+                html += `<p><strong>Articles Found:</strong> ${execution.results.articles_count}</p>`;
+                html += `<p><strong>Method Used:</strong> ${execution.results.method_used}</p>`;
+                html += `<p><strong>Status:</strong> ${execution.results.status}</p>`;
+                if (execution.results.articles && execution.results.articles.length > 0) {
+                    html += '<details><summary>View Articles</summary>';
+                    html += '<div class="debug-articles-list">';
+                    execution.results.articles.forEach((article, articleIndex) => {
+                        html += `<div class="debug-article-item">
+                            <strong>${articleIndex + 1}.</strong> ${formatContentForDisplay(article.title)}
+                            <br><em>${article.url}</em>
+                            <br>${formatContentForDisplay(article.preview)}
+                        </div>`;
+                    });
+                    html += '</div></details>';
+                }
+                html += '</details>';
+            }
+            
+            if (execution.error) {
+                html += `<p><strong>Error:</strong> ${execution.error}</p>`;
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    html += '</div>';
+    
+    output.innerHTML = html;
+    console.log('✅ Web search debug data displayed');
+}
+
+function clearWebSearchDebug() {
+    const output = document.getElementById('webSearchDebugOutput');
+    output.innerHTML = 'No web search data available';
+}
+
+async function collectWebSearchDebugData() {
+    try {
+        console.log('🔍 Fetching web search debug data from API...');
+        const response = await fetch('/api/systemDebug/web-search-debug');
+        const result = await response.json();
+        console.log('📊 API response:', result);
+        
+        if (result.success && result.data) {
+            return result.data;
+        } else {
+            return {
+                timestamp: new Date().toISOString(),
+                message: 'No web search debug data available'
+            };
+        }
+    } catch (error) {
+        console.error('Error fetching web search debug data:', error);
+        return {
+            timestamp: new Date().toISOString(),
+            message: 'Error fetching web search debug data: ' + error.message
+        };
+    }
+}
+
+// Reddit Debug Functions
+async function refreshRedditDebug() {
+    console.log('🔄 Refreshing reddit debug...');
+    const redditData = await collectRedditDebugData();
+    console.log('📋 Reddit data:', redditData);
+    const output = document.getElementById('redditDebugOutput');
+    
+    if (redditData.message) {
+        output.innerHTML = redditData.message;
+        return;
+    }
+    
+    let html = '<div class="debug-detailed-section">';
+    
+    // Basic info
+    html += `<h4>🤖 Reddit Debug - Complete Details</h4>`;
+    html += `<p><strong>Started:</strong> ${redditData.timestamp}</p>`;
+    html += `<p><strong>Debug Generated:</strong> ${new Date().toISOString()}</p>`;
+
+    // Query Generation
+    if (redditData.queryGeneration) {
+        html += '<h5>📝 Reddit Query Generation:</h5>';
+        html += '<div class="debug-reddit-query-generation-detailed">';
+        html += `<p><strong>Step:</strong> ${redditData.queryGeneration.step}</p>`;
+        html += `<p><strong>Timestamp:</strong> ${redditData.queryGeneration.timestamp}</p>`;
+        
+        // Add logic information
+        if (redditData.queryGeneration.logic) {
+            html += '<details><summary>🔧 Generation Logic</summary>';
+            html += `<p><strong>Description:</strong> ${formatContentForDisplay(redditData.queryGeneration.logic.description)}</p>`;
+            html += `<p><strong>Source:</strong> <code>${redditData.queryGeneration.logic.sourceFile}</code> - <code>${redditData.queryGeneration.logic.functionName}</code></p>`;
+            html += '<p><strong>Steps:</strong></p><ul>';
+            redditData.queryGeneration.logic.steps.forEach(step => {
+                html += `<li>${formatContentForDisplay(step)}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+        }
+        
+        if (redditData.queryGeneration.aiInteraction) {
+            html += '<details><summary>View AI Interaction</summary>';
+            if (redditData.queryGeneration.aiInteraction.promptSource) {
+                html += `<p><strong>Prompt Source:</strong> <code>${redditData.queryGeneration.aiInteraction.promptSource.sourceFile}</code> - <code>${redditData.queryGeneration.aiInteraction.promptSource.functionName}</code></p>`;
+                html += `<p><strong>Description:</strong> ${formatContentForDisplay(redditData.queryGeneration.aiInteraction.promptSource.description)}</p>`;
+            }
+            if (redditData.queryGeneration.aiInteraction.prompt) {
+                html += `<details><summary>View Prompt</summary><pre class="debug-prompt">${formatContentForDisplay(redditData.queryGeneration.aiInteraction.prompt)}</pre></details>`;
+            }
+            if (redditData.queryGeneration.aiInteraction.response) {
+                html += `<details><summary>View Response</summary><pre class="debug-response">${formatContentForDisplay(redditData.queryGeneration.aiInteraction.response)}</pre></details>`;
+            }
+            html += '</details>';
+        }
+        
+        if (redditData.queryGeneration.outputData) {
+            html += '<details><summary>View Generated Queries</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(redditData.queryGeneration.outputData, null, 2)}</pre>`;
+            html += '</details>';
+        }
+        
+        html += '</div>';
+    }
+
+    // Subreddit Discovery
+    if (redditData.subredditDiscovery) {
+        html += '<h5>🔍 Subreddit Discovery:</h5>';
+        html += '<div class="debug-subreddit-discovery-detailed">';
+        html += `<p><strong>Step:</strong> ${redditData.subredditDiscovery.step}</p>`;
+        html += `<p><strong>Timestamp:</strong> ${redditData.subredditDiscovery.timestamp}</p>`;
+        html += `<p><strong>Total Subreddits Found:</strong> ${redditData.subredditDiscovery.totalSubredditsFound || 0}</p>`;
+        
+        // Add logic information
+        if (redditData.subredditDiscovery.logic) {
+            html += '<details><summary>🔧 Discovery Logic</summary>';
+            html += `<p><strong>Description:</strong> ${formatContentForDisplay(redditData.subredditDiscovery.logic.description)}</p>`;
+            html += `<p><strong>Source:</strong> <code>${redditData.subredditDiscovery.logic.sourceFile}</code> - <code>${redditData.subredditDiscovery.logic.functionName}</code></p>`;
+            html += '<p><strong>Steps:</strong></p><ul>';
+            redditData.subredditDiscovery.logic.steps.forEach(step => {
+                html += `<li>${formatContentForDisplay(step)}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+        }
+        
+        if (redditData.subredditDiscovery.keywords && redditData.subredditDiscovery.keywords.length > 0) {
+            html += '<details><summary>View Keywords Used</summary>';
+            html += '<div class="debug-keywords-list">';
+            redditData.subredditDiscovery.keywords.forEach((keyword, index) => {
+                html += `<div class="debug-keyword-item">
+                    <strong>${index + 1}.</strong> ${formatContentForDisplay(keyword)}
+                </div>`;
+            });
+            html += '</div></details>';
+        }
+        
+        if (redditData.subredditDiscovery.discoveredSubreddits && redditData.subredditDiscovery.discoveredSubreddits.length > 0) {
+            html += '<details><summary>View Discovered Subreddits</summary>';
+            html += '<div class="debug-subreddits-list">';
+            redditData.subredditDiscovery.discoveredSubreddits.forEach((subreddit, index) => {
+                html += `<div class="debug-subreddit-item">
+                    <strong>${index + 1}.</strong> r/${formatContentForDisplay(subreddit.name)}
+                    <br><em>${formatContentForDisplay(subreddit.title)}</em>
+                    <br><span class="subreddit-meta">Subscribers: ${subreddit.subscribers || 'N/A'}</span>
+                </div>`;
+            });
+            html += '</div></details>';
+        }
+        
+        html += '</div>';
+    }
+
+    // Search Executions
+    if (redditData.searchExecutions && redditData.searchExecutions.length > 0) {
+        html += '<h5>🔍 Reddit Search Executions:</h5>';
+        html += '<div class="debug-reddit-search-executions-detailed">';
+        redditData.searchExecutions.forEach((execution, index) => {
+            html += `<div class="debug-reddit-search-execution-detailed">
+                <h6>Search ${index + 1}</h6>
+                <p><strong>Step:</strong> ${execution.step}</p>
+                <p><strong>Timestamp:</strong> ${execution.timestamp}</p>
+                <p><strong>Queries:</strong> ${execution.searchQueries?.length || 0}</p>
+                <p><strong>Subreddits:</strong> ${execution.subreddits?.length || 0}</p>
+                <p><strong>Time Frame:</strong> ${execution.timeFrame}</p>`;
+            
+            // Add logic information
+            if (execution.logic) {
+                html += '<details><summary>🔧 Search Logic</summary>';
+                html += `<p><strong>Description:</strong> ${formatContentForDisplay(execution.logic.description)}</p>`;
+                html += `<p><strong>Source:</strong> <code>${execution.logic.sourceFile}</code> - <code>${execution.logic.functionName}</code></p>`;
+                html += '<p><strong>Steps:</strong></p><ul>';
+                execution.logic.steps.forEach(step => {
+                    html += `<li>${formatContentForDisplay(step)}</li>`;
+                });
+                html += '</ul>';
+                html += '</details>';
+            }
+            
+            if (execution.searchResults && execution.searchResults.length > 0) {
+                html += '<details><summary>View Search Results</summary>';
+                html += '<div class="debug-reddit-search-results">';
+                execution.searchResults.forEach((result, resultIndex) => {
+                    html += `<div class="debug-reddit-search-result">
+                        <strong>Query ${resultIndex + 1}:</strong> ${formatContentForDisplay(result.query)}
+                        <br><strong>Sitewide Results:</strong> ${result.sitewide_results}
+                        <br><strong>Subreddit Results:</strong> ${result.subreddit_results}
+                        <br><strong>Total Results:</strong> ${result.total_results}`;
+                    
+                    if (result.logic) {
+                        html += '<details><summary>Query Logic</summary>';
+                        html += `<p><strong>Description:</strong> ${formatContentForDisplay(result.logic.description)}</p>`;
+                        html += `<p><strong>Source:</strong> <code>${result.logic.sourceFile}</code> - <code>${result.logic.functionName}</code></p>`;
+                        html += '<p><strong>Steps:</strong></p><ul>';
+                        result.logic.steps.forEach(step => {
+                            html += `<li>${formatContentForDisplay(step)}</li>`;
+                        });
+                        html += '</ul>';
+                        html += '</details>';
+                    }
+                    
+                    html += '</div>';
+                });
+                html += '</div></details>';
+            }
+            
+            if (execution.finalResults) {
+                html += '<details><summary>View Final Results</summary>';
+                html += `<p><strong>Total Posts Found:</strong> ${execution.finalResults.total_posts_found}</p>`;
+                html += `<p><strong>Articles Count:</strong> ${execution.finalResults.articles_count}</p>`;
+                html += `<p><strong>Query Type:</strong> ${execution.finalResults.query_type}</p>`;
+                if (execution.finalResults.articles && execution.finalResults.articles.length > 0) {
+                    html += '<details><summary>View Articles</summary>';
+                    html += '<div class="debug-reddit-articles-list">';
+                    execution.finalResults.articles.forEach((article, articleIndex) => {
+                        html += `<div class="debug-reddit-article-item">
+                            <strong>${articleIndex + 1}.</strong> ${formatContentForDisplay(article.title)}
+                            <br><em>${article.url}</em>
+                            <br>${formatContentForDisplay(article.preview)}
+                        </div>`;
+                    });
+                    html += '</div></details>';
+                }
+                html += '</details>';
+            }
+            
+            if (execution.error) {
+                html += `<p><strong>Error:</strong> ${execution.error}</p>`;
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    html += '</div>';
+    
+    output.innerHTML = html;
+    console.log('✅ Reddit debug data displayed');
+}
+
+function clearRedditDebug() {
+    const output = document.getElementById('redditDebugOutput');
+    output.innerHTML = 'No reddit data available';
+}
+
+async function collectRedditDebugData() {
+    try {
+        console.log('🔍 Fetching reddit debug data from API...');
+        const response = await fetch('/api/systemDebug/reddit-debug');
+        const result = await response.json();
+        console.log('📊 API response:', result);
+        
+        if (result.success && result.data) {
+            return result.data;
+        } else {
+            return {
+                timestamp: new Date().toISOString(),
+                message: 'No reddit debug data available'
+            };
+        }
+    } catch (error) {
+        console.error('Error fetching reddit debug data:', error);
+        return {
+            timestamp: new Date().toISOString(),
+            message: 'Error fetching reddit debug data: ' + error.message
+        };
+    }
+}

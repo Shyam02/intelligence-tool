@@ -6,10 +6,41 @@ const { config } = require('../config/config');
 
 // Execute search queries using Brave Search API
 async function executeSearch(req, res) {
-  // Debug logging removed for simplified approach
   try {
     const { query } = req.body;
     console.log('🔍 Search request received for query:', query);
+    
+    // Initialize debug data if not exists
+    if (!global.webSearchDebugData) {
+      global.webSearchDebugData = {
+        timestamp: new Date().toISOString(),
+        searchExecutions: []
+      };
+    }
+    
+    // Add search execution to debug data
+    const searchExecution = {
+      step: 'web_search_execution',
+      timestamp: new Date().toISOString(),
+      query: query,
+      logic: {
+        description: 'Execute web search using Brave Search API',
+        sourceFile: 'controllers/webSearch.js',
+        functionName: 'executeSearch()',
+        steps: [
+          'Validate query and API configuration',
+          'Call Brave Search API with query',
+          'Process web results and format articles',
+          'Handle errors and provide fallbacks',
+          'Return formatted search results'
+        ]
+      },
+      apiCalls: [],
+      results: null,
+      error: null
+    };
+    
+    global.webSearchDebugData.searchExecutions.push(searchExecution);
     
     if (!query || query.trim() === '') {
       return res.status(400).json({ error: 'Query is required' });
@@ -29,13 +60,27 @@ async function executeSearch(req, res) {
       // Call Brave Search API
       const braveResponse = await searchBrave(query, 10);
       
-      apiCalls.push({
+      const apiCall = {
         call: 1,
         type: 'brave_search_api',
         query: query,
         results_count: braveResponse.web?.results?.length || 0,
-        timestamp: new Date().toISOString()
-      });
+        timestamp: new Date().toISOString(),
+        logic: {
+          description: 'Brave Search API call',
+          sourceFile: 'services/webSearch.js',
+          functionName: 'searchBrave()',
+          steps: [
+            'Send HTTP request to Brave Search API',
+            'Handle rate limiting and authentication',
+            'Parse JSON response',
+            'Extract web results'
+          ]
+        }
+      };
+      
+      apiCalls.push(apiCall);
+      searchExecution.apiCalls.push(apiCall);
 
       console.log('📊 Brave search response structure:', {
         hasWeb: !!braveResponse.web,
@@ -82,6 +127,9 @@ async function executeSearch(req, res) {
     } catch (error) {
       console.error('⚠️ Brave Search failed:', error.message);
       
+      // Store error in debug data
+      searchExecution.error = error.message;
+      
       // Error fallback
       articles = [
         {
@@ -111,6 +159,14 @@ async function executeSearch(req, res) {
       timestamp: new Date().toISOString(),
       status: 'success',
       api_calls: apiCalls
+    };
+    
+    // Store results in debug data
+    searchExecution.results = {
+      articles_count: articles.length,
+      method_used: method,
+      status: 'success',
+      articles: articles
     };
     
     res.json(response);

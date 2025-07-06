@@ -12,6 +12,38 @@ async function discoverRelevantSubreddits(req, res) {
       return res.status(400).json({ error: 'Foundational intelligence data is required' });
     }
     
+    // Initialize debug data if not exists
+    if (!global.redditDebugData) {
+      global.redditDebugData = {
+        timestamp: new Date().toISOString(),
+        foundationalIntelligence: foundationalIntelligence,
+        queryGeneration: null,
+        subredditDiscovery: null,
+        searchExecutions: []
+      };
+    }
+    
+    // Add subreddit discovery to debug data
+    global.redditDebugData.subredditDiscovery = {
+      step: 'subreddit_discovery',
+      timestamp: new Date().toISOString(),
+      inputData: foundationalIntelligence,
+      logic: {
+        description: 'Discover relevant subreddits based on business intelligence',
+        sourceFile: 'controllers/reddit.js',
+        functionName: 'discoverRelevantSubreddits()',
+        steps: [
+          'Extract keywords from business intelligence',
+          'Call Reddit API for subreddit discovery',
+          'Filter subreddits by relevance and activity',
+          'Return ranked list of relevant subreddits'
+        ]
+      },
+      keywords: [],
+      discoveredSubreddits: [],
+      error: null
+    };
+    
     console.log('🔍 Starting subreddit discovery based on business intelligence...');
     
     // Extract keywords for subreddit discovery
@@ -26,6 +58,9 @@ async function discoverRelevantSubreddits(req, res) {
       return res.status(400).json({ error: 'No keywords found in business intelligence for subreddit discovery' });
     }
     
+    // Store keywords in debug data
+    global.redditDebugData.subredditDiscovery.keywords = keywords;
+    
     console.log('🎯 Using keywords for discovery:', keywords);
     
     // Discover subreddits
@@ -37,6 +72,10 @@ async function discoverRelevantSubreddits(req, res) {
       subreddit.name && 
       subreddit.title
     );
+    
+    // Store results in debug data
+    global.redditDebugData.subredditDiscovery.discoveredSubreddits = relevantSubreddits;
+    global.redditDebugData.subredditDiscovery.totalSubredditsFound = relevantSubreddits.length;
     
     console.log('✅ Subreddit discovery completed:', relevantSubreddits.length, 'relevant subreddits found');
     
@@ -65,6 +104,40 @@ async function searchRedditDiscussions(req, res) {
     if (!searchQueries || !Array.isArray(searchQueries) || searchQueries.length === 0) {
       return res.status(400).json({ error: 'Search queries array is required' });
     }
+    
+    // Initialize debug data if not exists
+    if (!global.redditDebugData) {
+      global.redditDebugData = {
+        timestamp: new Date().toISOString(),
+        searchExecutions: []
+      };
+    }
+    
+    // Add search execution to debug data
+    const searchExecution = {
+      step: 'reddit_search_execution',
+      timestamp: new Date().toISOString(),
+      searchQueries: searchQueries,
+      subreddits: subreddits || [],
+      timeFrame: timeFrame,
+      logic: {
+        description: 'Search Reddit discussions using generated queries',
+        sourceFile: 'controllers/reddit.js',
+        functionName: 'searchRedditDiscussions()',
+        steps: [
+          'Validate search queries and parameters',
+          'Execute searches for each query',
+          'Search sitewide and within specific subreddits',
+          'Remove duplicates and sort by engagement',
+          'Format results as articles'
+        ]
+      },
+      searchResults: [],
+      finalResults: null,
+      error: null
+    };
+    
+    global.redditDebugData.searchExecutions.push(searchExecution);
     
     console.log('🔍 Starting Reddit discussion search with', searchQueries.length, 'queries...');
     
@@ -98,12 +171,26 @@ async function searchRedditDiscussions(req, res) {
         const combinedResults = [...sitewideResults, ...subredditResults];
         allPosts.push(...combinedResults);
         
-        searchResults.push({
+        const searchResult = {
           query: query,
           sitewide_results: sitewideResults.length,
           subreddit_results: subredditResults.length,
-          total_results: combinedResults.length
-        });
+          total_results: combinedResults.length,
+          logic: {
+            description: 'Individual Reddit search result',
+            sourceFile: 'services/reddit.js',
+            functionName: 'searchReddit()',
+            steps: [
+              'Search Reddit API with query',
+              'Handle rate limiting and authentication',
+              'Parse JSON response',
+              'Extract post data'
+            ]
+          }
+        };
+        
+        searchResults.push(searchResult);
+        searchExecution.searchResults.push(searchResult);
         
         console.log(`✅ Search ${i + 1} completed: ${combinedResults.length} posts found`);
         
@@ -146,6 +233,14 @@ async function searchRedditDiscussions(req, res) {
     const formattedArticles = formatRedditPostsAsArticles(sortedPosts.slice(0, maxResults));
     
     console.log('✅ Reddit discussion search completed:', formattedArticles.length, 'unique discussions found');
+    
+    // Store final results in debug data
+    searchExecution.finalResults = {
+      total_posts_found: uniquePosts.length,
+      articles_count: formattedArticles.length,
+      query_type: isMultipleQueries ? 'multiple' : 'single',
+      articles: formattedArticles
+    };
     
     res.json({
       success: true,
@@ -212,11 +307,47 @@ async function generateRedditSearchQueries(req, res) {
       return res.status(400).json({ error: 'Foundational intelligence data is required' });
     }
     
+    // Initialize debug data
+    global.redditDebugData = {
+      timestamp: new Date().toISOString(),
+      foundationalIntelligence: foundationalIntelligence,
+      queryGeneration: {
+        step: 'reddit_query_generation',
+        timestamp: new Date().toISOString(),
+        inputData: foundationalIntelligence,
+        logic: {
+          description: 'Generate Reddit search queries using AI',
+          sourceFile: 'controllers/reddit.js',
+          functionName: 'generateRedditSearchQueries()',
+          steps: [
+            'Prepare AI prompt with business intelligence',
+            'Send prompt to Claude API for query generation',
+            'Parse AI response and extract structured queries',
+            'Handle parsing errors with fallback queries',
+            'Return formatted query array'
+          ]
+        }
+      },
+      subredditDiscovery: null,
+      searchExecutions: []
+    };
+    
     console.log('🔍 Starting AI-powered Reddit query generation...');
     
     // Use the sophisticated AI prompt for Reddit query generation
     const redditQueryPrompt = reddit.generateRedditSearchQueries(foundationalIntelligence);
     const redditQueriesResponse = await callClaudeAPI(redditQueryPrompt, false, null, 'AI: Reddit Queries');
+    
+    // Store AI interaction in debug data
+    global.redditDebugData.queryGeneration.aiInteraction = {
+      prompt: redditQueryPrompt,
+      response: redditQueriesResponse,
+      promptSource: {
+        sourceFile: 'prompts/reddit/queryGeneration.js',
+        functionName: 'generateRedditSearchQueries()',
+        description: 'AI prompt for Reddit search query generation'
+      }
+    };
     
     // Parse the AI response
     let generatedQueries;
@@ -281,6 +412,13 @@ async function generateRedditSearchQueries(req, res) {
     }
     
     console.log('✅ Reddit query generation completed:', queryArray.length, 'queries generated');
+    
+    // Store generated queries in debug data
+    global.redditDebugData.queryGeneration.outputData = {
+      queries: queryArray,
+      structured_queries: generatedQueries,
+      total_queries: queryArray.length
+    };
     
     res.json({
       success: true,

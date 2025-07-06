@@ -6,6 +6,31 @@ async function generateQueries(req, res) {
     try {
       const foundationalIntelligence = req.body;
       
+      // Initialize debug data
+      global.webSearchDebugData = {
+        timestamp: new Date().toISOString(),
+        foundationalIntelligence: foundationalIntelligence,
+        queryGeneration: {
+          step: 'search_query_generation',
+          timestamp: new Date().toISOString(),
+          inputData: foundationalIntelligence,
+          logic: {
+            description: 'Generate structured search queries from business intelligence',
+            sourceFile: 'controllers/webSearchQueries.js',
+            functionName: 'generateQueries()',
+            steps: [
+              'Extract competitor names from business intelligence',
+              'Generate competitor-specific queries',
+              'Generate keyword-based queries',
+              'Generate content discovery queries',
+              'Structure queries by category'
+            ]
+          }
+        },
+        generatedQueries: null,
+        searchExecutions: []
+      };
+      
       // Extract competitor names for enhanced queries
       let competitorNames = [];
       if (foundationalIntelligence.competitor_intelligence && 
@@ -132,6 +157,15 @@ async function generateQueries(req, res) {
         keyword_queries: keywordQueries,
         content_queries: contentQueries
       };
+
+      // Store generated queries in debug data
+      global.webSearchDebugData.generatedQueries = allQueries;
+      global.webSearchDebugData.queryGeneration.outputData = allQueries;
+      global.webSearchDebugData.queryGeneration.competitorNamesFound = competitorNames.length;
+      global.webSearchDebugData.queryGeneration.totalQueriesGenerated = 
+        Object.values(allQueries).reduce((total, category) => 
+          total + Object.values(category).reduce((catTotal, queries) => 
+            catTotal + (Array.isArray(queries) ? queries.length : 0), 0), 0);
 
       res.json(allQueries);
     } catch (error) {
