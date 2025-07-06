@@ -6,26 +6,105 @@ const { intelligence } = require('../prompts');
 
 // Generate comprehensive content strategy
 async function generateContentStrategy(req, res) {
-  // Debug logging removed for simplified approach
   try {
     const { businessContext, availableData } = req.body;
     
     console.log('📋 Starting content strategy generation...');
     
+    // Initialize global debug data
+    global.contentStrategyDebugData = {
+      timestamp: new Date().toISOString(),
+      businessContext: businessContext,
+      availableData: availableData,
+      strategyContext: null,
+      dataCompleteness: null,
+      aiPrompt: null,
+      aiResponse: null,
+      finalStrategy: null,
+      error: null
+    };
+    
     // Prepare context with missing field handling
     const strategyContext = prepareContext(businessContext);
+    global.contentStrategyDebugData.strategyContext = strategyContext;
+    
     const dataCompleteness = calculateCompleteness(availableData);
+    global.contentStrategyDebugData.dataCompleteness = dataCompleteness;
     
     console.log('📊 Data completeness score:', dataCompleteness.score);
     
     // Generate AI prompt
     const prompt = intelligence.contentStrategyPrompt(strategyContext, dataCompleteness);
+    global.contentStrategyDebugData.aiPrompt = {
+      step: 'content_strategy_generation',
+      timestamp: new Date().toISOString(),
+      prompt: prompt,
+      promptSource: {
+        sourceFile: 'prompts/intelligence/contentStrategy.js',
+        functionName: 'contentStrategyPrompt()',
+        description: 'AI prompt for comprehensive content strategy generation'
+      },
+      logic: {
+        description: 'Generate comprehensive content strategy using business context and data completeness',
+        sourceFile: 'controllers/contentStrategy.js',
+        functionName: 'generateContentStrategy() - AI prompt generation',
+        steps: [
+          'Prepare business context with missing field handling',
+          'Calculate data completeness score',
+          'Generate AI prompt with business context and completeness data',
+          'Send prompt to Claude API for content strategy generation'
+        ],
+        dataUsage: {
+          businessContext: [
+            'Business Profile',
+            'Competitor Analysis',
+            'Industry Insights',
+            'Website Data',
+            'Business Goals',
+            'Current Social Presence'
+          ],
+          dataCompleteness: [
+            'Completeness Score',
+            'Missing Fields',
+            'Recommendations'
+          ]
+        }
+      }
+    };
     
     // Get AI response
     const response = await callClaudeAPI(prompt, false, null, 'AI: Content Strategy');
+    global.contentStrategyDebugData.aiResponse = {
+      step: 'content_strategy_ai_response',
+      timestamp: new Date().toISOString(),
+      response: response,
+      logic: {
+        description: 'AI response for content strategy generation',
+        sourceFile: 'services/ai.js',
+        functionName: 'callClaudeAPI()',
+        steps: [
+          'Send content strategy prompt to Claude API',
+          'Receive AI response with comprehensive strategy',
+          'Handle API rate limiting and errors'
+        ]
+      }
+    };
     
     // Parse strategy response
     const strategy = parseStrategyResponse(response);
+    global.contentStrategyDebugData.finalStrategy = strategy;
+    
+    // Add final result to debug data
+    global.contentStrategyDebugData.summary = {
+      businessContextFields: Object.keys(businessContext || {}).length,
+      availableDataFields: Object.keys(availableData || {}).length,
+      dataCompletenessScore: dataCompleteness.score,
+      missingFields: dataCompleteness.missing_fields,
+      recommendations: dataCompleteness.recommendations,
+      strategyGenerated: !!strategy,
+      strategyChannels: strategy?.content_strategy?.channels ? Object.keys(strategy.content_strategy.channels).length : 0,
+      analysisMethod: 'ai_powered_content_strategy_generation'
+    };
     
     console.log('✅ Content strategy generated successfully');
     res.json({
@@ -34,10 +113,18 @@ async function generateContentStrategy(req, res) {
       data_completeness: strategy.content_strategy.data_completeness
     });
     
-    // Debug logging removed for simplified approach
   } catch (error) {
     console.error('❌ Content strategy generation failed:', error);
-    // Error logging removed for simplified approach
+    
+    // Store error in debug data
+    if (global.contentStrategyDebugData) {
+      global.contentStrategyDebugData.error = {
+        timestamp: new Date().toISOString(),
+        error: error.message,
+        stack: error.stack
+      };
+    }
+    
     res.status(500).json({
       success: false,
       error: error.message

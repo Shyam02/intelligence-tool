@@ -188,9 +188,11 @@ function toggleDebugSection(sectionId) {
         toggle.textContent = '▼';
         toggle.style.transform = 'rotate(0deg)';
         
-        // Auto-refresh competitor intelligence debug when opened
+        // Auto-refresh specific debug sections when opened
         if (sectionId === 'competitorIntelligenceDebug') {
             refreshCompetitorIntelligenceDebug();
+        } else if (sectionId === 'contentStrategyDebug') {
+            refreshContentStrategyDebug();
         }
     } else {
         section.style.display = 'none';
@@ -625,6 +627,180 @@ function refreshWebsiteCrawlDebug() {
     output.innerHTML = html;
 }
 
+// Content Strategy Debug Functions
+async function refreshContentStrategyDebug() {
+    console.log('🔄 Refreshing content strategy debug...');
+    const contentStrategyData = await collectContentStrategyDebugData();
+    console.log('📋 Content strategy data:', contentStrategyData);
+    const output = document.getElementById('contentStrategyDebugOutput');
+    
+    if (contentStrategyData.message) {
+        output.innerHTML = contentStrategyData.message;
+        return;
+    }
+    
+    let html = '<div class="debug-detailed-section">';
+    
+    // Basic info
+    html += `<h4>📋 Content Strategy Debug - Complete Details</h4>`;
+    html += `<p><strong>Timestamp:</strong> ${contentStrategyData.timestamp}</p>`;
+    
+    // Business Context
+    if (contentStrategyData.businessContext) {
+        html += '<h5>🏢 Business Context:</h5>';
+        html += '<div class="debug-content">';
+        html += '<p><strong>Source:</strong> <code>controllers/contentStrategy.js</code> - <code>prepareContext()</code></p>';
+        html += '<p><strong>Description:</strong> Business context prepared for content strategy generation</p>';
+        html += '<details>';
+        html += '<summary>View Business Context Data</summary>';
+        html += `<pre>${formatContentForDisplay(JSON.stringify(contentStrategyData.businessContext, null, 2))}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // Available Data
+    if (contentStrategyData.availableData) {
+        html += '<h5>📊 Available Data Assessment:</h5>';
+        html += '<div class="debug-content">';
+        html += '<p><strong>Source:</strong> <code>controllers/contentStrategy.js</code> - <code>calculateCompleteness()</code></p>';
+        html += '<p><strong>Description:</strong> Assessment of data completeness for strategy generation</p>';
+        html += '<details>';
+        html += '<summary>View Available Data Assessment</summary>';
+        html += `<pre>${formatContentForDisplay(JSON.stringify(contentStrategyData.availableData, null, 2))}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // Data Completeness
+    if (contentStrategyData.dataCompleteness) {
+        html += '<h5>📈 Data Completeness Analysis:</h5>';
+        html += '<div class="debug-content">';
+        html += '<p><strong>Source:</strong> <code>controllers/contentStrategy.js</code> - <code>calculateCompleteness()</code></p>';
+        html += '<p><strong>Description:</strong> Data completeness score and recommendations</p>';
+        html += '<details>';
+        html += '<summary>View Data Completeness Analysis</summary>';
+        html += `<pre>${formatContentForDisplay(JSON.stringify(contentStrategyData.dataCompleteness, null, 2))}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // AI Prompt
+    if (contentStrategyData.aiPrompt) {
+        html += '<h5>🤖 AI Prompt Generation:</h5>';
+        html += '<div class="debug-content">';
+        html += `<p><strong>Source:</strong> <code>${contentStrategyData.aiPrompt.promptSource.sourceFile}</code> - <code>${contentStrategyData.aiPrompt.promptSource.functionName}</code></p>`;
+        html += `<p><strong>Description:</strong> ${contentStrategyData.aiPrompt.logic.description}</p>`;
+        html += '<details>';
+        html += '<summary>View AI Prompt Logic</summary>';
+        html += '<div class="debug-logic">';
+        html += '<ul>';
+        contentStrategyData.aiPrompt.logic.steps.forEach(step => {
+            html += `<li>${step}</li>`;
+        });
+        html += '</ul>';
+        html += '</div>';
+        html += '</details>';
+        html += '<details>';
+        html += '<summary>View Full AI Prompt</summary>';
+        html += `<pre>${formatContentForDisplay(contentStrategyData.aiPrompt.prompt)}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // AI Response
+    if (contentStrategyData.aiResponse) {
+        html += '<h5>🤖 AI Response:</h5>';
+        html += '<div class="debug-content">';
+        html += `<p><strong>Source:</strong> <code>${contentStrategyData.aiResponse.logic.sourceFile}</code> - <code>${contentStrategyData.aiResponse.logic.functionName}</code></p>`;
+        html += `<p><strong>Description:</strong> ${contentStrategyData.aiResponse.logic.description}</p>`;
+        html += '<details>';
+        html += '<summary>View AI Response Logic</summary>';
+        html += '<div class="debug-logic">';
+        html += '<ul>';
+        contentStrategyData.aiResponse.logic.steps.forEach(step => {
+            html += `<li>${step}</li>`;
+        });
+        html += '</ul>';
+        html += '</div>';
+        html += '</details>';
+        html += '<details>';
+        html += '<summary>View Full AI Response</summary>';
+        html += `<pre>${formatContentForDisplay(contentStrategyData.aiResponse.response)}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // Final Strategy
+    if (contentStrategyData.finalStrategy) {
+        html += '<h5>📋 Final Content Strategy:</h5>';
+        html += '<div class="debug-content">';
+        html += '<p><strong>Source:</strong> <code>controllers/contentStrategy.js</code> - <code>parseStrategyResponse()</code></p>';
+        html += '<p><strong>Description:</strong> Parsed and structured content strategy result</p>';
+        html += '<details>';
+        html += '<summary>View Final Strategy</summary>';
+        html += `<pre>${formatContentForDisplay(JSON.stringify(contentStrategyData.finalStrategy, null, 2))}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // Error (if any)
+    if (contentStrategyData.error) {
+        html += '<h5>❌ Error:</h5>';
+        html += '<div class="debug-content">';
+        html += `<p><strong>Error:</strong> ${contentStrategyData.error.error}</p>`;
+        html += '<details>';
+        html += '<summary>View Error Stack</summary>';
+        html += `<pre>${formatContentForDisplay(contentStrategyData.error.stack)}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // Summary
+    if (contentStrategyData.summary) {
+        html += '<h5>📈 Summary:</h5>';
+        html += '<div class="debug-summary-detailed">';
+        html += `<p><strong>Business Context Fields:</strong> ${contentStrategyData.summary.businessContextFields}</p>`;
+        html += `<p><strong>Available Data Fields:</strong> ${contentStrategyData.summary.availableDataFields}</p>`;
+        html += `<p><strong>Data Completeness Score:</strong> ${contentStrategyData.summary.dataCompletenessScore}%</p>`;
+        html += `<p><strong>Strategy Generated:</strong> ${contentStrategyData.summary.strategyGenerated ? 'Yes' : 'No'}</p>`;
+        if (contentStrategyData.summary.strategyChannels > 0) {
+            html += `<p><strong>Strategy Channels:</strong> ${contentStrategyData.summary.strategyChannels}</p>`;
+        }
+        html += `<p><strong>Analysis Method:</strong> ${contentStrategyData.summary.analysisMethod}</p>`;
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    output.innerHTML = html;
+}
+
+function clearContentStrategyDebug() {
+    const output = document.getElementById('contentStrategyDebugOutput');
+    output.innerHTML = 'No content strategy debug data available';
+}
+
+async function collectContentStrategyDebugData() {
+    try {
+        const response = await fetch('/api/systemDebug/content-strategy-debug');
+        const result = await response.json();
+        
+        if (result.success) {
+            return result.data;
+        } else {
+            return {
+                timestamp: new Date().toISOString(),
+                message: result.message || 'No content strategy debug data available'
+            };
+        }
+    } catch (error) {
+        console.error('Error collecting content strategy debug data:', error);
+        return {
+            timestamp: new Date().toISOString(),
+            message: 'Error collecting content strategy debug data: ' + error.message
+        };
+    }
+}
+
 // Function to format content with proper line breaks
 function formatContentForDisplay(content) {
     if (!content) return '';
@@ -778,6 +954,19 @@ async function updateCompetitorIntelligenceDebugData(data) {
     const debugSection = document.getElementById('competitorIntelligenceDebug');
     if (debugSection && debugSection.style.display !== 'none') {
         await refreshCompetitorIntelligenceDebug();
+    }
+}
+
+// Global variable to store content strategy debug data
+window.contentStrategyDebugData = null;
+
+// Function to update content strategy debug data (called from backend)
+async function updateContentStrategyDebugData(data) {
+    window.contentStrategyDebugData = data;
+    // Auto-refresh the debug display if it's open
+    const debugSection = document.getElementById('contentStrategyDebug');
+    if (debugSection && debugSection.style.display !== 'none') {
+        await refreshContentStrategyDebug();
     }
 }
 

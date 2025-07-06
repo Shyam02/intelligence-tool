@@ -526,6 +526,25 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Content Strategy Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('contentStrategyDebug')">
+                                        <h4>📋 Content Strategy</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="contentStrategyDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshContentStrategyDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearContentStrategyDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Content Strategy Data</h5>
+                                            <div id="contentStrategyDebugOutput">No content strategy debug data available</div>
+                                            <button onclick="copyToClipboard('contentStrategyDebugOutput', this)" class="copy-btn">📋 Copy Strategy Data</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

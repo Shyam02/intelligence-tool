@@ -38,4 +38,31 @@ router.get('/competitor-debug', (req, res) => {
   }
 });
 
+// Route to get content strategy debug data
+router.get('/content-strategy-debug', (req, res) => {
+  try {
+    const debugData = global.contentStrategyDebugData || null;
+    if (debugData) {
+      res.json({
+        success: true,
+        data: debugData,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'No content strategy debug data available',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching content strategy debug data:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
