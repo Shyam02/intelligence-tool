@@ -645,8 +645,35 @@ async function refreshContentStrategyDebug() {
     html += `<h4>📋 Content Strategy Debug - Complete Details</h4>`;
     html += `<p><strong>Timestamp:</strong> ${contentStrategyData.timestamp}</p>`;
     
-    // Business Context
-    if (contentStrategyData.businessContext) {
+    // Business Context Preparation
+    if (contentStrategyData.businessContextPreparation) {
+        html += '<h5>🏢 Business Context Preparation:</h5>';
+        html += '<div class="debug-content">';
+        html += `<p><strong>Source:</strong> <code>${contentStrategyData.businessContextPreparation.logic.sourceFile}</code> - <code>${contentStrategyData.businessContextPreparation.logic.functionName}</code></p>`;
+        html += `<p><strong>Description:</strong> ${contentStrategyData.businessContextPreparation.logic.description}</p>`;
+        html += '<details>';
+        html += '<summary>View Business Context Preparation Logic</summary>';
+        html += '<div class="debug-logic">';
+        html += '<ul>';
+        contentStrategyData.businessContextPreparation.logic.steps.forEach(step => {
+            html += `<li>${step}</li>`;
+        });
+        html += '</ul>';
+        html += '</div>';
+        html += '</details>';
+        html += '<details>';
+        html += '<summary>View Input Business Context</summary>';
+        html += `<pre>${formatContentForDisplay(JSON.stringify(contentStrategyData.businessContextPreparation.inputContext, null, 2))}</pre>`;
+        html += '</details>';
+        html += '<details>';
+        html += '<summary>View Prepared Business Context</summary>';
+        html += `<pre>${formatContentForDisplay(JSON.stringify(contentStrategyData.businessContextPreparation.outputContext, null, 2))}</pre>`;
+        html += '</details>';
+        html += '</div>';
+    }
+    
+    // Business Context (legacy - for backward compatibility)
+    if (contentStrategyData.businessContext && !contentStrategyData.businessContextPreparation) {
         html += '<h5>🏢 Business Context:</h5>';
         html += '<div class="debug-content">';
         html += '<p><strong>Source:</strong> <code>controllers/contentStrategy.js</code> - <code>prepareContext()</code></p>';
@@ -989,6 +1016,23 @@ async function refreshCompetitorIntelligenceDebug() {
     html += `<p><strong>Started:</strong> ${competitorData.timestamp}</p>`;
     html += `<p><strong>Debug Generated:</strong> ${new Date().toISOString()}</p>`;
     html += `<p><strong>Competitor Queries:</strong> ${competitorData.competitorQueries?.length || 0}</p>`;
+
+    // Show full prompt and response for search query generation if present
+    if (competitorData.aiInteractions && competitorData.aiInteractions.length > 0) {
+        const aiGen = competitorData.aiInteractions[0];
+        if (aiGen.prompt && aiGen.response) {
+            html += '<details><summary>🧠 View Search Query Generation Prompt & AI Response</summary>';
+            html += '<div class="debug-prompt">';
+            html += `<p><strong>Prompt Source:</strong> <code>${aiGen.promptSource?.sourceFile || ''}</code> - <code>${aiGen.promptSource?.functionName || ''}</code></p>`;
+            html += `<p><strong>Description:</strong> ${aiGen.promptSource?.description || ''}</p>`;
+            html += '<strong>Prompt:</strong>';
+            html += `<pre>${formatContentForDisplay(aiGen.prompt)}</pre>`;
+            html += '<strong>AI Response:</strong>';
+            html += `<pre>${formatContentForDisplay(aiGen.response)}</pre>`;
+            html += '</div>';
+            html += '</details>';
+        }
+    }
     
     // Competitor Queries
     if (competitorData.competitorQueries && competitorData.competitorQueries.length > 0) {

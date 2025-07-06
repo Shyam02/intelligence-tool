@@ -80,63 +80,43 @@ async function crawlHomepageOnly(websiteUrl) {
     extractedData.external_pages_analyzed = 0;
     extractedData.total_content_length = cleanText.length;
     
-    // Collect debug data for competitor crawl
-    const crawlDebugData = {
-      step: 'competitor_homepage_crawl',
-      timestamp: new Date().toISOString(),
-      websiteUrl: websiteUrl,
-      rawData: {
-        originalHtmlLength: homepageHtml.length,
-        cleanTextLength: cleanText.length,
-        compressionRatio: Math.round((1 - cleanText.length / homepageHtml.length) * 100) + '%'
+    // Store AI interaction data for competitor research controller to collect
+    extractedData.aiInteraction = {
+      prompt: crawlPrompt,
+      response: crawlResult,
+      parsedData: {
+        company_name: extractedData.company_name,
+        business_description: extractedData.business_description,
+        target_audience: extractedData.target_audience,
+        key_features: extractedData.key_features,
+        pricing_model: extractedData.pricing_model,
+        unique_value_proposition: extractedData.unique_value_proposition,
+        business_model: extractedData.business_model,
+        industry: extractedData.industry,
+        competitive_advantages: extractedData.competitive_advantages,
+        challenges: extractedData.challenges,
+        growth_potential: extractedData.growth_potential,
+        market_position: extractedData.market_position,
+        technology_stack: extractedData.technology_stack,
+        partnerships: extractedData.partnerships,
+        regulatory_considerations: extractedData.regulatory_considerations,
+        sustainability_factors: extractedData.sustainability_factors,
+        risk_factors: extractedData.risk_factors,
+        success_metrics: extractedData.success_metrics,
+        future_plans: extractedData.future_plans,
+        extraction_method: extractedData.extraction_method,
+        extraction_timestamp: extractedData.extraction_timestamp,
+        pages_analyzed: extractedData.pages_analyzed,
+        pages_selected: extractedData.pages_selected,
+        external_pages_analyzed: extractedData.external_pages_analyzed,
+        total_content_length: extractedData.total_content_length
       },
-      processedData: {
-        cleanText: cleanText,
-        extractedData: extractedData
-      },
-      aiInteraction: {
-        prompt: crawlPrompt,
-        response: crawlResult,
-        parsedData: extractedData,
-        promptSource: {
-          sourceFile: 'prompts/intelligence/websiteCrawling.js',
-          functionName: 'mainCrawlPrompt()',
-          description: 'AI prompt for single-page business analysis'
-        }
-      },
-      logic: {
-        description: 'Simple homepage-only crawl for competitor analysis',
-        sourceFile: 'services/websiteCrawler.js',
-        functionName: 'crawlHomepageOnly()',
-        steps: [
-          'Fetch homepage HTML using enhanced fetchWebsiteHTML function',
-          'Extract clean text using extractCleanText (preserves business content)',
-          'Send to AI for business intelligence extraction',
-          'Parse AI response and extract structured data',
-          'Add metadata (extraction method, timestamps, content length)',
-          'Return extracted competitor data'
-        ],
-        crawlingMethod: 'homepage_only',
-        contentProcessing: 'Same extractCleanText logic as main crawler'
+      promptSource: {
+        sourceFile: 'prompts/intelligence/websiteCrawling.js',
+        functionName: 'mainCrawlPrompt()',
+        description: 'AI prompt for single-page business analysis'
       }
     };
-    
-    // Store debug data globally for frontend access
-    if (typeof global !== 'undefined') {
-      if (!global.competitorDebugData) {
-        global.competitorDebugData = {
-          timestamp: new Date().toISOString(),
-          competitorQueries: [],
-          searchResults: [],
-          competitorUrls: [],
-          crawlResults: [],
-          aiInteractions: [],
-          finalResult: null
-        };
-      }
-      // Add this crawl result to the global debug data
-      global.competitorDebugData.crawlResults.push(crawlDebugData);
-    }
     
     console.log('✅ Competitor homepage crawl completed:', extractedData.company_name);
     return extractedData;
@@ -144,21 +124,7 @@ async function crawlHomepageOnly(websiteUrl) {
   } catch (error) {
     console.error('❌ Competitor homepage crawl failed:', error.message);
     
-    // Store error in debug data
-    if (typeof global !== 'undefined' && global.competitorDebugData) {
-      global.competitorDebugData.crawlResults.push({
-        step: 'competitor_homepage_crawl_error',
-        timestamp: new Date().toISOString(),
-        websiteUrl: websiteUrl,
-        error: error.message,
-        logic: {
-          description: 'Error during competitor homepage crawl',
-          sourceFile: 'services/websiteCrawler.js',
-          functionName: 'crawlHomepageOnly()',
-          error: error.message
-        }
-      });
-    }
+    // Error handling - let competitor research controller handle debug data
     
     // Return fallback data for competitors
     return createFallbackData(websiteUrl, null, error.message);

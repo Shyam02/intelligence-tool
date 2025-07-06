@@ -56,6 +56,10 @@ async function generateIntelligence(req, res) {
 
     // STEP 1: Generate initial foundational intelligence + competitor queries
     const businessPrompt = intelligence.businessAnalysisPrompt(combinedData);
+    global.businessIntelligenceDebugData = {
+      prompt: businessPrompt,
+      aiResponse: null
+    };
     systemLogger.logStep(masterId, {
       step: 'Business analysis prompt prepared',
       prompt: businessPrompt,
@@ -63,6 +67,7 @@ async function generateIntelligence(req, res) {
       next: 'Send prompt to AI.'
     });
     const initialIntelligence = await callClaudeAPI(businessPrompt, false, masterId, 'AI: Business Analysis');
+    global.businessIntelligenceDebugData.aiResponse = initialIntelligence;
     systemLogger.logStep(masterId, {
       step: 'AI: Business Analysis result',
       aiResponse: initialIntelligence,
@@ -117,7 +122,9 @@ async function generateIntelligence(req, res) {
         competitorIntelligence = await performCompetitorResearch(
           foundationalIntelligence.competitor_discovery_queries,
           foundationalIntelligence,
-          masterId
+          masterId,
+          global.businessIntelligenceDebugData.prompt,
+          global.businessIntelligenceDebugData.aiResponse
         );
         systemLogger.logStep(masterId, {
           step: 'Competitor research completed',

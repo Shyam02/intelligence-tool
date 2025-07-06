@@ -28,6 +28,47 @@ async function generateContentStrategy(req, res) {
     const strategyContext = prepareContext(businessContext);
     global.contentStrategyDebugData.strategyContext = strategyContext;
     
+    // Store business context preparation logic in debug data
+    global.contentStrategyDebugData.businessContextPreparation = {
+      step: 'business_context_preparation',
+      timestamp: new Date().toISOString(),
+      inputContext: businessContext,
+      outputContext: strategyContext,
+      logic: {
+        description: 'Prepare business context with missing field handling and defaults',
+        sourceFile: 'controllers/contentStrategy.js',
+        functionName: 'prepareContext()',
+        steps: [
+          'Extract business_profile from input or use empty object',
+          'Extract competitor_analysis from input or use empty object',
+          'Extract industry_insights from input or use empty array',
+          'Extract website_data from input or use empty object',
+          'Extract business_goals from input or use "general growth" default',
+          'Extract current_presence from input or use empty object',
+          'Return structured context object for AI processing'
+        ],
+        dataUsage: {
+          inputFields: [
+            'business_profile',
+            'competitor_analysis', 
+            'industry_insights',
+            'website_data',
+            'business_goals',
+            'current_presence'
+          ],
+          defaultValues: {
+            business_profile: '{}',
+            competitor_analysis: '{}',
+            industry_insights: '[]',
+            website_data: '{}',
+            business_goals: '"general growth"',
+            current_presence: '{}'
+          },
+          outputStructure: 'Structured object with all required fields for AI prompt'
+        }
+      }
+    };
+    
     const dataCompleteness = calculateCompleteness(availableData);
     global.contentStrategyDebugData.dataCompleteness = dataCompleteness;
     
