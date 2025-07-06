@@ -48,7 +48,7 @@ async function crawlHomepageOnly(websiteUrl) {
     
     // Step 2: Simple AI analysis (homepage only)
     const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
-    const crawlResult = await callClaudeAPI(crawlPrompt, false, masterId, 'AI: Homepage Analysis');
+    const crawlResult = await callClaudeAPI(crawlPrompt, false, null, 'AI: Competitor Homepage Analysis');
     
     console.log('🤖 AI analysis completed for competitor homepage');
     
@@ -80,11 +80,86 @@ async function crawlHomepageOnly(websiteUrl) {
     extractedData.external_pages_analyzed = 0;
     extractedData.total_content_length = cleanText.length;
     
+    // Collect debug data for competitor crawl
+    const crawlDebugData = {
+      step: 'competitor_homepage_crawl',
+      timestamp: new Date().toISOString(),
+      websiteUrl: websiteUrl,
+      rawData: {
+        originalHtmlLength: homepageHtml.length,
+        cleanTextLength: cleanText.length,
+        compressionRatio: Math.round((1 - cleanText.length / homepageHtml.length) * 100) + '%'
+      },
+      processedData: {
+        cleanText: cleanText,
+        extractedData: extractedData
+      },
+      aiInteraction: {
+        prompt: crawlPrompt,
+        response: crawlResult,
+        parsedData: extractedData,
+        promptSource: {
+          sourceFile: 'prompts/intelligence/websiteCrawling.js',
+          functionName: 'mainCrawlPrompt()',
+          description: 'AI prompt for single-page business analysis'
+        }
+      },
+      logic: {
+        description: 'Simple homepage-only crawl for competitor analysis',
+        sourceFile: 'services/websiteCrawler.js',
+        functionName: 'crawlHomepageOnly()',
+        steps: [
+          'Fetch homepage HTML using enhanced fetchWebsiteHTML function',
+          'Extract clean text using extractCleanText (preserves business content)',
+          'Send to AI for business intelligence extraction',
+          'Parse AI response and extract structured data',
+          'Add metadata (extraction method, timestamps, content length)',
+          'Return extracted competitor data'
+        ],
+        crawlingMethod: 'homepage_only',
+        contentProcessing: 'Same extractCleanText logic as main crawler'
+      }
+    };
+    
+    // Store debug data globally for frontend access
+    if (typeof global !== 'undefined') {
+      if (!global.competitorDebugData) {
+        global.competitorDebugData = {
+          timestamp: new Date().toISOString(),
+          competitorQueries: [],
+          searchResults: [],
+          competitorUrls: [],
+          crawlResults: [],
+          aiInteractions: [],
+          finalResult: null
+        };
+      }
+      // Add this crawl result to the global debug data
+      global.competitorDebugData.crawlResults.push(crawlDebugData);
+    }
+    
     console.log('✅ Competitor homepage crawl completed:', extractedData.company_name);
     return extractedData;
     
   } catch (error) {
     console.error('❌ Competitor homepage crawl failed:', error.message);
+    
+    // Store error in debug data
+    if (typeof global !== 'undefined' && global.competitorDebugData) {
+      global.competitorDebugData.crawlResults.push({
+        step: 'competitor_homepage_crawl_error',
+        timestamp: new Date().toISOString(),
+        websiteUrl: websiteUrl,
+        error: error.message,
+        logic: {
+          description: 'Error during competitor homepage crawl',
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'crawlHomepageOnly()',
+          error: error.message
+        }
+      });
+    }
+    
     // Return fallback data for competitors
     return createFallbackData(websiteUrl, null, error.message);
   }

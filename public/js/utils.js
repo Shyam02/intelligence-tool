@@ -187,6 +187,11 @@ function toggleDebugSection(sectionId) {
         section.style.display = 'block';
         toggle.textContent = '▼';
         toggle.style.transform = 'rotate(0deg)';
+        
+        // Auto-refresh competitor intelligence debug when opened
+        if (sectionId === 'competitorIntelligenceDebug') {
+            refreshCompetitorIntelligenceDebug();
+        }
     } else {
         section.style.display = 'none';
         toggle.textContent = '▶';
@@ -760,5 +765,479 @@ function updateCrawlDebugData(data) {
     const debugSection = document.getElementById('websiteCrawlDebug');
     if (debugSection && debugSection.style.display !== 'none') {
         refreshWebsiteCrawlDebug();
+    }
+}
+
+// Global variable to store competitor intelligence debug data
+window.competitorDebugData = null;
+
+// Function to update competitor intelligence debug data (called from backend)
+async function updateCompetitorIntelligenceDebugData(data) {
+    window.competitorDebugData = data;
+    // Auto-refresh the debug display if it's open
+    const debugSection = document.getElementById('competitorIntelligenceDebug');
+    if (debugSection && debugSection.style.display !== 'none') {
+        await refreshCompetitorIntelligenceDebug();
+    }
+}
+
+// Competitor Intelligence Debug Functions
+async function refreshCompetitorIntelligenceDebug() {
+    console.log('🔄 Refreshing competitor intelligence debug...');
+    const competitorData = await collectCompetitorIntelligenceDebugData();
+    console.log('📋 Competitor data:', competitorData);
+    const output = document.getElementById('competitorIntelligenceDebugOutput');
+    
+    if (competitorData.message) {
+        output.innerHTML = competitorData.message;
+        return;
+    }
+    
+    let html = '<div class="debug-detailed-section">';
+    
+    // Basic info
+    html += `<h4>🏢 Competitor Intelligence Debug - Complete Details</h4>`;
+    html += `<p><strong>Started:</strong> ${competitorData.timestamp}</p>`;
+    html += `<p><strong>Debug Generated:</strong> ${new Date().toISOString()}</p>`;
+    html += `<p><strong>Competitor Queries:</strong> ${competitorData.competitorQueries?.length || 0}</p>`;
+    
+    // Competitor Queries
+    if (competitorData.competitorQueries && competitorData.competitorQueries.length > 0) {
+        html += '<h5>🔍 Competitor Discovery Queries:</h5>';
+        html += '<div class="debug-queries-detailed">';
+        html += '<p><strong>AI-Generated Queries for Competitor Discovery:</strong></p>';
+        html += '<p><strong>Source:</strong> <code>prompts/intelligence/businessAnalysis.js</code> - <code>businessAnalysisPrompt()</code></p>';
+        html += '<p><strong>Description:</strong> AI-generated competitor discovery queries from business analysis prompt</p>';
+        html += '<div class="debug-queries-list">';
+        competitorData.competitorQueries.forEach((query, index) => {
+            html += `<div class="debug-query-item">
+                <strong>${index + 1}.</strong> ${formatContentForDisplay(query)}
+            </div>`;
+        });
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    // Web Searches
+    if (competitorData.searchResults && competitorData.searchResults.length > 0) {
+        html += '<h5>🌐 Web Searches:</h5>';
+        html += '<div class="debug-searches-detailed">';
+        competitorData.searchResults.forEach((search, index) => {
+            html += `<div class="debug-search-detailed">
+                <h6>Search ${index + 1}: ${search.query}</h6>
+                <p><strong>Timestamp:</strong> ${search.timestamp}</p>`;
+            
+            // Add logic information
+            if (search.logic) {
+                html += '<details><summary>🔧 Search Logic</summary>';
+                html += `<p><strong>Description:</strong> ${formatContentForDisplay(search.logic.description)}</p>`;
+                html += `<p><strong>Source:</strong> <code>${search.logic.sourceFile}</code> - <code>${search.logic.functionName}</code></p>`;
+                html += '<p><strong>Steps:</strong></p><ul>';
+                search.logic.steps.forEach(step => {
+                    html += `<li>${formatContentForDisplay(step)}</li>`;
+                });
+                html += '</ul>';
+                html += '</details>';
+            }
+            
+            if (search.result && search.result.web && search.result.web.results) {
+                html += `<p><strong>Results Found:</strong> ${search.result.web.results.length}</p>`;
+                html += '<details><summary>View Search Results</summary>';
+                html += '<div class="debug-search-results">';
+                search.result.web.results.forEach((result, resultIndex) => {
+                    html += `<div class="debug-search-result">
+                        <strong>${resultIndex + 1}.</strong> ${formatContentForDisplay(result.title)}
+                        <br><em>${result.url}</em>
+                        <br>${formatContentForDisplay(result.description)}
+                    </div>`;
+                });
+                html += '</div></details>';
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // URL Extraction
+    if (competitorData.urlExtraction) {
+        html += '<h5>🔗 URL Extraction:</h5>';
+        html += '<div class="debug-url-extraction-detailed">';
+        html += `<p><strong>Total URLs Found:</strong> ${competitorData.urlExtraction.totalUrlsFound}</p>`;
+        
+        // Add logic information
+        if (competitorData.urlExtraction.logic) {
+            html += '<details><summary>🔧 Extraction Logic</summary>';
+            html += `<p><strong>Description:</strong> ${formatContentForDisplay(competitorData.urlExtraction.logic.description)}</p>`;
+            html += `<p><strong>Source:</strong> <code>${competitorData.urlExtraction.logic.sourceFile}</code> - <code>${competitorData.urlExtraction.logic.functionName}</code></p>`;
+            html += '<p><strong>Steps:</strong></p><ul>';
+            competitorData.urlExtraction.logic.steps.forEach(step => {
+                html += `<li>${formatContentForDisplay(step)}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+        }
+        
+        if (competitorData.competitorUrls && competitorData.competitorUrls.length > 0) {
+            html += '<details><summary>View Extracted Competitor URLs</summary>';
+            html += '<div class="debug-urls-list">';
+            competitorData.competitorUrls.forEach((url, index) => {
+                html += `<div class="debug-url-item">
+                    <strong>${index + 1}.</strong> ${formatContentForDisplay(url.title)}
+                    <br><em>${url.url}</em>
+                    <br><span class="url-meta">Source: ${url.query_source}, Rank: ${url.rank}</span>
+                </div>`;
+            });
+            html += '</div></details>';
+        }
+        
+        html += '</div>';
+    }
+    
+    // Competitor Crawling
+    if (competitorData.crawlResults && competitorData.crawlResults.length > 0) {
+        html += '<h5>🏠 Competitor Homepage Crawling:</h5>';
+        html += '<div class="debug-crawls-detailed">';
+        competitorData.crawlResults.forEach((crawl, index) => {
+            html += `<div class="debug-crawl-detailed">
+                <h6>Competitor ${index + 1}: ${crawl.websiteUrl}</h6>
+                <p><strong>Step:</strong> ${crawl.step}</p>
+                <p><strong>Timestamp:</strong> ${crawl.timestamp}</p>`;
+            
+            if (crawl.error) {
+                html += `<p><strong>Error:</strong> ${crawl.error}</p>`;
+            } else {
+                // Add logic information
+                if (crawl.logic) {
+                    html += '<details><summary>🔧 Crawling Logic</summary>';
+                    html += `<p><strong>Description:</strong> ${formatContentForDisplay(crawl.logic.description)}</p>`;
+                    html += `<p><strong>Source:</strong> <code>${crawl.logic.sourceFile}</code> - <code>${crawl.logic.functionName}</code></p>`;
+                    html += '<p><strong>Steps:</strong></p><ul>';
+                    crawl.logic.steps.forEach(step => {
+                        html += `<li>${formatContentForDisplay(step)}</li>`;
+                    });
+                    html += '</ul>';
+                    html += `<p><strong>Method:</strong> ${formatContentForDisplay(crawl.logic.crawlingMethod)}</p>`;
+                    html += `<p><strong>Content Processing:</strong> ${formatContentForDisplay(crawl.logic.contentProcessing)}</p>`;
+                    html += '</details>';
+                }
+                
+                if (crawl.rawData) {
+                    html += '<details><summary>View Raw Data</summary>';
+                    html += `<p><strong>Original HTML Length:</strong> ${crawl.rawData.originalHtmlLength}</p>`;
+                    html += `<p><strong>Clean Text Length:</strong> ${crawl.rawData.cleanTextLength}</p>`;
+                    html += `<p><strong>Compression Ratio:</strong> ${crawl.rawData.compressionRatio}</p>`;
+                    html += '</details>';
+                }
+                
+                if (crawl.aiInteraction) {
+                    html += '<details><summary>View AI Interaction</summary>';
+                    if (crawl.aiInteraction.promptSource) {
+                        html += `<p><strong>Prompt Source:</strong> <code>${crawl.aiInteraction.promptSource.sourceFile}</code> - <code>${crawl.aiInteraction.promptSource.functionName}</code></p>`;
+                        html += `<p><strong>Description:</strong> ${formatContentForDisplay(crawl.aiInteraction.promptSource.description)}</p>`;
+                    }
+                    if (crawl.aiInteraction.prompt) {
+                        html += `<details><summary>View Prompt</summary><pre class="debug-prompt">${formatContentForDisplay(crawl.aiInteraction.prompt)}</pre></details>`;
+                    }
+                    if (crawl.aiInteraction.response) {
+                        html += `<details><summary>View Response</summary><pre class="debug-response">${formatContentForDisplay(crawl.aiInteraction.response)}</pre></details>`;
+                    }
+                    if (crawl.aiInteraction.parsedData) {
+                        html += `<details><summary>View Parsed Data</summary><pre class="debug-data">${JSON.stringify(crawl.aiInteraction.parsedData, null, 2)}</pre></details>`;
+                    }
+                    html += '</details>';
+                }
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // AI Interactions
+    if (competitorData.aiInteractions && competitorData.aiInteractions.length > 0) {
+        html += '<h5>🤖 AI Interactions:</h5>';
+        html += '<div class="debug-ai-interactions-detailed">';
+        competitorData.aiInteractions.forEach((interaction, index) => {
+            html += `<div class="debug-ai-interaction-detailed">
+                <h6>${index + 1}. ${formatContentForDisplay(interaction.step)}</h6>
+                <p><strong>Timestamp:</strong> ${interaction.timestamp}</p>`;
+            
+            // Add prompt source information if available
+            if (interaction.promptSource) {
+                html += `<p><strong>Prompt Source:</strong> <code>${interaction.promptSource.sourceFile}</code> - <code>${interaction.promptSource.functionName}</code></p>`;
+                html += `<p><strong>Description:</strong> ${formatContentForDisplay(interaction.promptSource.description)}</p>`;
+            }
+            
+            // Add logic information if available
+            if (interaction.logic) {
+                html += '<details><summary>🔧 Processing Logic</summary>';
+                html += `<p><strong>Description:</strong> ${formatContentForDisplay(interaction.logic.description)}</p>`;
+                html += `<p><strong>Source:</strong> <code>${interaction.logic.sourceFile}</code> - <code>${interaction.logic.functionName}</code></p>`;
+                html += '<p><strong>Steps:</strong></p><ul>';
+                interaction.logic.steps.forEach(step => {
+                    html += `<li>${formatContentForDisplay(step)}</li>`;
+                });
+                html += '</ul>';
+                
+                // Add data usage information
+                if (interaction.logic.dataUsage) {
+                    html += '<h6>📊 Data Usage in Business Profile:</h6>';
+                    html += '<div class="data-usage-sections">';
+                    
+                    if (interaction.logic.dataUsage.competitiveInsights) {
+                        html += '<div class="usage-section">';
+                        html += '<h7>🎯 Competitive Insights Section:</h7>';
+                        html += '<ul>';
+                        interaction.logic.dataUsage.competitiveInsights.forEach(field => {
+                            html += `<li>${field}</li>`;
+                        });
+                        html += '</ul>';
+                        html += '</div>';
+                    }
+                    
+                    if (interaction.logic.dataUsage.differentiationOpportunities) {
+                        html += '<div class="usage-section">';
+                        html += '<h7>💡 Differentiation Opportunities Section:</h7>';
+                        html += '<ul>';
+                        interaction.logic.dataUsage.differentiationOpportunities.forEach(field => {
+                            html += `<li>${field}</li>`;
+                        });
+                        html += '</ul>';
+                        html += '</div>';
+                    }
+                    
+                    if (interaction.logic.dataUsage.contentStrategyInsights) {
+                        html += '<div class="usage-section">';
+                        html += '<h7>📝 Content Strategy Insights Section:</h7>';
+                        html += '<ul>';
+                        interaction.logic.dataUsage.contentStrategyInsights.forEach(field => {
+                            html += `<li>${field}</li>`;
+                        });
+                        html += '</ul>';
+                        html += '</div>';
+                    }
+                    
+                    html += '</div>';
+                }
+                
+                html += '</details>';
+            }
+            
+            if (interaction.prompt) {
+                html += `<details><summary>View Full Prompt</summary><pre class="debug-prompt">${formatContentForDisplay(interaction.prompt)}</pre></details>`;
+            }
+            
+            if (interaction.response) {
+                html += `<details><summary>View Full Response</summary><pre class="debug-response">${formatContentForDisplay(interaction.response)}</pre></details>`;
+            }
+            
+            if (interaction.parsedData) {
+                html += `<details><summary>View Parsed Data</summary><pre class="debug-data">${JSON.stringify(interaction.parsedData, null, 2)}</pre></details>`;
+            }
+            
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    // Final Result
+    if (competitorData.finalResult) {
+        html += '<h5>🎯 Final Result:</h5>';
+        html += '<div class="debug-final-result-detailed">';
+        html += `<pre class="debug-final-result">${JSON.stringify(competitorData.finalResult, null, 2)}</pre>`;
+        
+        // Add clear usage information
+        html += '<div class="final-result-usage">';
+        html += '<h6>🚀 How This Data is Used:</h6>';
+        html += '<div class="usage-highlight">';
+        html += '<p><strong>This competitor intelligence is automatically populated into the Business Profile form in the Strategic Intelligence section:</strong></p>';
+        
+        html += '<div class="usage-sections">';
+        html += '<div class="usage-section-primary">';
+        html += '<h7>🎯 Competitive Insights (Auto-filled):</h7>';
+        html += '<ul>';
+        html += '<li><strong>Market Gaps:</strong> Identified gaps in competitor offerings</li>';
+        html += '<li><strong>Common Features:</strong> Standard features across competitors</li>';
+        html += '<li><strong>Pricing Landscape:</strong> Competitive pricing analysis</li>';
+        html += '<li><strong>Positioning Opportunities:</strong> Market positioning insights</li>';
+        html += '</ul>';
+        html += '</div>';
+        
+        html += '<div class="usage-section-primary">';
+        html += '<h7>💡 Differentiation Opportunities (Auto-filled):</h7>';
+        html += '<ul>';
+        html += '<li><strong>Unique Value Propositions:</strong> Ways to differentiate</li>';
+        html += '<li><strong>Competitive Advantages:</strong> Potential advantages over competitors</li>';
+        html += '<li><strong>Market Positioning:</strong> Strategic positioning recommendations</li>';
+        html += '</ul>';
+        html += '</div>';
+        
+        html += '<div class="usage-section-primary">';
+        html += '<h7>📝 Content Strategy Insights (Auto-filled):</h7>';
+        html += '<ul>';
+        html += '<li><strong>Competitor Content Themes:</strong> Common content topics</li>';
+        html += '<li><strong>Content Gaps to Exploit:</strong> Underserved content areas</li>';
+        html += '<li><strong>Messaging Opportunities:</strong> Unique messaging angles</li>';
+        html += '</ul>';
+        html += '</div>';
+        html += '</div>';
+        
+        html += '<div class="usage-note">';
+        html += '<p><strong>💡 Note:</strong> All fields are automatically populated when you submit the Business Profile form. You can review and edit any field before final submission.</p>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    // Summary
+    if (competitorData.summary) {
+        html += '<h5>📈 Summary:</h5>';
+        html += '<div class="debug-summary-detailed">';
+        html += `<p><strong>Queries Executed:</strong> ${competitorData.summary.queriesExecuted}</p>`;
+        html += `<p><strong>Competitors Found:</strong> ${competitorData.summary.competitorsFound}</p>`;
+        html += `<p><strong>Competitors Crawled:</strong> ${competitorData.summary.competitorsCrawled}</p>`;
+        html += `<p><strong>Successful Crawls:</strong> ${competitorData.summary.successfulCrawls}</p>`;
+        html += `<p><strong>Failed Crawls:</strong> ${competitorData.summary.failedCrawls}</p>`;
+        html += `<p><strong>AI Interactions:</strong> ${competitorData.summary.aiInteractions}</p>`;
+        html += `<p><strong>Analysis Method:</strong> ${competitorData.summary.analysisMethod}</p>`;
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    output.innerHTML = html;
+}
+
+function clearCompetitorIntelligenceDebug() {
+    const output = document.getElementById('competitorIntelligenceDebugOutput');
+    output.innerHTML = 'No competitor intelligence data available';
+}
+
+async function collectCompetitorIntelligenceDebugData() {
+    try {
+        console.log('🔍 Fetching competitor debug data from API...');
+        // Try to fetch from API endpoint first
+        const response = await fetch('/api/systemDebug/competitor-debug');
+        const result = await response.json();
+        console.log('📊 API response:', result);
+        
+        if (result.success && result.data) {
+            const debugData = result.data;
+            return {
+                timestamp: debugData.timestamp,
+                competitorQueries: debugData.competitorQueries || [],
+                businessContext: debugData.businessContext || {},
+                
+                // Web search results
+                searchResults: debugData.searchResults?.map(search => ({
+                    step: search.step,
+                    timestamp: search.timestamp,
+                    query: search.query,
+                    queryIndex: search.queryIndex,
+                    result: search.result,
+                    logic: search.logic || null
+                })) || [],
+                
+                // URL extraction
+                urlExtraction: debugData.urlExtraction || null,
+                competitorUrls: debugData.competitorUrls || [],
+                
+                // Crawl results
+                crawlResults: debugData.crawlResults?.map(crawl => ({
+                    step: crawl.step,
+                    timestamp: crawl.timestamp,
+                    websiteUrl: crawl.websiteUrl,
+                    error: crawl.error,
+                    rawData: crawl.rawData || null,
+                    processedData: crawl.processedData || null,
+                    aiInteraction: crawl.aiInteraction || null,
+                    logic: crawl.logic || null
+                })) || [],
+                
+                // AI interactions
+                aiInteractions: debugData.aiInteractions?.map(interaction => ({
+                    step: interaction.step,
+                    timestamp: interaction.timestamp,
+                    prompt: interaction.prompt || null,
+                    response: interaction.response || null,
+                    parsedData: interaction.parsedData || null,
+                    promptSource: interaction.promptSource || null,
+                    logic: interaction.logic || null
+                })) || [],
+                
+                // Final result
+                finalResult: debugData.finalResult || null,
+                
+                // Summary
+                summary: debugData.summary || null
+            };
+        } else {
+            // Fallback to window data if API fails
+            const appState = window.appState || {};
+            const debugData = window.competitorDebugData || null;
+            
+            if (!debugData) {
+                return {
+                    timestamp: new Date().toISOString(),
+                    message: 'No competitor intelligence debug data available'
+                };
+            }
+            
+            return {
+                timestamp: debugData.timestamp,
+                competitorQueries: debugData.competitorQueries || [],
+                businessContext: debugData.businessContext || {},
+                
+                // Web search results
+                searchResults: debugData.searchResults?.map(search => ({
+                    step: search.step,
+                    timestamp: search.timestamp,
+                    query: search.query,
+                    queryIndex: search.queryIndex,
+                    result: search.result,
+                    logic: search.logic || null
+                })) || [],
+                
+                // URL extraction
+                urlExtraction: debugData.urlExtraction || null,
+                competitorUrls: debugData.competitorUrls || [],
+                
+                // Crawl results
+                crawlResults: debugData.crawlResults?.map(crawl => ({
+                    step: crawl.step,
+                    timestamp: crawl.timestamp,
+                    websiteUrl: crawl.websiteUrl,
+                    error: crawl.error,
+                    rawData: crawl.rawData || null,
+                    processedData: crawl.processedData || null,
+                    aiInteraction: crawl.aiInteraction || null,
+                    logic: crawl.logic || null
+                })) || [],
+                
+                // AI interactions
+                aiInteractions: debugData.aiInteractions?.map(interaction => ({
+                    step: interaction.step,
+                    timestamp: interaction.timestamp,
+                    prompt: interaction.prompt || null,
+                    response: interaction.response || null,
+                    parsedData: interaction.parsedData || null,
+                    promptSource: interaction.promptSource || null,
+                    logic: interaction.logic || null
+                })) || [],
+                
+                // Final result
+                finalResult: debugData.finalResult || null,
+                
+                // Summary
+                summary: debugData.summary || null
+            };
+        }
+    } catch (error) {
+        console.error('Error fetching competitor debug data:', error);
+        return {
+            timestamp: new Date().toISOString(),
+            message: 'Error fetching competitor intelligence debug data: ' + error.message
+        };
     }
 }

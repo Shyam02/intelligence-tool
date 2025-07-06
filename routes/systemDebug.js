@@ -11,4 +11,31 @@ router.get('/status', (req, res) => {
   });
 });
 
+// Route to get competitor intelligence debug data
+router.get('/competitor-debug', (req, res) => {
+  try {
+    const debugData = global.competitorDebugData || null;
+    if (debugData) {
+      res.json({
+        success: true,
+        data: debugData,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'No competitor intelligence debug data available',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching competitor debug data:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
