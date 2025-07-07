@@ -54,3 +54,50 @@ function createContentBriefsTemplate(briefsData) {
     
     return briefsHTML;
 }
+
+function createContentBriefsDebugTemplate(debugData) {
+    let html = '<div class="debug-detailed-section">';
+    html += `<h4>📝 Content Briefs Debug - Complete Details</h4>`;
+    html += `<p><strong>Started:</strong> ${debugData.timestamp}</p>`;
+    if (debugData.summary) {
+        html += `<h5>📊 Summary:</h5>`;
+        html += `<div class="debug-summary-detailed">`;
+        html += `<p><strong>Viable Count:</strong> ${debugData.summary.viableCount}</p>`;
+        html += `<p><strong>Total Briefs:</strong> ${debugData.summary.totalBriefs}</p>`;
+        html += `<p><strong>Evaluated Count:</strong> ${debugData.summary.evaluatedCount}</p>`;
+        html += '</div>';
+    }
+    if (debugData.steps && debugData.steps.length > 0) {
+        html += '<h5>📝 Steps:</h5>';
+        html += '<div class="debug-steps-detailed">';
+        debugData.steps.forEach((step, idx) => {
+            html += `<div class="debug-step-detailed">`;
+            html += `<strong>${idx + 1}. ${step.step}</strong> <span class="timestamp">${step.timestamp}</span>`;
+            if (step.logic) {
+                html += `<details><summary>View Logic & Source</summary><div class="debug-logic">`;
+                html += `<p><strong>Description:</strong> ${step.logic.description}</p>`;
+                html += `<p><strong>Source:</strong> <code>${step.logic.sourceFile}</code> - <code>${step.logic.functionName}</code></p>`;
+                html += '</div></details>';
+            }
+            if (step.prompt) {
+                html += `<details><summary>View Prompt</summary><pre class="debug-prompt">${step.prompt}</pre></details>`;
+            }
+            if (step.response) {
+                html += `<details><summary>View AI Response</summary><pre class="debug-response">${step.response}</pre></details>`;
+            }
+            if (step.parsedBriefs) {
+                html += `<details><summary>View Parsed Briefs</summary><pre class="debug-data">${JSON.stringify(step.parsedBriefs, null, 2)}</pre></details>`;
+            }
+            if (step.error) {
+                html += `<div class="debug-error"><strong>Error:</strong> ${step.error}</div>`;
+            }
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    if (debugData.error) {
+        html += `<div class="debug-error"><strong>Error:</strong> ${debugData.error}</div>`;
+    }
+    html += '</div>';
+    return html;
+}

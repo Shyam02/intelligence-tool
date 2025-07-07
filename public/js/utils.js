@@ -1872,3 +1872,45 @@ async function collectRedditDebugData() {
         };
     }
 }
+
+async function refreshContentBriefsDebug() {
+    const output = document.getElementById('contentBriefsDebugOutput');
+    output.innerHTML = 'Loading...';
+    try {
+        const response = await fetch('/api/systemDebug/content-briefs-debug');
+        const result = await response.json();
+        if (result.success && result.data) {
+            output.innerHTML = createContentBriefsDebugTemplate(result.data);
+        } else {
+            output.innerHTML = result.message || 'No content briefs debug data available';
+        }
+    } catch (error) {
+        output.innerHTML = 'Error loading content briefs debug data: ' + error.message;
+    }
+}
+
+function clearContentBriefsDebug() {
+    const output = document.getElementById('contentBriefsDebugOutput');
+    output.innerHTML = 'No content briefs debug data available';
+}
+
+async function refreshContentGenerationDebug() {
+    const output = document.getElementById('contentGenerationDebugOutput');
+    output.innerHTML = 'Loading...';
+    try {
+        const response = await fetch('/api/systemDebug/content-generation-debug');
+        const result = await response.json();
+        if (result.success && result.data) {
+            output.innerHTML = createContentGenerationDebugTemplate(result.data);
+        } else {
+            output.innerHTML = result.message || 'No content generation debug data available';
+        }
+    } catch (error) {
+        output.innerHTML = 'Error loading content generation debug data: ' + error.message;
+    }
+}
+
+function clearContentGenerationDebug() {
+    const output = document.getElementById('contentGenerationDebugOutput');
+    output.innerHTML = 'No content generation debug data available';
+}

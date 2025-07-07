@@ -583,6 +583,43 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Content Briefs Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('contentBriefsDebug')">
+                                        <h4>📝 Content Briefs</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="contentBriefsDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshContentBriefsDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearContentBriefsDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Content Briefs Debug Data</h5>
+                                            <div id="contentBriefsDebugOutput">No content briefs debug data available</div>
+                                            <button onclick="copyToClipboard('contentBriefsDebugOutput', this)" class="copy-btn">📋 Copy Briefs Debug Data</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Content Generation Debug Section -->
+                                <div class="debug-section">
+                                    <div class="debug-header" onclick="toggleDebugSection('contentGenerationDebug')">
+                                        <h4>🎨 Content Generation</h4>
+                                        <span class="debug-toggle">▼</span>
+                                    </div>
+                                    <div id="contentGenerationDebug" class="debug-content" style="display: none;">
+                                        <div class="debug-controls">
+                                            <button onclick="refreshContentGenerationDebug()" class="debug-btn">🔄 Refresh</button>
+                                            <button onclick="clearContentGenerationDebug()" class="debug-btn">🗑️ Clear</button>
+                                        </div>
+                                        <div class="debug-data">
+                                            <h5>Content Generation Debug Data</h5>
+                                            <div id="contentGenerationDebugOutput">No content generation debug data available</div>
+                                            <button onclick="copyToClipboard('contentGenerationDebugOutput', this)" class="copy-btn">📋 Copy Generation Debug Data</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

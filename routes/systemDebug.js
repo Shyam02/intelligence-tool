@@ -119,4 +119,58 @@ router.get('/reddit-debug', (req, res) => {
   }
 });
 
+// Route to get content briefs debug data
+router.get('/content-briefs-debug', (req, res) => {
+  try {
+    const debugData = global.contentBriefsDebugData || null;
+    if (debugData) {
+      res.json({
+        success: true,
+        data: debugData,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'No content briefs debug data available',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching content briefs debug data:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Route to get content generation debug data
+router.get('/content-generation-debug', (req, res) => {
+  try {
+    const debugData = global.contentGenerationDebugData || null;
+    if (debugData) {
+      res.json({
+        success: true,
+        data: debugData,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'No content generation debug data available',
+        timestamp: new Date().toISOString()
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching content generation debug data:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
