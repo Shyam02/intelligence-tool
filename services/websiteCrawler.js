@@ -647,14 +647,45 @@ async function crawlWebsite(websiteUrl, masterId = null) {
     let crawlData;
     // Step 1: Try enhanced multi-page crawling (0-10 pages)
     try {
+      // --- HOMEPAGE ANALYSIS & LINK EXTRACTION ---
       crawlData = await fetchMultiplePages(websiteUrl, masterId);
-      if (masterId) systemLogger.logStep(masterId, {
-        step: 'Crawling: multi-page analysis complete',
-        crawlData,
-        logic: 'Fetched homepage and additional pages, applied link selection and AI analysis.',
-        next: 'Prepare prompt for AI multi-page analysis.'
-      });
-      // Create comprehensive prompt with all page content
+      // Push homepage analysis step
+      if (typeof global !== 'undefined' && global.crawlDebugData && global.crawlDebugData.homepageAnalysis) {
+        debugData.steps.push({
+          step: 'homepage_analysis',
+          timestamp: global.crawlDebugData.homepageAnalysis.timestamp,
+          rawData: global.crawlDebugData.homepageAnalysis.rawData,
+          processedData: global.crawlDebugData.homepageAnalysis.processedData,
+          logic: global.crawlDebugData.homepageAnalysis.logic,
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'fetchMultiplePages()'
+        });
+      }
+      // Push AI link selection step
+      if (typeof global !== 'undefined' && global.crawlDebugData && global.crawlDebugData.linkSelection) {
+        debugData.steps.push({
+          step: 'ai_link_selection',
+          timestamp: global.crawlDebugData.linkSelection.timestamp,
+          inputData: global.crawlDebugData.linkSelection.inputData,
+          logic: global.crawlDebugData.linkSelection.logic,
+          outputData: global.crawlDebugData.linkSelection.outputData,
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'fetchMultiplePages()'
+        });
+      }
+      // Push page crawling step
+      if (typeof global !== 'undefined' && global.crawlDebugData && global.crawlDebugData.pageCrawling) {
+        debugData.steps.push({
+          step: 'page_crawling',
+          timestamp: global.crawlDebugData.pageCrawling.timestamp,
+          selectedLinks: global.crawlDebugData.pageCrawling.selectedLinks,
+          crawledPages: global.crawlDebugData.pageCrawling.crawledPages,
+          logic: global.crawlDebugData.pageCrawling.logic,
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'fetchMultiplePages()'
+        });
+      }
+      // --- FINAL PROMPT ---
       let combinedContent = `HOMEPAGE CONTENT:\n${crawlData.homepageContent}\n\n`;
       if (crawlData.additionalPages.length > 0) {
         combinedContent += 'ADDITIONAL PAGES:\n';
@@ -667,13 +698,40 @@ async function crawlWebsite(websiteUrl, masterId = null) {
         });
       }
       const enhancedCrawlPrompt = intelligence.multiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData);
-      if (masterId) systemLogger.logStep(masterId, {
-        step: 'Crawling: AI multi-page analysis prompt',
+      debugData.steps.push({
+        step: 'final_prompt_prepared',
+        timestamp: new Date().toISOString(),
         prompt: enhancedCrawlPrompt,
-        logic: 'Prompt constructed for AI multi-page analysis.',
-        next: 'Send prompt to AI.'
+        logic: {
+          description: 'Prompt constructed for AI multi-page analysis.',
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'crawlWebsite()',
+          steps: [
+            'Combine homepage and additional page content',
+            'Format prompt for AI business analysis'
+          ]
+        },
+        sourceFile: 'services/websiteCrawler.js',
+        functionName: 'crawlWebsite()'
       });
+      // --- AI RESPONSE ---
       crawlResult = await callClaudeAPI(enhancedCrawlPrompt, false, masterId, 'AI: Multi-Page Analysis');
+      debugData.steps.push({
+        step: 'ai_response_received',
+        timestamp: new Date().toISOString(),
+        aiResponse: crawlResult,
+        logic: {
+          description: 'AI response received for multi-page analysis.',
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'crawlWebsite()',
+          steps: [
+            'Send prompt to Claude API',
+            'Receive AI response with business analysis'
+          ]
+        },
+        sourceFile: 'services/websiteCrawler.js',
+        functionName: 'crawlWebsite()'
+      });
       if (masterId) systemLogger.logStep(masterId, {
         step: 'Crawling: AI multi-page analysis result',
         aiResponse: crawlResult,
@@ -692,13 +750,39 @@ async function crawlWebsite(websiteUrl, masterId = null) {
         const singlePageHtml = await fetchWebsiteHTML(websiteUrl);
         const cleanText = extractCleanText(singlePageHtml);
         const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
-        if (masterId) systemLogger.logStep(masterId, {
-          step: 'Crawling: single page analysis prompt',
+        debugData.steps.push({
+          step: 'single_page_prompt_prepared',
+          timestamp: new Date().toISOString(),
           prompt: crawlPrompt,
-          logic: 'Prompt constructed for AI single page analysis.',
-          next: 'Send prompt to AI.'
+          logic: {
+            description: 'Prompt constructed for AI single page analysis.',
+            sourceFile: 'services/websiteCrawler.js',
+            functionName: 'crawlWebsite()',
+            steps: [
+              'Extract clean text from homepage',
+              'Format prompt for AI single page analysis'
+            ]
+          },
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'crawlWebsite()'
         });
         crawlResult = await callClaudeAPI(crawlPrompt, false, masterId, 'AI: Single Page Analysis');
+        debugData.steps.push({
+          step: 'single_page_ai_response_received',
+          timestamp: new Date().toISOString(),
+          aiResponse: crawlResult,
+          logic: {
+            description: 'AI response received for single page analysis.',
+            sourceFile: 'services/websiteCrawler.js',
+            functionName: 'crawlWebsite()',
+            steps: [
+              'Send prompt to Claude API',
+              'Receive AI response with business analysis'
+            ]
+          },
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'crawlWebsite()'
+        });
         if (masterId) systemLogger.logStep(masterId, {
           step: 'Crawling: single page analysis result',
           aiResponse: crawlResult,

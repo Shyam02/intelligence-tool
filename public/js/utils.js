@@ -294,9 +294,44 @@ function refreshWebsiteCrawlDebug() {
         crawlData.steps.forEach((step, index) => {
             html += `<div class="debug-step-detailed">
                 <strong>${index + 1}. ${step.step}</strong>
-                <span class="timestamp">${step.timestamp}</span>
-                ${step.extractedData ? `<pre class="step-data">${JSON.stringify(step.extractedData, null, 2)}</pre>` : ''}
-            </div>`;
+                <span class="timestamp">${step.timestamp}</span>`;
+            // Show all fields except step/timestamp/sourceFile/functionName inline
+            Object.keys(step).forEach(key => {
+                if (["step", "timestamp", "sourceFile", "functionName"].includes(key)) return;
+                const value = step[key];
+                if (value === undefined || value === null) return;
+                if (typeof value === "string" && value.length > 200) {
+                    html += `<details><summary>${key}</summary><pre class="step-data">${value}</pre></details>`;
+                } else if (typeof value === "object") {
+                    html += `<details><summary>${key}</summary><pre class="step-data">${JSON.stringify(value, null, 2)}</pre></details>`;
+                } else {
+                    html += `<div><strong>${key}:</strong> ${value}</div>`;
+                }
+            });
+            // Show logic/source info if present
+            if (step.logic) {
+                html += '<details><summary>Logic</summary>';
+                if (typeof step.logic === 'object') {
+                    if (step.logic.description) html += `<div><strong>Description:</strong> ${step.logic.description}</div>`;
+                    if (step.logic.sourceFile) html += `<div><strong>Source:</strong> <code>${step.logic.sourceFile}</code></div>`;
+                    if (step.logic.functionName) html += `<div><strong>Function:</strong> <code>${step.logic.functionName}</code></div>`;
+                    if (step.logic.steps && Array.isArray(step.logic.steps)) {
+                        html += '<div><strong>Steps:</strong><ul>';
+                        step.logic.steps.forEach(lstep => html += `<li>${lstep}</li>`);
+                        html += '</ul></div>';
+                    }
+                } else {
+                    html += `<pre>${JSON.stringify(step.logic, null, 2)}</pre>`;
+                }
+                html += '</details>';
+            }
+            if (step.sourceFile || step.functionName) {
+                html += '<div class="debug-step-source">';
+                if (step.sourceFile) html += `<span><strong>Source:</strong> <code>${step.sourceFile}</code></span> `;
+                if (step.functionName) html += `<span><strong>Function:</strong> <code>${step.functionName}</code></span>`;
+                html += '</div>';
+            }
+            html += '</div>';
         });
         html += '</div>';
     }
