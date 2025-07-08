@@ -7,13 +7,13 @@ const { URL } = require('url');
  * MAIN FUNCTION: Extract clean, meaningful text from HTML
  * Approach: Universal linguistic analysis, not content-specific patterns
  */
-function extractCleanText(html) {
+function extractCleanText(html, options = {}) {
   try {
     console.log('🧹 Starting universal content-agnostic extraction...');
     
     // Phase 1: Structure-aware preprocessing
     console.log('Phase 1: Structure-aware preprocessing...');
-    const preprocessed = structureAwarePreprocessing(html);
+    const preprocessed = structureAwarePreprocessing(html, options);
     
     // Phase 2: Semantic HTML analysis
     console.log('Phase 2: Semantic HTML analysis...');
@@ -50,7 +50,7 @@ function extractCleanText(html) {
  * PHASE 1: Structure-aware preprocessing
  * Focus: Remove non-content elements using HTML semantics, not content assumptions
  */
-function structureAwarePreprocessing(html) {
+function structureAwarePreprocessing(html, options = {}) {
   // Remove elements that are universally non-content
   let processed = html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -59,6 +59,13 @@ function structureAwarePreprocessing(html) {
     .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, '')
     .replace(/<canvas\b[^>]*>[\s\S]*?<\/canvas>/gi, '')
     .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '');
+  
+  // Domain-based footer/navigation filtering for same-domain pages
+  if (options.skipFooterNav) {
+    processed = processed
+      .replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, '')
+      .replace(/<nav\b[^>]*>[\s\S]*?<\/nav>/gi, '');
+  }
   
   // Smart entity handling - preserve linguistic structure
   processed = preserveLinguisticStructure(processed);
@@ -379,6 +386,9 @@ function statisticalRepetitionRemoval(text) {
     
     console.log(`📊 Repetition analysis: avgFreq=${avgFrequency.toFixed(1)}, maxFreq=${maxFrequency}, threshold=${repetitionThreshold}`);
     
+    // Track removed words to avoid duplicate logging
+    const removedWords = new Map();
+    
     // Filter out statistically excessive repetitions
     const filtered = words.filter(word => {
       const normalized = word.toLowerCase().replace(/[^\w]/g, '');
@@ -387,16 +397,18 @@ function statisticalRepetitionRemoval(text) {
       const count = wordFreq.get(normalized) || 0;
       const isExcessive = count > repetitionThreshold;
       
-      if (isExcessive && count > 10) { // Only log significant removals
-        console.log(`🧹 Removing excessive repetition: "${word}" (${count} occurrences, threshold: ${repetitionThreshold})`);
+      if (isExcessive && !removedWords.has(normalized)) {
+        console.log(`🧹 Removing excessive word: "${normalized}" (${count} occurrences, threshold: ${repetitionThreshold})`);
+        removedWords.set(normalized, count);
       }
       
       return !isExcessive;
     });
     
     const removedCount = words.length - filtered.length;
+    const uniqueWordsRemoved = removedWords.size;
     if (removedCount > 0) {
-      console.log(`🧹 Statistical repetition removal: removed ${removedCount} excessive words`);
+      console.log(`🧹 Statistical repetition removal: removed ${removedCount} excessive words (${uniqueWordsRemoved} unique word types)`);
     }
     
     return filtered.join(' ');
@@ -496,9 +508,6 @@ function extractAllLinks(html, baseUrl) {
       const url = match[1];
       const rawText = match[2];
       
-      // ONLY filter out fragment URLs that cause duplicate content
-      // Let AI decide value of all other link types (mailto, tel, javascript, etc.)
-      
       // Clean link text using universal principles
       const linkText = universalLinkTextCleaning(rawText);
       if (!linkText) continue; // Only skip completely empty content
@@ -512,14 +521,10 @@ function extractAllLinks(html, baseUrl) {
         continue;
       }
       
-      // ONLY filter: Skip fragment URLs that point to same page sections (cause duplicate content)
+      // UNIVERSAL: Skip ALL fragment URLs (they never provide crawlable content)
       if (absoluteUrl.includes('#')) {
-        const basePartOfUrl = absoluteUrl.split('#')[0];
-        const basePartOfCurrent = baseUrl.split('#')[0];
-        if (basePartOfUrl === basePartOfCurrent) {
-          console.log('🚫 Skipping fragment URL:', absoluteUrl, '(points to same page section)');
-          continue;
-        }
+        console.log('🚫 Skipping fragment URL:', absoluteUrl, '(points to page section)');
+        continue;
       }
       
       const urlObj = new URL(absoluteUrl);
