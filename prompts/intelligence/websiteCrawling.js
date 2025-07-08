@@ -28,6 +28,13 @@ Extract business information and respond with ONLY a JSON object containing the 
 "social_media": {
   "twitter": "",
   "linkedin": "",
+  "instagram": "",
+  "facebook": "",
+  "youtube": "",
+  "tiktok": "",
+  "pinterest": "",
+  "reddit": "",
+  "discord": "",
   "other": []
 },
 "funding_info": "",
@@ -84,6 +91,13 @@ Extract business information and respond with ONLY a JSON object containing the 
 "social_media": {
   "twitter": "",
   "linkedin": "",
+  "instagram": "",
+  "facebook": "",
+  "youtube": "",
+  "tiktok": "",
+  "pinterest": "",
+  "reddit": "",
+  "discord": "",
   "other": []
 },
 "funding_info": "",
@@ -128,6 +142,13 @@ return `The website content could not be fetched. Based only on the website URL 
 "social_media": {
   "twitter": "",
   "linkedin": "",
+  "instagram": "",
+  "facebook": "",
+  "youtube": "",
+  "tiktok": "",
+  "pinterest": "",
+  "reddit": "",
+  "discord": "",
   "other": []
 },
 "funding_info": "Not found",

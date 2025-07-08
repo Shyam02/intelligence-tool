@@ -43,6 +43,13 @@ const competitorAnalysisPrompt = (mainBusinessData, competitorCrawlResults) => {
         "social_media_presence": {
           "twitter": "<twitter handle or 'Not found'>",
           "linkedin": "<linkedin URL or 'Not found'>",
+          "instagram": "<instagram URL or 'Not found'>",
+          "facebook": "<facebook URL or 'Not found'>",
+          "youtube": "<youtube URL or 'Not found'>",
+          "tiktok": "<tiktok URL or 'Not found'>",
+          "pinterest": "<pinterest URL or 'Not found'>",
+          "reddit": "<reddit URL or 'Not found'>",
+          "discord": "<discord URL or 'Not found'>",
           "other": ["<other social platforms>"]
         },
         "content_strategy_observations": "<observations about their content/marketing approach>",

@@ -152,12 +152,30 @@ function createWebsiteIntelligenceTemplate(websiteData) {
                 </div>
             ` : ''}
 
-            ${websiteData.social_media && (websiteData.social_media.twitter || websiteData.social_media.linkedin || websiteData.social_media.other?.length > 0) ? `
+            ${websiteData.social_media && (
+                websiteData.social_media.twitter || 
+                websiteData.social_media.linkedin || 
+                websiteData.social_media.instagram || 
+                websiteData.social_media.facebook || 
+                websiteData.social_media.youtube || 
+                websiteData.social_media.tiktok || 
+                websiteData.social_media.pinterest || 
+                websiteData.social_media.reddit || 
+                websiteData.social_media.discord || 
+                websiteData.social_media.other?.length > 0
+            ) ? `
                 <div class="data-section">
                     <h4>🌐 Social Media</h4>
                     <div class="social-links">
                         ${websiteData.social_media.twitter ? `<div class="social-item">Twitter: <a href="${websiteData.social_media.twitter}" target="_blank">${websiteData.social_media.twitter}</a></div>` : ''}
                         ${websiteData.social_media.linkedin ? `<div class="social-item">LinkedIn: <a href="${websiteData.social_media.linkedin}" target="_blank">${websiteData.social_media.linkedin}</a></div>` : ''}
+                        ${websiteData.social_media.instagram ? `<div class="social-item">Instagram: <a href="${websiteData.social_media.instagram}" target="_blank">${websiteData.social_media.instagram}</a></div>` : ''}
+                        ${websiteData.social_media.facebook ? `<div class="social-item">Facebook: <a href="${websiteData.social_media.facebook}" target="_blank">${websiteData.social_media.facebook}</a></div>` : ''}
+                        ${websiteData.social_media.youtube ? `<div class="social-item">YouTube: <a href="${websiteData.social_media.youtube}" target="_blank">${websiteData.social_media.youtube}</a></div>` : ''}
+                        ${websiteData.social_media.tiktok ? `<div class="social-item">TikTok: <a href="${websiteData.social_media.tiktok}" target="_blank">${websiteData.social_media.tiktok}</a></div>` : ''}
+                        ${websiteData.social_media.pinterest ? `<div class="social-item">Pinterest: <a href="${websiteData.social_media.pinterest}" target="_blank">${websiteData.social_media.pinterest}</a></div>` : ''}
+                        ${websiteData.social_media.reddit ? `<div class="social-item">Reddit: <a href="${websiteData.social_media.reddit}" target="_blank">${websiteData.social_media.reddit}</a></div>` : ''}
+                        ${websiteData.social_media.discord ? `<div class="social-item">Discord: <a href="${websiteData.social_media.discord}" target="_blank">${websiteData.social_media.discord}</a></div>` : ''}
                         ${websiteData.social_media.other && websiteData.social_media.other.length > 0 ? websiteData.social_media.other.map(link => `<div class="social-item">Other: <a href="${link}" target="_blank">${link}</a></div>`).join('') : ''}
                     </div>
                 </div>
