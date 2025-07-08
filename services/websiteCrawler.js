@@ -49,7 +49,7 @@ async function crawlHomepageOnly(websiteUrl) {
     // Step 2: Simple AI analysis (homepage only)
     const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
     const crawlResult = await callClaudeAPI(crawlPrompt, false);
-    
+
     // Step 3: Parse result
     let extractedData;
     try {
@@ -58,7 +58,30 @@ async function crawlHomepageOnly(websiteUrl) {
       console.log('❌ JSON parsing failed for competitor crawl, creating fallback data');
       extractedData = createFallbackData(websiteUrl, crawlResult, 'JSON parsing failed');
     }
-    
+
+    // Add AI interaction details for debug
+    extractedData.aiInteraction = {
+      prompt: crawlPrompt,
+      response: crawlResult,
+      promptSource: {
+        sourceFile: 'prompts/intelligence/websiteCrawling.js',
+        functionName: 'mainCrawlPrompt()',
+        description: 'AI prompt for single-page business analysis'
+      },
+      logic: {
+        description: 'Single-page AI analysis of competitor homepage',
+        sourceFile: 'services/websiteCrawler.js',
+        functionName: 'crawlHomepageOnly()',
+        steps: [
+          'Fetch homepage HTML',
+          'Extract and clean text',
+          'Build prompt for AI business analysis',
+          'Send prompt to Claude API',
+          'Parse AI response for business data'
+        ]
+      }
+    };
+
     // Store additional metadata for competitor analysis
     extractedData.crawlDebugData = {
       websiteUrl: websiteUrl,
