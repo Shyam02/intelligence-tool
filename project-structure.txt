@@ -9,6 +9,7 @@
 │   ├── contentGeneration.js
 │   ├── contentStrategy.js
 │   ├── reddit.js
+│   ├── systemDebug.js
 │   ├── webSearch.js
 │   ├── webSearchQueries.js
 │   └── websiteCrawling.js
@@ -53,11 +54,13 @@
 │       ├── layout.css
 │       ├── reddit.css
 │       ├── responsive.css
-│       └── sidebar.css
+│       ├── sidebar.css
+│       └── systemDebug.css
 ├── routes
 │   ├── content.js
 │   ├── intelligence.js
 │   ├── reddit.js
+│   ├── systemDebug.js
 │   ├── testing.js
 │   └── webSearch.js
 ├── server.js
@@ -66,7 +69,8 @@
     ├── contentGenerator.js
     ├── htmlParser.js
     ├── reddit.js
+    ├── systemLogger.js
     ├── webSearch.js
     └── websiteCrawler.js
 
-13 directories, 57 files
+13 directories, 61 files
