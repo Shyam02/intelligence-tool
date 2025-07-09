@@ -523,7 +523,7 @@ function extractAllLinks(html, baseUrl) {
       
       // UNIVERSAL: Skip ALL fragment URLs (they never provide crawlable content)
       if (absoluteUrl.includes('#')) {
-        console.log('🚫 Skipping fragment URL:', absoluteUrl, '(points to page section)');
+        //console.log('🚫 Skipping fragment URL:', absoluteUrl, '(points to page section)');
         continue;
       }
       
@@ -607,7 +607,7 @@ function universalDeduplicateLinks(links) {
 function filterRelevantLinks(links) {
   // Return all links - let AI decide what's relevant
   // Only technical deduplication has already been done
-  console.log(`🔗 Passing all ${links.length} extracted links to AI for intelligent selection`);
+  //console.log(`🔗 Passing all ${links.length} extracted links to AI for intelligent selection`);
   return links;
 }
 
