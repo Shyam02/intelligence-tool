@@ -33,26 +33,47 @@ async function fetchWebsiteHTML(websiteUrl) {
   }
 }
 
-// NEW: Simple homepage-only crawling for competitors
+// // UPDATED: Enhanced homepage crawling for competitors (EXACT SAME STEPS as self website)
 async function crawlHomepageOnly(websiteUrl) {
   try {
-    console.log('🏠 Starting simple homepage crawl for competitor:', websiteUrl);
+    console.log('🏠 Starting enhanced homepage crawl for competitor:', websiteUrl);
+    
+    // ========== EXACT SAME HOMEPAGE DATA STRUCTURING STEPS ==========
     
     // Step 1: Fetch homepage HTML
     const homepageHtml = await fetchWebsiteHTML(websiteUrl);
-    const cleanText = extractCleanText(homepageHtml);
     
-    console.log('📄 Homepage content extracted:', {
+    // Step 2: Extract clean text from homepage
+    let homepageCleanText = extractCleanText(homepageHtml);
+    
+    // Step 3: Extract ALL links from homepage
+    const allLinks = extractAllLinks(homepageHtml, websiteUrl);
+    
+    // Step 4: Filter relevant links (actually no filtering - passes all)
+    const relevantLinks = filterRelevantLinks(allLinks);
+    
+    // Step 5: Format links into structured text data
+    const homepageStructuredLinks = formatStructuredLinks(relevantLinks, websiteUrl);
+    
+    // Step 6: Append structured links to homepage content
+    homepageCleanText += homepageStructuredLinks;
+    
+    // ========== END OF EXACT SAME STEPS ==========
+    
+    console.log('📄 Enhanced homepage content extracted:', {
       originalLength: homepageHtml.length,
-      cleanLength: cleanText.length,
-      compressionRatio: Math.round((1 - cleanText.length / homepageHtml.length) * 100) + '%'
+      cleanLength: homepageCleanText.length,
+      linksFound: allLinks.length,
+      relevantLinks: relevantLinks.length,
+      externalLinks: relevantLinks.filter(l => l.isExternal).length,
+      compressionRatio: Math.round((1 - homepageCleanText.length / homepageHtml.length) * 100) + '%'
     });
     
-    // Step 2: Simple AI analysis (homepage only)
-    const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
+    // Step 7: AI analysis with enhanced structured content (homepage + links)
+    const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, homepageCleanText);
     const crawlResult = await callClaudeAPI(crawlPrompt, false);
 
-    // Step 3: Parse result
+    // Step 8: Parse result (same as before)
     let extractedData;
     try {
       extractedData = JSON.parse(crawlResult);
@@ -61,85 +82,62 @@ async function crawlHomepageOnly(websiteUrl) {
       extractedData = createFallbackData(websiteUrl, crawlResult, 'JSON parsing failed');
     }
 
-    // Add AI interaction details for debug
+    // Step 9: Add AI interaction details for debug (same as before)
     extractedData.aiInteraction = {
       prompt: crawlPrompt,
       response: crawlResult,
       promptSource: {
         sourceFile: 'prompts/intelligence/websiteCrawling.js',
         functionName: 'mainCrawlPrompt()',
-        description: 'AI prompt for single-page business analysis'
+        description: 'AI prompt for enhanced single-page business analysis with structured links'
       },
       logic: {
-        description: 'Single-page AI analysis of competitor homepage',
+        description: 'Enhanced single-page AI analysis of competitor homepage with structured links',
         sourceFile: 'services/websiteCrawler.js',
         functionName: 'crawlHomepageOnly()',
         steps: [
           'Fetch homepage HTML',
           'Extract and clean text',
+          'Extract ALL links from homepage',
+          'Filter relevant links (passes all)',
+          'Format links into structured text data',
+          'Append structured links to content',
           'Build prompt for AI business analysis',
-          'Send prompt to Claude API',
+          'Send enhanced structured content to Claude API',
           'Parse AI response for business data'
         ]
       }
     };
 
-    // Store additional metadata for competitor analysis
+    // Step 10: Store additional metadata for competitor analysis (enhanced)
     extractedData.crawlDebugData = {
       websiteUrl: websiteUrl,
-      analysisMethod: 'competitor_homepage_only',
+      analysisMethod: 'competitor_homepage_enhanced_with_structured_links',
       timestamp: new Date().toISOString(),
       originalHtmlLength: homepageHtml.length,
-      cleanTextLength: cleanText.length,
-      compressionRatio: Math.round((1 - cleanText.length / homepageHtml.length) * 100) + '%',
-      extractedData: {
-        company_name: extractedData.company_name,
-        business_description: extractedData.business_description,
-        value_proposition: extractedData.value_proposition,
-        target_customer: extractedData.target_customer,
-        key_features: extractedData.key_features,
-        pricing_info: extractedData.pricing_info,
-        business_stage: extractedData.business_stage,
-        industry_category: extractedData.industry_category,
-        competitors_mentioned: extractedData.competitors_mentioned,
-        social_media: extractedData.social_media,
-        contact_info: extractedData.contact_info,
-        team_info: extractedData.team_info,
-        funding_info: extractedData.funding_info,
-        recent_updates: extractedData.recent_updates,
-        mission_vision: extractedData.mission_vision,
-        additional_notes: extractedData.additional_notes,
-        competitive_advantages: extractedData.competitive_advantages,
-        challenges: extractedData.challenges,
-        growth_potential: extractedData.growth_potential,
-        market_position: extractedData.market_position,
-        technology_stack: extractedData.technology_stack,
-        partnerships: extractedData.partnerships,
-        regulatory_considerations: extractedData.regulatory_considerations,
-        sustainability_factors: extractedData.sustainability_factors,
-        risk_factors: extractedData.risk_factors,
-        success_metrics: extractedData.success_metrics,
-        future_plans: extractedData.future_plans,
-        extraction_method: extractedData.extraction_method,
-        extraction_timestamp: extractedData.extraction_timestamp,
-        pages_analyzed: extractedData.pages_analyzed,
-        pages_selected: extractedData.pages_selected,
-        external_pages_analyzed: extractedData.external_pages_analyzed,
-        total_content_length: extractedData.total_content_length
-      },
-      promptSource: {
-        sourceFile: 'prompts/intelligence/websiteCrawling.js',
-        functionName: 'mainCrawlPrompt()',
-        description: 'AI prompt for competitor business analysis'
+      cleanTextLength: homepageCleanText.length,
+      linksExtracted: allLinks.length,
+      relevantLinksFound: relevantLinks.length,
+      externalLinksFound: relevantLinks.filter(l => l.isExternal).length,
+      internalLinksFound: relevantLinks.filter(l => !l.isExternal).length,
+      compressionRatio: Math.round((1 - homepageCleanText.length / homepageHtml.length) * 100) + '%',
+      contentStructure: {
+        hasCleanText: true,
+        hasStructuredLinks: relevantLinks.length > 0,
+        linkCategories: {
+          internal: relevantLinks.filter(l => !l.isExternal).length,
+          external: relevantLinks.filter(l => l.isExternal).length
+        }
       }
     };
 
-    console.log('✅ Simple homepage crawl completed for competitor:', extractedData.company_name || 'Unknown');
+    console.log('✅ Enhanced competitor homepage crawl completed:', extractedData.company_name || 'Unknown company');
+    
     return extractedData;
-
+    
   } catch (error) {
-    console.error('❌ Simple homepage crawl failed:', error.message);
-    return createFallbackData(websiteUrl, null, error.message);
+    console.error('❌ Enhanced competitor homepage crawl failed:', error.message);
+    throw error;
   }
 }
 
