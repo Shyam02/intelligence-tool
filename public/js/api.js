@@ -318,12 +318,19 @@ async function generateRedditQueriesAPI(foundationalIntelligence) {
     }
 }
 
-// NEW: Search Reddit discussions
-async function searchRedditAPI(searchQueries, discoveredSubreddits = []) {
+// NEW: Search Reddit discussions (FIXED - works with or without subreddits)
+async function searchRedditAPI(searchQueries, discoveredSubreddits = null) {
     try {
         console.log('🔍 Searching Reddit discussions...');
         
-        const subredditNames = discoveredSubreddits.map(sub => sub.name).slice(0, 5);
+        // Only use subreddits if they're actually discovered and valid
+        let subredditNames = [];
+        if (discoveredSubreddits && Array.isArray(discoveredSubreddits) && discoveredSubreddits.length > 0) {
+            subredditNames = discoveredSubreddits.map(sub => sub.name).filter(name => name).slice(0, 5);
+            console.log('🎯 Using discovered subreddits for targeted search:', subredditNames);
+        } else {
+            console.log('🌐 No subreddits available - performing sitewide Reddit search');
+        }
         
         const response = await fetch('/api/searchReddit', {
             method: 'POST',
@@ -332,7 +339,7 @@ async function searchRedditAPI(searchQueries, discoveredSubreddits = []) {
             },
             body: JSON.stringify({ 
                 searchQueries: searchQueries,
-                subreddits: subredditNames,
+                subreddits: subredditNames,  // Empty array = sitewide search
                 timeFrame: 'month'
             })
         });
