@@ -22,7 +22,7 @@ const config = {
     
     brave: {
         defaultCount: 8,
-        country: 'us',
+        // country: 'us',
         spellcheck: 1,
         searchLang: 'en'
     },

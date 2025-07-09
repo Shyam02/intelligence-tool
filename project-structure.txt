@@ -36,6 +36,7 @@
 │   │   ├── app.js
 │   │   ├── contentBriefs.js
 │   │   ├── contentGeneration.js
+│   │   ├── desingAssetsDisplay.js
 │   │   ├── forms.js
 │   │   ├── reddit.js
 │   │   ├── results.js
@@ -50,6 +51,7 @@
 │       ├── contentBriefs.css
 │       ├── contentGeneration.css
 │       ├── contentStrategy.css
+│       ├── designAssets.css
 │       ├── forms.css
 │       ├── layout.css
 │       ├── reddit.css
@@ -67,10 +69,11 @@
 └── services
     ├── ai.js
     ├── contentGenerator.js
+    ├── designExtractor.js
     ├── htmlParser.js
     ├── reddit.js
     ├── systemLogger.js
     ├── webSearch.js
     └── websiteCrawler.js
 
-13 directories, 61 files
+13 directories, 64 files

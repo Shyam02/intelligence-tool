@@ -10,7 +10,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// FIXED: Perform competitor research with sequential API calls and simple homepage crawling
+// ENHANCED: Perform competitor research with global search and better logging
 async function performCompetitorResearch(competitorQueries, businessContext, masterId = null, businessPrompt = null, businessAiResponse = null) {
   // Initialize global debug data
   global.competitorDebugData = {
@@ -20,6 +20,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
     searchResults: [],
     competitorUrls: [],
     crawlResults: [],
+    searchScope: 'Global (Country Neutral)',
     aiInteractions: [
       {
         step: 'competitor_discovery_query_generation',
@@ -45,7 +46,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           ],
           dataUsage: {
             competitiveInsights: [
-              'Competitor Discovery Queries (used for web search)'
+              'Competitor Discovery Queries (used for global web search)'
             ],
             differentiationOpportunities: [
               'Query targeting for competitor analysis'
@@ -64,11 +65,14 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
   if (masterId) systemLogger.logStep(masterId, {
     step: 'Competitor research: started',
     competitorQueries,
-    logic: 'Begin competitor research with provided queries.',
-    next: 'Run web search for each query.'
+    searchScope: 'Global (Country Neutral)',
+    logic: 'Begin competitor research with provided queries using global search.',
+    next: 'Run global web search for each query.'
   });
+  
   try {
     console.log('🔍 Starting competitor research with queries:', competitorQueries);
+    console.log('🌐 Using global search (country neutral)');
     console.log('⏱️ Using sequential requests to respect API rate limits...');
     
     // STEP 1: Search for competitors using sequential requests (1 request per second)
@@ -77,33 +81,35 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
     for (let i = 0; i < competitorQueries.length; i++) {
       const query = competitorQueries[i];
       if (masterId) systemLogger.logStep(masterId, {
-        step: 'Competitor research: executing search',
+        step: 'Competitor research: executing global search',
         query,
         index: i,
-        logic: 'Run web search for competitor discovery.',
+        searchScope: 'Global',
+        logic: 'Run global web search for competitor discovery.',
         next: 'Store search results.'
       });
-      console.log(`🔍 Executing search ${i + 1}/${competitorQueries.length}: ${query}`);
+      console.log(`🔍 Executing global search ${i + 1}/${competitorQueries.length}: ${query}`);
       
       try {
         const result = await searchBrave(query, 3);
         searchResults.push(result);
-        console.log(`✅ Search ${i + 1} completed successfully`);
+        console.log(`✅ Global search ${i + 1} completed successfully`);
         
         // Store search result in debug data
         global.competitorDebugData.searchResults.push({
-          step: 'web_search',
+          step: 'global_web_search',
           timestamp: new Date().toISOString(),
           query: query,
           queryIndex: i,
           result: result,
+          searchScope: 'Global (Country Neutral)',
           logic: {
-            description: 'Web search for competitor discovery',
+            description: 'Global web search for competitor discovery',
             sourceFile: 'services/webSearch.js',
             functionName: 'searchBrave()',
             steps: [
-              'Send query to Brave Search API',
-              'Request 3 results per query',
+              'Send query to Brave Search API without country restriction',
+              'Request 3 results per query for global coverage',
               'Handle rate limiting with 1.1s delays',
               'Store search results for URL extraction'
             ]
@@ -111,10 +117,11 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         });
         
         if (masterId) systemLogger.logStep(masterId, {
-          step: 'Competitor research: search completed',
+          step: 'Competitor research: global search completed',
           query,
           result,
-          logic: 'Search completed successfully.',
+          searchScope: 'Global',
+          logic: 'Global search completed successfully.',
           next: 'Continue to next query or extract competitor URLs.'
         });
         
@@ -125,15 +132,16 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         }
         
       } catch (searchError) {
-        console.error(`❌ Search ${i + 1} failed:`, searchError.message);
+        console.error(`❌ Global search ${i + 1} failed:`, searchError.message);
         // Add empty result for failed search
         searchResults.push({ web: { results: [] } });
         
         if (masterId) systemLogger.logStep(masterId, {
-          step: 'Competitor research: search failed',
+          step: 'Competitor research: global search failed',
           query,
           error: searchError.message,
-          logic: 'Search failed, storing empty result.',
+          searchScope: 'Global',
+          logic: 'Global search failed, storing empty result.',
           next: 'Continue to next query.'
         });
         
@@ -156,14 +164,15 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
               title: webResult.title,
               description: webResult.description,
               query_source: `Query ${queryIndex + 1}`,
-              rank: resultIndex + 1
+              rank: resultIndex + 1,
+              search_scope: 'Global'
             });
           }
         });
       }
     });
     
-    console.log(`📊 Found ${competitorUrls.length} potential competitors to analyze`);
+    console.log(`📊 Found ${competitorUrls.length} potential competitors to analyze (Global search)`);
     
     // Store URL extraction in debug data
     global.competitorDebugData.competitorUrls = competitorUrls;
@@ -171,16 +180,17 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
       step: 'url_extraction',
       timestamp: new Date().toISOString(),
       totalUrlsFound: competitorUrls.length,
+      searchScope: 'Global (Country Neutral)',
       urlsByQuery: searchResults.map((result, index) => ({
         queryIndex: index,
         urlsFound: result.web?.results?.length || 0
       })),
       logic: {
-        description: 'Extract competitor URLs from search results',
+        description: 'Extract competitor URLs from global search results',
         sourceFile: 'controllers/competitorResearch.js',
         functionName: 'performCompetitorResearch() - URL extraction',
         steps: [
-          'Process each search result',
+          'Process each global search result',
           'Extract top 3 results from each query',
           'Limit to maximum 6 total competitors',
           'Store URL, title, description, and metadata',
@@ -192,20 +202,23 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: extracted competitor URLs',
       competitorUrls,
-      logic: 'Extracted up to 6 competitor URLs from search results.',
+      searchScope: 'Global',
+      logic: 'Extracted up to 6 competitor URLs from global search results.',
       next: 'Crawl competitor homepages.'
     });
     
     if (competitorUrls.length === 0) {
       if (masterId) systemLogger.logStep(masterId, {
         step: 'Competitor research: no competitors found',
-        logic: 'No competitors found in search results.',
+        searchScope: 'Global',
+        logic: 'No competitors found in global search results.',
         next: 'Return empty competitor intelligence.'
       });
       return {
         discovery_queries_used: competitorQueries,
         competitors_found: 0,
         competitors_selected: 0,
+        search_scope: 'Global (Country Neutral)',
         competitor_analysis: [],
         competitive_insights: {
           market_gaps: [],
@@ -219,11 +232,11 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           content_gaps_to_exploit: [],
           messaging_opportunities: []
         },
-        analysis_note: "No competitors found in search results"
+        analysis_note: "No competitors found in global search results"
       };
     }
     
-    // STEP 3: FIXED - Crawl competitor homepages only (simple and fast)
+    // STEP 3: Crawl competitor homepages (simple and fast)
     const competitorCrawlResults = [];
     const crawledUrls = new Set(); // Track crawled URLs to prevent duplicates
     
@@ -234,6 +247,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         continue;
       }
       crawledUrls.add(competitor.url);
+      
       try {
         if (masterId) systemLogger.logStep(masterId, {
           step: 'Competitor research: crawling competitor homepage',
@@ -255,10 +269,11 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           timestamp: new Date().toISOString(),
           websiteUrl: competitor.url,
           companyName: crawledData.company_name || competitor.title,
+          searchScope: 'Global',
           rawData: {
             originalHtmlLength: crawledData.original_html?.length || 0,
             cleanTextLength: crawledData.clean_text?.length || 0,
-            compressionRatio: crawledData.original_html && crawledData.clean_text ? 
+            compressionRatio: crawledData.original_html && crawledData.clean_text ?
               ((crawledData.clean_text.length / crawledData.original_html.length) * 100).toFixed(1) + '%' : 'N/A'
           },
           processedData: crawledData,
@@ -304,6 +319,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           timestamp: new Date().toISOString(),
           websiteUrl: competitor.url,
           companyName: competitor.title,
+          searchScope: 'Global',
           error: crawlError.message,
           logic: {
             description: 'Crawl competitor homepage for business intelligence',
@@ -334,6 +350,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: analyzing competitor data with AI',
       competitorCrawlResults,
+      searchScope: 'Global',
       logic: 'Prepare prompt and send to AI for competitor analysis.',
       next: 'Parse AI response.'
     });
@@ -353,17 +370,18 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
       timestamp: new Date().toISOString(),
       prompt: competitorAnalysisPrompt,
       response: competitorAnalysisResponse,
+      searchScope: 'Global',
       promptSource: {
         sourceFile: 'prompts/intelligence/competitorAnalysis.js',
         functionName: 'competitorAnalysisPrompt()',
         description: 'AI prompt for comprehensive competitor intelligence analysis'
       },
       logic: {
-        description: 'Final AI analysis of all competitor data',
+        description: 'Final AI analysis of all competitor data from global search',
         sourceFile: 'controllers/competitorResearch.js',
         functionName: 'performCompetitorResearch() - final analysis',
         steps: [
-          'Combine all crawled competitor data',
+          'Combine all crawled competitor data from global search',
           'Create comprehensive analysis prompt',
           'Send to AI for competitor intelligence generation',
           'Parse AI response to extract structured insights',
@@ -389,6 +407,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         }
       }
     });
+    
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: AI response',
       competitorAnalysisResponse,
@@ -404,6 +423,8 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         competitorAnalysis = JSON.parse(jsonMatch[0]);
         competitorAnalysis.discovery_queries_used = competitorQueries;
         competitorAnalysis.competitors_found = competitorUrls.length;
+        competitorAnalysis.search_scope = 'Global (Country Neutral)';
+        
         if (masterId) systemLogger.logStep(masterId, {
           step: 'Competitor research: parsed AI analysis',
           competitorAnalysis,
@@ -426,6 +447,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         discovery_queries_used: competitorQueries,
         competitors_found: competitorUrls.length,
         competitors_selected: 0,
+        search_scope: 'Global (Country Neutral)',
         competitor_analysis: [],
         competitive_insights: {
           market_gaps: [],
@@ -453,21 +475,25 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
       failedCrawls: competitorCrawlResults.filter(c => c.error).length,
       aiInteractions: global.competitorDebugData.aiInteractions.length,
       totalSearchResults: searchResults.length,
-      analysisMethod: 'sequential_search_and_crawl'
+      searchScope: 'Global (Country Neutral)',
+      analysisMethod: 'sequential_search_and_crawl_global'
     };
     
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: complete',
       competitorAnalysis,
-      logic: 'Final competitor intelligence ready.',
+      searchScope: 'Global',
+      logic: 'Final competitor intelligence ready from global search.',
       next: 'Return to business profile flow.'
     });
+    
     return competitorAnalysis;
   } catch (error) {
     console.error('Competitor research failed:', error);
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: error',
       error: error.message,
+      searchScope: 'Global',
       logic: 'Unhandled error during competitor research.',
       next: 'Return fallback competitor intelligence.'
     });

@@ -12,14 +12,21 @@ async function searchBrave(query, count = config.brave.defaultCount) {
       throw new Error('Brave API key not configured');
     }
 
+    // Build search parameters - country neutral
+    const searchParams = {
+      q: query,
+      count: count,
+      spellcheck: config.brave.spellcheck,
+      search_lang: config.brave.searchLang,
+      // REMOVED: country parameter for global search
+      // Enhanced parameters for better results
+      text_decorations: false,  // Get clean text without markup
+      extra_snippets: true,     // Get additional text snippets
+      result_filter: 'web'      // Focus on web results only
+    };
+
     const response = await axios.get(config.braveApiUrl, {
-      params: {
-        q: query,
-        count: count,
-        country: config.brave.country,
-        spellcheck: config.brave.spellcheck,
-        search_lang: config.brave.searchLang
-      },
+      params: searchParams,
       headers: {
         'Accept': 'application/json',
         'Accept-Encoding': 'gzip',
@@ -27,10 +34,11 @@ async function searchBrave(query, count = config.brave.defaultCount) {
       }
     });
 
-    console.log('✅ Brave Search response:', {
+    console.log('✅ Brave Search response (Global):', {
       status: response.status,
       hasWeb: !!response.data.web,
-      webResultsCount: response.data.web?.results?.length || 0
+      webResultsCount: response.data.web?.results?.length || 0,
+      searchScope: 'Global (Country Neutral)'
     });
 
     return response.data;
@@ -65,7 +73,7 @@ async function testBraveAPI() {
     const braveResult = await searchBrave('test search', 2);
     return { 
       status: 'success', 
-      message: 'API key working', 
+      message: 'API key working (Global Search)', 
       results_found: braveResult.web?.results?.length || 0 
     };
     
