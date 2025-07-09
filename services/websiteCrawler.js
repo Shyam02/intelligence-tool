@@ -3,7 +3,9 @@ const axios = require('axios');
 const { callClaudeAPI } = require('./ai');
 const { intelligence } = require('../prompts');
 const { extractCleanText, extractAllLinks, filterRelevantLinks } = require('./htmlParser');
+const { extractDesignAssets } = require('./designExtractor'); // NEW IMPORT
 const systemLogger = require('./systemLogger');
+const { cleanupDesignAssets, getCompanyIdentifier } = require('./designExtractor');
 
 // ENHANCED: Fetch website HTML content with better error handling
 async function fetchWebsiteHTML(websiteUrl) {
@@ -128,58 +130,50 @@ async function crawlHomepageOnly(websiteUrl) {
       promptSource: {
         sourceFile: 'prompts/intelligence/websiteCrawling.js',
         functionName: 'mainCrawlPrompt()',
-        description: 'AI prompt for single-page business analysis'
+        description: 'AI prompt for competitor business analysis'
       }
     };
-    
-    console.log('✅ Competitor homepage crawl completed:', extractedData.company_name);
+
+    console.log('✅ Simple homepage crawl completed for competitor:', extractedData.company_name || 'Unknown');
     return extractedData;
-    
+
   } catch (error) {
-    console.error('❌ Competitor homepage crawl failed:', error.message);
-    
-    // Error handling - let competitor research controller handle debug data
-    
-    // Return fallback data for competitors
+    console.error('❌ Simple homepage crawl failed:', error.message);
     return createFallbackData(websiteUrl, null, error.message);
   }
 }
 
-// NEW: Filter duplicate footer/navigation content from additional pages (content-agnostic)
-function filterDuplicateFooterContent(pageLines, homepageLines) {
+// ENHANCED: Filter duplicate footer/navigation content
+function filterDuplicateFooterContent(pageContent, homepageLines) {
   try {
-    console.log('🧹 Filtering duplicate footer content...');
-    
+    const pageLines = pageContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
     const filtered = [];
     
-    // Create normalized homepage content for comparison
-    const homepageNormalized = homepageLines.map(line => 
-      line.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[^\w\s]/g, '')
-    ).filter(line => line.length > 2);
-    
     for (const line of pageLines) {
-      const lineNormalized = line.toLowerCase().trim().replace(/\s+/g, ' ').replace(/[^\w\s]/g, '');
+      let isDuplicate = false;
       
-      // Skip empty lines
-      if (lineNormalized.length <= 2) {
+      // Skip very short lines (likely not meaningful content)
+      if (line.length < 10) {
         filtered.push(line);
         continue;
       }
       
-      // Check for exact or substantial overlap with homepage content
-      let isDuplicate = false;
-      
-      for (const homepageLine of homepageNormalized) {
-        // Exact match
-        if (lineNormalized === homepageLine) {
+      // Check for similarity with homepage lines
+      for (const homepageLine of homepageLines) {
+        if (homepageLine.length < 10) continue;
+        
+        const lineNormalized = line.toLowerCase().replace(/[^\w\s]/g, '').trim();
+        const homepageLineNormalized = homepageLine.toLowerCase().replace(/[^\w\s]/g, '').trim();
+        
+        if (lineNormalized === homepageLineNormalized) {
           isDuplicate = true;
           break;
         }
         
-        // High content overlap (80%+ similarity)
-        if (lineNormalized.length > 5 && homepageLine.length > 5) {
-          const shorter = lineNormalized.length < homepageLine.length ? lineNormalized : homepageLine;
-          const longer = lineNormalized.length >= homepageLine.length ? lineNormalized : homepageLine;
+        // Check for substantial overlap
+        if (lineNormalized.length > 20 && homepageLineNormalized.length > 20) {
+          const shorter = lineNormalized.length <= homepageLineNormalized.length ? lineNormalized : homepageLineNormalized;
+          const longer = lineNormalized.length >= homepageLineNormalized.length ? lineNormalized : homepageLineNormalized;
           
           if (longer.includes(shorter)) {
             const overlapRatio = shorter.length / longer.length;
@@ -538,23 +532,26 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
         const pageHtml = await fetchWebsiteHTML(selectedLink.url);
         let pageCleanText = extractCleanText(pageHtml, { skipFooterNav: !isExternal });
         
-        // ENHANCEMENT: Filter duplicate footer content for additional pages only
-        const pageLines = pageCleanText.split('\n');
-        pageCleanText = filterDuplicateFooterContent(pageLines, homepageLines);
+        // ENHANCEMENT: Filter duplicate footer/navigation content (not for external domains)
+        if (!isExternal) {
+          const originalLength = pageCleanText.length;
+          pageCleanText = filterDuplicateFooterContent(pageCleanText, homepageLines);
+          console.log(`🧹 Filtered duplicate content: ${originalLength} → ${pageCleanText.length} chars`);
+        }
         
-        // ENHANCEMENT: Extract and add structured links for this page (same logic as homepage)
+        // ENHANCEMENT: Extract and add page-specific structured links
         const pageLinks = extractAllLinks(pageHtml, selectedLink.url);
-        const relevantPageLinks = filterRelevantLinks(pageLinks); // Apply same filtering as homepage
+        const pageRelevantLinks = filterRelevantLinks(pageLinks);
         
-        // ENHANCEMENT: Cross-page deduplication - only show links not seen before
-        const uniquePageLinks = relevantPageLinks.filter(link => !allSeenLinks.has(link.url));
-        console.log(`🔗 Cross-page deduplication for ${selectedLink.text}: ${relevantPageLinks.length} → ${uniquePageLinks.length} unique links`);
+        // ENHANCEMENT: Avoid duplicate links we've already seen
+        const newLinks = pageRelevantLinks.filter(link => !allSeenLinks.has(link.url));
+        newLinks.forEach(link => allSeenLinks.add(link.url));
         
-        // Add unique links to seen set for future deduplication
-        uniquePageLinks.forEach(link => allSeenLinks.add(link.url));
-        
-        const pageStructuredLinks = formatStructuredLinks(uniquePageLinks, selectedLink.url);
-        pageCleanText += pageStructuredLinks;
+        if (newLinks.length > 0) {
+          const pageStructuredLinks = formatStructuredLinks(newLinks, selectedLink.url);
+          pageCleanText += pageStructuredLinks;
+          console.log(`🔗 Added ${newLinks.length} new links from page: ${selectedLink.text}`);
+        }
         
         const pageData = {
           url: selectedLink.url,
@@ -572,16 +569,15 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
         pageCrawlDebugData.crawledPages.push({
           url: selectedLink.url,
           title: selectedLink.text,
-          originalHtmlLength: pageHtml.length,
-          cleanTextLength: pageCleanText.length,
+          contentLength: pageCleanText.length,
           isExternal: isExternal,
           domain: linkDomain,
-          success: true,
-          content: pageCleanText // Full content
+          reasoning: selectedLink.reasoning,
+          newLinksFound: newLinks.length,
+          success: true
         });
         
-        console.log('✅ Successfully processed page:', selectedLink.text, 
-          '(', pageCleanText.length, 'chars,', isExternal ? 'external' : 'internal', ')');
+        console.log(`✅ Successfully crawled: "${selectedLink.text}" (${pageCleanText.length} chars, ${isExternal ? 'external' : 'internal'})`);
         
       } catch (pageError) {
         console.log('⚠️ Failed to fetch page:', selectedLink.url, '→', pageError.message);
@@ -641,6 +637,20 @@ async function fetchMultiplePages(websiteUrl, masterId = null) {
 
 // ENHANCED: Main website crawling function with flexible page support (FOR MAIN BUSINESS ONLY)
 async function crawlWebsite(websiteUrl, masterId = null) {
+  // Initialize URL-specific design assets cache
+if (!global.designAssetsCache) {
+  global.designAssetsCache = {};
+}
+const urlCacheKey = getCompanyIdentifier(websiteUrl);
+// Clear cache for this specific URL for fresh extraction
+global.designAssetsCache[urlCacheKey] = null;
+  
+  // Clean up old assets for this company before starting new extraction
+  
+  const companyIdentifier = getCompanyIdentifier(websiteUrl);
+  await cleanupDesignAssets(companyIdentifier);
+  console.log(`🧹 Cleaned up old assets for: ${companyIdentifier}`);
+  
   // Initialize debug data collection
   const debugData = {
     timestamp: new Date().toISOString(),
@@ -708,6 +718,55 @@ async function crawlWebsite(websiteUrl, masterId = null) {
           functionName: 'fetchMultiplePages()'
         });
       }
+
+      // NEW: Extract design assets after content crawling but before AI analysis
+      debugData.steps.push({
+        step: 'design_extraction_started',
+        timestamp: new Date().toISOString(),
+        logic: {
+          description: 'Extract design assets (colors, fonts, logos) from homepage HTML',
+          sourceFile: 'services/designExtractor.js',
+          functionName: 'extractDesignAssets()',
+          steps: [
+            'Parse CSS files and inline styles for color palette',
+            'Extract typography information and Google Fonts',
+            'Identify and download logo assets',
+            'Analyze visual design elements and patterns',
+            'Store extracted assets in public directory'
+          ]
+        },
+        sourceFile: 'services/websiteCrawler.js',
+        functionName: 'crawlWebsite()'
+      });
+
+      // Extract design assets from homepage HTML (ONLY ONCE)
+      let designAssets;
+      if (!global.designAssetsCache[urlCacheKey]) {
+        const homepageHtml = await fetchWebsiteHTML(websiteUrl);
+        designAssets = await extractDesignAssets(websiteUrl, homepageHtml);
+        global.designAssetsCache[urlCacheKey] = designAssets; // Cache to prevent duplicate extraction
+        
+        debugData.steps.push({
+          step: 'design_extraction_completed',
+          timestamp: new Date().toISOString(),
+          designAssets: designAssets,
+          logic: {
+            description: 'Design asset extraction completed',
+            extractedElements: {
+              colors: designAssets.color_palette?.all_extracted_colors?.length || 0,
+              fonts: designAssets.typography?.font_families_found?.length || 0,
+              logos: designAssets.logo_assets?.main_logo ? 1 : 0,
+              visual_elements: Object.keys(designAssets.visual_elements || {}).length
+            }
+          },
+          sourceFile: 'services/websiteCrawler.js',
+          functionName: 'crawlWebsite()'
+        });
+      } else {
+        designAssets = global.designAssetsCache[urlCacheKey];
+        console.log('🎨 Using cached design assets (avoiding duplicate extraction)');
+      }
+
       // --- FINAL PROMPT ---
       let combinedContent = `HOMEPAGE CONTENT:\n${crawlData.homepageContent}\n\n`;
       if (crawlData.additionalPages.length > 0) {
@@ -720,18 +779,19 @@ async function crawlWebsite(websiteUrl, masterId = null) {
           }
         });
       }
-      const enhancedCrawlPrompt = intelligence.multiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData);
+      const enhancedCrawlPrompt = intelligence.multiPageAnalysisPrompt(websiteUrl, combinedContent, crawlData, designAssets);
       debugData.steps.push({
         step: 'final_prompt_prepared',
         timestamp: new Date().toISOString(),
         prompt: enhancedCrawlPrompt,
         logic: {
-          description: 'Prompt constructed for AI multi-page analysis.',
+          description: 'Prompt constructed for AI multi-page analysis with design assets.',
           sourceFile: 'services/websiteCrawler.js',
           functionName: 'crawlWebsite()',
           steps: [
             'Combine homepage and additional page content',
-            'Format prompt for AI business analysis'
+            'Include design asset information in prompt context',
+            'Format prompt for AI business analysis with design awareness'
           ]
         },
         sourceFile: 'services/websiteCrawler.js',
@@ -772,6 +832,33 @@ async function crawlWebsite(websiteUrl, masterId = null) {
       try {
         const singlePageHtml = await fetchWebsiteHTML(websiteUrl);
         const cleanText = extractCleanText(singlePageHtml);
+        
+        // NEW: Extract design assets even in fallback mode (only if not already extracted)
+        let designAssets;
+        if (!global.designAssetsCache[urlCacheKey]) {
+          debugData.steps.push({
+            step: 'fallback_design_extraction_started',
+            timestamp: new Date().toISOString(),
+            logic: {
+              description: 'Extract design assets in fallback mode',
+              sourceFile: 'services/designExtractor.js',
+              functionName: 'extractDesignAssets()'
+            }
+          });
+          
+          designAssets = await extractDesignAssets(websiteUrl, singlePageHtml);
+          global.designAssetsCache[urlCacheKey] = designAssets;
+          
+          debugData.steps.push({
+            step: 'fallback_design_extraction_completed',
+            timestamp: new Date().toISOString(),
+            designAssets: designAssets
+          });
+        } else {
+          designAssets = global.designAssetsCache[urlCacheKey];
+          console.log('🎨 Using cached design assets in fallback mode');
+        }
+        
         const crawlPrompt = intelligence.mainCrawlPrompt(websiteUrl, cleanText);
         debugData.steps.push({
           step: 'single_page_prompt_prepared',
@@ -857,6 +944,25 @@ async function crawlWebsite(websiteUrl, masterId = null) {
       });
     }
     
+    // NEW: Add design assets to the extracted data
+    if (typeof designAssets !== 'undefined') {
+      extractedData.design_assets = designAssets;
+    } else {
+      // Try to extract design assets if not already done
+      try {
+        const homepageHtml = await fetchWebsiteHTML(websiteUrl);
+        const fallbackDesignAssets = await extractDesignAssets(websiteUrl, homepageHtml);
+        extractedData.design_assets = fallbackDesignAssets;
+      } catch (designError) {
+        extractedData.design_assets = {
+          extraction_metadata: {
+            extraction_method: 'failed',
+            error: designError.message
+          }
+        };
+      }
+    }
+    
     // Step 3: Add crawling metadata
     extractedData.pages_analyzed = crawlData.additionalPages ? 
       crawlData.additionalPages.filter(p => !p.error).length : 0;
@@ -867,6 +973,17 @@ async function crawlWebsite(websiteUrl, masterId = null) {
     if (crawlData.selectionStrategy) {
       extractedData.ai_selection_strategy = crawlData.selectionStrategy;
     }
+    
+    // NEW: Add design extraction metadata
+    extractedData.extraction_metadata = {
+      timestamp: new Date().toISOString(),
+      pages_analyzed: 1 + (crawlData.additionalPages?.length || 0),
+      pages_selected: crawlData.pagesSelected || 0,
+      external_pages_analyzed: crawlData.additionalPages ? crawlData.additionalPages.filter(p => p.isExternal && !p.error).length : 0,
+      total_content_length: crawlData.homepageContent.length + (crawlData.additionalPages ? crawlData.additionalPages.reduce((sum, page) => sum + (page.error ? 0 : page.contentLength), 0) : 0),
+      analysis_method: crawlData.analysisMethod,
+      design_extraction_status: extractedData.design_assets?.extraction_metadata?.extraction_method || 'unknown'
+    };
     
     // Collect final debug data
     debugData.finalResult = extractedData;
@@ -928,7 +1045,28 @@ async function crawlWebsite(websiteUrl, masterId = null) {
       global.crawlDebugData = debugData;
     }
     
-    return createFallbackData(websiteUrl, null, error.message);
+    // NEW: Try to extract design assets even if crawling failed (only if not already extracted)
+    const fallbackData = createFallbackData(websiteUrl, null, error.message);
+    if (!global.designAssetsCache[urlCacheKey]) {
+      try {
+        const homepageHtml = await fetchWebsiteHTML(websiteUrl);
+        const designAssets = await extractDesignAssets(websiteUrl, homepageHtml);
+        fallbackData.design_assets = designAssets;
+        global.designAssetsCache[urlCacheKey] = designAssets;
+      } catch (designError) {
+        fallbackData.design_assets = {
+          extraction_metadata: {
+            extraction_method: 'failed',
+            error: designError.message
+          }
+        };
+      }
+    } else {
+      fallbackData.design_assets = global.designAssetsCache[urlCacheKey];
+      console.log('🎨 Using cached design assets in error fallback');
+    }
+    
+    return fallbackData;
   }
 }
 
@@ -957,7 +1095,13 @@ function createFallbackData(websiteUrl, rawResponse = null, errorMessage = '') {
     pages_analyzed: 0,
     pages_selected: 0,
     external_pages_analyzed: 0,
-    total_content_length: 0
+    total_content_length: 0,
+    design_assets: {
+      extraction_metadata: {
+        extraction_method: 'not_attempted',
+        error: errorMessage
+      }
+    }
   };
   
   // If we have raw response, try to extract any useful information

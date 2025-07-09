@@ -1,0 +1,648 @@
+/* public/styles/designAssets.css */
+/* Styles for design assets display components */
+
+.design-assets-container {
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    border: 1px solid var(--border-light);
+}
+
+.design-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.design-header h3 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.extraction-info {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* Design Sections */
+.design-section {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+}
+
+.design-section h4 {
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    font-size: 1.2em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.design-section h5 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 1em;
+    font-weight: 500;
+}
+
+/* Color Palette Styles */
+.color-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.color-category {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.color-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.color-swatch {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.color-code {
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.color-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+/* Typography Styles */
+.typography-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.font-family {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.font-display {
+    font-size: 24px;
+    margin: 8px 0;
+    color: var(--text-primary);
+}
+
+.font-code {
+    background: #f5f5f5;
+    color: #666;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.google-fonts ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+
+.google-fonts li {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 6px 12px;
+    margin: 4px 0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.font-weights {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.weight-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.weight-tag {
+    background: #f0f0f0;
+    color: #555;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.typography-actions {
+    margin-top: 16px;
+}
+
+/* Logo Assets Styles */
+.logo-assets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.logo-asset {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.logo-preview {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 12px 0;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-image {
+    max-width: 100%;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.favicon-preview {
+    min-height: 60px;
+}
+
+.favicon-image {
+    max-width: 32px;
+    max-height: 32px;
+}
+
+.logo-info {
+    margin: 12px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.logo-info p {
+    margin: 4px 0;
+}
+
+.logo-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+/* Visual Elements Styles */
+.visual-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.design-pattern {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.pattern-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.radius-example {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    height: 40px;
+}
+
+.spacing-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.spacing-tag {
+    background: #e8f5e8;
+    color: #2e7d32;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Monaco', 'Consolas', monospace;
+}
+
+.layout-info {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.layout-tag {
+    background: #fff3e0;
+    color: #f57c00;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Content Voice Styles */
+.voice-analysis {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.voice-characteristics {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.voice-trait {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.voice-trait strong {
+    color: var(--text-primary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.trait-value {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.personality-traits {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.traits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.personality-tag {
+    background: #f3e5f5;
+    color: #7b1fa2;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.voice-examples {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.examples-list {
+    margin-top: 8px;
+}
+
+.voice-example {
+    background: #f5f5f5;
+    border-left: 4px solid var(--primary-color);
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-style: italic;
+    color: var(--text-primary);
+    border-radius: 0 4px 4px 0;
+}
+
+.brand-language {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.language-pattern {
+    margin: 12px 0;
+}
+
+.words-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.power-word {
+    background: #e1f5fe;
+    color: #0277bd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.voice-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+}
+
+/* Usage Instructions Styles */
+.usage-instructions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.usage-item {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.usage-item h5 {
+    color: var(--primary-color);
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.usage-item p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Button Styles */
+.copy-btn, .download-btn, .export-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.copy-btn:hover, .download-btn:hover, .export-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.download-btn {
+    background: #4caf50;
+}
+
+.download-btn:hover {
+    background: #388e3c;
+}
+
+.export-btn {
+    background: #ff9800;
+}
+
+.export-btn:hover {
+    background: #f57c00;
+}
+
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+    background: #4caf50;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .color-swatches {
+        justify-content: center;
+    }
+    
+    .color-swatch {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .logo-assets {
+        grid-template-columns: 1fr;
+    }
+    
+    .voice-characteristics {
+        grid-template-columns: 1fr;
+    }
+    
+    .usage-instructions {
+        grid-template-columns: 1fr;
+    }
+    
+    .color-actions, .voice-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* Simple Design Assets Display (for results.js displayDesignAssetsSimple function) */
+.design-assets-simple {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.design-assets-simple h3 {
+    margin: 0 0 20px 0;
+    color: #1e293b;
+    font-size: 1.25em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.design-assets-simple > div {
+    margin-bottom: 16px;
+}
+
+.design-assets-simple > div:last-child {
+    margin-bottom: 0;
+}
+
+.design-assets-simple strong {
+    color: #374151;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Color swatches for simple display */
+.design-assets-simple div[style*="display: flex"] {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.design-assets-simple div[style*="width: 40px"] {
+    position: relative;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.design-assets-simple div[style*="width: 40px"]:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Font lists for simple display */
+.design-assets-simple ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+}
+
+.design-assets-simple li {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.design-assets-simple li:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Logo display for simple display */
+.design-assets-simple img {
+    background: white;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 8px;
+    transition: all 0.2s ease;
+}
+
+.design-assets-simple img:hover {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+}
+
+.design-assets-simple img[alt="Company Logo"] {
+    max-width: 200px !important;
+    max-height: 80px !important;
+    object-fit: contain;
+}
+
+.design-assets-simple img[alt="Favicon"] {
+    width: 32px !important;
+    height: 32px !important;
+    object-fit: contain;
+}
