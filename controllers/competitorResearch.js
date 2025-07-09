@@ -1,16 +1,49 @@
+// ===== controllers/competitorResearch.js =====
+// FIXED VERSION - Lightweight previews + AI selection
+
 // Competitor research controller
 const { callClaudeAPI } = require('../services/ai');
 const { crawlHomepageOnly } = require('../services/websiteCrawler');
 const { searchBrave } = require('../services/webSearch');
 const { intelligence } = require('../prompts');
 const systemLogger = require('../services/systemLogger');
+const axios = require('axios');
 
 // Helper function to delay execution
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// ENHANCED: Perform competitor research with global search and better logging
+// Helper function to extract base URL
+function extractBaseUrl(fullUrl) {
+  try {
+    const url = new URL(fullUrl);
+    return `${url.protocol}//${url.hostname}`;
+  } catch (error) {
+    console.log(`⚠️ Invalid URL: ${fullUrl}`);
+    return fullUrl; // Return original if parsing fails
+  }
+}
+
+// LIGHTWEIGHT preview function (not full content extraction)
+function generateLightweightPreview(htmlContent) {
+  try {
+    // Simple text extraction without heavy processing
+    let text = htmlContent
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove scripts
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')   // Remove styles
+      .replace(/<[^>]+>/g, ' ')                          // Remove HTML tags
+      .replace(/\s+/g, ' ')                              // Normalize whitespace
+      .trim();
+    
+    // Get first 500 characters
+    return text.substring(0, 500);
+  } catch (error) {
+    return 'Preview generation failed';
+  }
+}
+
+// ENHANCED: Perform competitor research with three-step processing
 async function performCompetitorResearch(competitorQueries, businessContext, masterId = null, businessPrompt = null, businessAiResponse = null) {
   // Initialize global debug data
   global.competitorDebugData = {
@@ -63,66 +96,45 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
   };
   
   if (masterId) systemLogger.logStep(masterId, {
-    step: 'Competitor research: started',
+    step: 'Competitor research: started enhanced three-step processing',
     competitorQueries,
     searchScope: 'Global (Country Neutral)',
-    logic: 'Begin competitor research with provided queries using global search.',
-    next: 'Run global web search for each query.'
+    logic: 'Begin enhanced competitor research with three-step processing: Enhanced search → Lightweight previews → AI selection → Crawl selected.',
+    next: 'Execute enhanced global search with 10 results per query.'
   });
-  
+
   try {
-    console.log('🔍 Starting competitor research with queries:', competitorQueries);
-    console.log('🌐 Using global search (country neutral)');
-    console.log('⏱️ Using sequential requests to respect API rate limits...');
-    
-    // STEP 1: Search for competitors using sequential requests (1 request per second)
+    // =============================================================================
+    // STEP 1: Enhanced search with 10 results per query (was 3)
+    // =============================================================================
+    console.log('🔍 STEP 1: Enhanced search with 10 results per query...');
     const searchResults = [];
     
     for (let i = 0; i < competitorQueries.length; i++) {
       const query = competitorQueries[i];
-      if (masterId) systemLogger.logStep(masterId, {
-        step: 'Competitor research: executing global search',
-        query,
-        index: i,
-        searchScope: 'Global',
-        logic: 'Run global web search for competitor discovery.',
-        next: 'Store search results.'
-      });
-      console.log(`🔍 Executing global search ${i + 1}/${competitorQueries.length}: ${query}`);
-      
       try {
-        const result = await searchBrave(query, 3);
-        searchResults.push(result);
-        console.log(`✅ Global search ${i + 1} completed successfully`);
-        
-        // Store search result in debug data
-        global.competitorDebugData.searchResults.push({
-          step: 'global_web_search',
-          timestamp: new Date().toISOString(),
-          query: query,
-          queryIndex: i,
-          result: result,
+        if (masterId) systemLogger.logStep(masterId, {
+          step: 'Competitor research: enhanced global search',
+          query,
+          searchCount: 10, // Enhanced from 3 to 10
           searchScope: 'Global (Country Neutral)',
-          logic: {
-            description: 'Global web search for competitor discovery',
-            sourceFile: 'services/webSearch.js',
-            functionName: 'searchBrave()',
-            steps: [
-              'Send query to Brave Search API without country restriction',
-              'Request 3 results per query for global coverage',
-              'Handle rate limiting with 1.1s delays',
-              'Store search results for URL extraction'
-            ]
-          }
+          logic: 'Execute global search with increased result count for better competitor discovery.',
+          next: 'Process search results.'
         });
         
+        console.log(`🌐 Enhanced Global Search ${i + 1}/${competitorQueries.length}: "${query}" (10 results)`);
+        const searchResult = await searchBrave(query, 10); // Enhanced: was 3, now 10
+        searchResults.push(searchResult);
+        
+        console.log(`✅ Enhanced search ${i + 1} completed: ${searchResult.web?.results?.length || 0} results found`);
+        
         if (masterId) systemLogger.logStep(masterId, {
-          step: 'Competitor research: global search completed',
+          step: 'Competitor research: enhanced search result',
           query,
-          result,
+          resultsFound: searchResult.web?.results?.length || 0,
           searchScope: 'Global',
-          logic: 'Global search completed successfully.',
-          next: 'Continue to next query or extract competitor URLs.'
+          logic: 'Enhanced search completed with increased result count.',
+          next: 'Continue to next query or process URLs.'
         });
         
         // Add delay between requests (1.1 seconds to be safe with 1 req/sec limit)
@@ -132,16 +144,16 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         }
         
       } catch (searchError) {
-        console.error(`❌ Global search ${i + 1} failed:`, searchError.message);
+        console.error(`❌ Enhanced Global search ${i + 1} failed:`, searchError.message);
         // Add empty result for failed search
         searchResults.push({ web: { results: [] } });
         
         if (masterId) systemLogger.logStep(masterId, {
-          step: 'Competitor research: global search failed',
+          step: 'Competitor research: enhanced search failed',
           query,
           error: searchError.message,
           searchScope: 'Global',
-          logic: 'Global search failed, storing empty result.',
+          logic: 'Enhanced search failed, storing empty result.',
           next: 'Continue to next query.'
         });
         
@@ -152,66 +164,254 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         }
       }
     }
-    
-    // STEP 2: Extract competitor URLs (top 3 from each query = max 6 competitors)
-    const competitorUrls = [];
+
+    // =============================================================================
+    // STEP 2: Lightweight URL processing with base URL extraction and quick previews
+    // =============================================================================
+    console.log('🔄 STEP 2: Processing competitor URLs with LIGHTWEIGHT logic...');
+
+    // Step 2a: Extract all URLs and convert to base URLs
+    const rawCompetitorCandidates = [];
     searchResults.forEach((result, queryIndex) => {
       if (result.web && result.web.results) {
         result.web.results.forEach((webResult, resultIndex) => {
-          if (competitorUrls.length < 6) { // Limit to 6 total competitors
-            competitorUrls.push({
-              url: webResult.url,
-              title: webResult.title,
-              description: webResult.description,
-              query_source: `Query ${queryIndex + 1}`,
-              rank: resultIndex + 1,
-              search_scope: 'Global'
-            });
-          }
+          const baseUrl = extractBaseUrl(webResult.url);
+          rawCompetitorCandidates.push({
+            baseUrl: baseUrl,
+            originalUrl: webResult.url,
+            title: webResult.title,
+            description: webResult.description,
+            query_source: `Query ${queryIndex + 1}`,
+            rank: resultIndex + 1,
+            search_scope: 'Global'
+          });
         });
       }
     });
-    
-    console.log(`📊 Found ${competitorUrls.length} potential competitors to analyze (Global search)`);
-    
-    // Store URL extraction in debug data
-    global.competitorDebugData.competitorUrls = competitorUrls;
+
+    console.log(`📊 Raw candidates from search: ${rawCompetitorCandidates.length} URLs`);
+
+    // Step 2b: Deduplicate by base URL (keep first occurrence)
+    const uniqueCompetitors = [];
+    const seenBaseUrls = new Set();
+
+    rawCompetitorCandidates.forEach(candidate => {
+      if (!seenBaseUrls.has(candidate.baseUrl)) {
+        seenBaseUrls.add(candidate.baseUrl);
+        uniqueCompetitors.push(candidate);
+      }
+    });
+
+    console.log(`🔄 After deduplication: ${uniqueCompetitors.length} unique URLs`);
+
+    // Step 2c: LIGHTWEIGHT preview generation (quick fetch only)
+    const candidatesWithPreviews = [];
+
+    for (const candidate of uniqueCompetitors) {
+      try {
+        console.log(`🔍 Quick preview generation: ${candidate.baseUrl}`);
+        
+        // LIGHTWEIGHT fetch (no full content extraction)
+        const response = await axios.get(candidate.baseUrl, {
+          timeout: 5000, // Shorter timeout for quick preview
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+          }
+        });
+        
+        // LIGHTWEIGHT preview generation (not full content extraction)
+        const preview = generateLightweightPreview(response.data);
+        
+        // Only keep if we got meaningful content
+        if (preview.length > 50) {
+          candidatesWithPreviews.push({
+            url: candidate.baseUrl,
+            title: candidate.title,
+            description: candidate.description,
+            query_source: candidate.query_source,
+            rank: candidate.rank,
+            search_scope: candidate.search_scope,
+            preview: preview,
+            originalUrl: candidate.originalUrl
+          });
+          console.log(`✅ Preview generated: ${candidate.baseUrl} (${preview.length} chars)`);
+        } else {
+          console.log(`❌ Insufficient content: ${candidate.baseUrl}`);
+        }
+        
+      } catch (error) {
+        console.log(`❌ Preview failed: ${candidate.baseUrl} - ${error.message}`);
+        // Skip this URL completely
+      }
+    }
+
+    console.log(`📊 Candidates with previews: ${candidatesWithPreviews.length}/${uniqueCompetitors.length}`);
+
+    // =============================================================================
+    // STEP 3: AI selection of best candidates (max 5 for crawling)
+    // =============================================================================
+    console.log('🤖 STEP 3: AI selection of best competitors...');
+
+    let selectedCompetitors = candidatesWithPreviews;
+
+    if (candidatesWithPreviews.length > 0) {
+      try {
+        const competitorSelectionPrompt = `You are analyzing potential competitors for this business:
+
+BUSINESS CONTEXT:
+${JSON.stringify(businessContext, null, 2)}
+
+CANDIDATE COMPETITORS (with previews):
+${JSON.stringify(candidatesWithPreviews.map(comp => ({
+  baseUrl: comp.url,
+  title: comp.title,
+  description: comp.description,
+  preview: comp.preview,
+  querySource: comp.query_source
+})), null, 2)}
+
+Your task:
+1. Identify which candidates are actual DIRECT competitors (exclude review sites, blogs, unrelated companies)
+2. Rank them from most relevant to least relevant  
+3. Return MAXIMUM 5 competitors in order of decreasing relevance
+4. Only exclude if clearly NOT a competitor
+
+RESPOND WITH JSON ONLY:
+{
+  "selected_competitors": [
+    {
+      "baseUrl": "https://competitor.com",
+      "relevanceScore": 95,
+      "relevanceReason": "Direct competitor in same category",
+      "isDirectCompetitor": true
+    }
+  ],
+  "total_selected": 3
+}`;
+
+        console.log('🔄 Requesting AI competitor selection...');
+        const aiSelectionResponse = await callClaudeAPI(competitorSelectionPrompt, false, masterId, 'AI: Competitor Selection');
+        
+        // Parse AI response
+        let selectionData;
+        try {
+          const jsonMatch = aiSelectionResponse.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            selectionData = JSON.parse(jsonMatch[0]);
+            
+            // Map AI results back to our URL format
+            selectedCompetitors = selectionData.selected_competitors.map(aiComp => {
+              const originalComp = candidatesWithPreviews.find(comp => comp.url === aiComp.baseUrl);
+              return {
+                ...originalComp,
+                relevanceScore: aiComp.relevanceScore,
+                relevanceReason: aiComp.relevanceReason,
+                aiSelected: true
+              };
+            }).slice(0, 5); // Ensure max 5
+            
+            console.log(`🎯 AI selected: ${candidatesWithPreviews.length} → ${selectedCompetitors.length} competitors for crawling`);
+            
+            // Store AI selection in debug data
+            global.competitorDebugData.aiSelection = {
+              step: 'ai_competitor_selection',
+              timestamp: new Date().toISOString(),
+              inputCandidates: candidatesWithPreviews.length,
+              outputSelected: selectedCompetitors.length,
+              prompt: competitorSelectionPrompt,
+              response: aiSelectionResponse,
+              logic: {
+                description: 'AI selection of best competitors for full crawling',
+                sourceFile: 'controllers/competitorResearch.js',
+                functionName: 'performCompetitorResearch() - AI selection',
+                steps: [
+                  'Send candidates with lightweight previews to AI',
+                  'AI identifies direct competitors vs review sites/blogs',
+                  'AI ranks competitors by relevance to business',
+                  'Return maximum 5 competitors for full crawling',
+                  'Map AI results back to original URL format'
+                ]
+              }
+            };
+            
+            if (masterId) systemLogger.logStep(masterId, {
+              step: 'Competitor research: AI selection complete',
+              inputCount: candidatesWithPreviews.length,
+              outputCount: selectedCompetitors.length,
+              logic: 'AI successfully selected best competitors for crawling.',
+              next: 'Proceed to crawl selected competitors.'
+            });
+            
+          } else {
+            throw new Error('No JSON found in AI selection response');
+          }
+        } catch (parseError) {
+          console.log('⚠️ AI selection parse failed, using top candidates');
+          selectedCompetitors = candidatesWithPreviews.slice(0, 5); // Just take first 5
+        }
+        
+      } catch (aiError) {
+        console.log('⚠️ AI selection failed, using top candidates:', aiError.message);
+        selectedCompetitors = candidatesWithPreviews.slice(0, 5); // Just take first 5
+      }
+    } else {
+      console.log('⚠️ No candidates available for AI selection');
+    }
+
+    // Enhanced debug data
+    global.competitorDebugData.competitorUrls = selectedCompetitors;
     global.competitorDebugData.urlExtraction = {
-      step: 'url_extraction',
+      step: 'enhanced_three_step_processing',
       timestamp: new Date().toISOString(),
-      totalUrlsFound: competitorUrls.length,
-      searchScope: 'Global (Country Neutral)',
+      step1_enhanced_search: {
+        resultsPerQuery: 10,
+        totalRawUrls: rawCompetitorCandidates.length,
+        searchScope: 'Global (Country Neutral)'
+      },
+      step2_lightweight_processing: {
+        uniqueUrls: uniqueCompetitors.length,
+        previewsGenerated: candidatesWithPreviews.length,
+        method: 'lightweight_preview_generation'
+      },
+      step3_ai_selection: {
+        inputCandidates: candidatesWithPreviews.length,
+        selectedForCrawling: selectedCompetitors.length,
+        maxAllowed: 5,
+        selectionMethod: 'AI relevance ranking'
+      },
       urlsByQuery: searchResults.map((result, index) => ({
         queryIndex: index,
         urlsFound: result.web?.results?.length || 0
       })),
       logic: {
-        description: 'Extract competitor URLs from global search results',
+        description: 'Three-step enhanced competitor discovery: Enhanced search → Lightweight previews → AI selection → Full crawl',
         sourceFile: 'controllers/competitorResearch.js',
-        functionName: 'performCompetitorResearch() - URL extraction',
+        functionName: 'performCompetitorResearch() - three-step processing',
         steps: [
-          'Process each global search result',
-          'Extract top 3 results from each query',
-          'Limit to maximum 6 total competitors',
-          'Store URL, title, description, and metadata',
-          'Track query source and ranking information'
+          'STEP 1: Enhanced search with 10 results per query',
+          'STEP 2: Extract base URLs, deduplicate, generate lightweight previews',
+          'STEP 3: AI selection of best 5 competitors for full crawling',
+          'STEP 4: Full crawl only the AI-selected competitors'
         ]
       }
     };
-    
+
     if (masterId) systemLogger.logStep(masterId, {
-      step: 'Competitor research: extracted competitor URLs',
-      competitorUrls,
+      step: 'Competitor research: three-step processing complete',
+      step1_rawUrls: rawCompetitorCandidates.length,
+      step2_previewsGenerated: candidatesWithPreviews.length,
+      step3_selectedForCrawling: selectedCompetitors.length,
       searchScope: 'Global',
-      logic: 'Extracted up to 6 competitor URLs from global search results.',
-      next: 'Crawl competitor homepages.'
+      logic: 'Three-step enhanced competitor discovery completed: Enhanced search → Lightweight previews → AI selection.',
+      next: 'Proceed to full crawl of AI-selected competitors.'
     });
-    
-    if (competitorUrls.length === 0) {
+
+    // Continue with existing logic from here - but use selectedCompetitors
+    if (selectedCompetitors.length === 0) {
       if (masterId) systemLogger.logStep(masterId, {
-        step: 'Competitor research: no competitors found',
+        step: 'Competitor research: no competitors selected',
         searchScope: 'Global',
-        logic: 'No competitors found in global search results.',
+        logic: 'No relevant competitors selected after three-step processing.',
         next: 'Return empty competitor intelligence.'
       });
       return {
@@ -223,7 +423,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         competitive_insights: {
           market_gaps: [],
           common_features: [],
-          pricing_landscape: "No competitor data available",
+          pricing_landscape: "No relevant competitor data available",
           positioning_opportunities: []
         },
         differentiation_opportunities: [],
@@ -232,15 +432,18 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           content_gaps_to_exploit: [],
           messaging_opportunities: []
         },
-        analysis_note: "No competitors found in global search results"
+        analysis_note: "No relevant competitors selected after enhanced three-step processing"
       };
     }
     
-    // STEP 3: Crawl competitor homepages (simple and fast)
+    // =============================================================================
+    // STEP 4: Full crawl of ONLY the AI-selected competitors
+    // =============================================================================
+    console.log(`🏠 STEP 4: Full crawl of ${selectedCompetitors.length} AI-selected competitors...`);
     const competitorCrawlResults = [];
     const crawledUrls = new Set(); // Track crawled URLs to prevent duplicates
     
-    for (const competitor of competitorUrls) {
+    for (const competitor of selectedCompetitors) {
       // Skip if URL already crawled (prevent duplicates)
       if (crawledUrls.has(competitor.url)) {
         console.log(`⏭️ Skipping duplicate URL: ${competitor.url}`);
@@ -250,26 +453,28 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
       
       try {
         if (masterId) systemLogger.logStep(masterId, {
-          step: 'Competitor research: crawling competitor homepage',
+          step: 'Competitor research: crawling selected competitor',
           competitor,
-          logic: 'Crawl homepage of competitor for data extraction.',
+          logic: 'Full crawl of AI-selected competitor homepage.',
           next: 'Extract and store crawl data.'
         });
-        console.log(`🏠 Crawling competitor homepage: ${competitor.title} (${competitor.url})`);
+        console.log(`🏠 Full crawling competitor: ${competitor.title} (${competitor.url})`);
         const crawledData = await crawlHomepageOnly(competitor.url);
         competitorCrawlResults.push({
           search_info: competitor,
           crawled_data: crawledData
         });
-        console.log(`✅ Successfully crawled homepage: ${crawledData.company_name || competitor.title}`);
+        console.log(`✅ Successfully crawled: ${crawledData.company_name || competitor.title}`);
         
         // Store crawl result in debug data
         global.competitorDebugData.crawlResults.push({
-          step: 'competitor_homepage_crawl',
+          step: 'selected_competitor_full_crawl',
           timestamp: new Date().toISOString(),
           websiteUrl: competitor.url,
           companyName: crawledData.company_name || competitor.title,
           searchScope: 'Global',
+          aiSelected: true,
+          relevanceScore: competitor.relevanceScore,
           rawData: {
             originalHtmlLength: crawledData.original_html?.length || 0,
             cleanTextLength: crawledData.clean_text?.length || 0,
@@ -279,17 +484,17 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           processedData: crawledData,
           aiInteraction: crawledData.aiInteraction || null,
           logic: {
-            description: 'Crawl competitor homepage for business intelligence',
+            description: 'Full crawl of AI-selected competitor homepage',
             sourceFile: 'services/websiteCrawler.js',
             functionName: 'crawlHomepageOnly()',
             steps: [
               'Fetch homepage HTML content',
-              'Extract and clean text content',
+              'Extract and clean text content (full process)',
               'Identify company name and business description',
               'Store structured business data'
             ],
-            crawlingMethod: 'Homepage-only crawl with content extraction',
-            contentProcessing: 'Text cleaning, company identification, business data extraction'
+            crawlingMethod: 'Full homepage crawl with complete content extraction',
+            contentProcessing: 'Full text cleaning, company identification, business data extraction'
           }
         });
         
@@ -297,8 +502,8 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           step: 'Competitor research: crawl success',
           competitor,
           crawledData,
-          logic: 'Successfully crawled competitor homepage.',
-          next: 'Continue to next competitor.'
+          logic: 'Successfully crawled AI-selected competitor.',
+          next: 'Continue to next selected competitor.'
         });
         
         // Add small delay between crawls to be respectful to competitor sites
@@ -315,14 +520,15 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         
         // Store failed crawl in debug data
         global.competitorDebugData.crawlResults.push({
-          step: 'competitor_homepage_crawl',
+          step: 'selected_competitor_full_crawl',
           timestamp: new Date().toISOString(),
           websiteUrl: competitor.url,
           companyName: competitor.title,
           searchScope: 'Global',
+          aiSelected: true,
           error: crawlError.message,
           logic: {
-            description: 'Crawl competitor homepage for business intelligence',
+            description: 'Full crawl of AI-selected competitor homepage',
             sourceFile: 'services/websiteCrawler.js',
             functionName: 'crawlHomepageOnly()',
             steps: [
@@ -331,8 +537,8 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
               'Identify company name and business description',
               'Store structured business data'
             ],
-            crawlingMethod: 'Homepage-only crawl with content extraction',
-            contentProcessing: 'Text cleaning, company identification, business data extraction'
+            crawlingMethod: 'Full homepage crawl with complete content extraction',
+            contentProcessing: 'Full text cleaning, company identification, business data extraction'
           }
         });
         
@@ -340,13 +546,15 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
           step: 'Competitor research: crawl failed',
           competitor,
           error: crawlError.message,
-          logic: 'Failed to crawl competitor homepage.',
-          next: 'Continue to next competitor.'
+          logic: 'Failed to crawl AI-selected competitor.',
+          next: 'Continue to next selected competitor.'
         });
       }
     }
     
-    // STEP 4: AI analysis of competitor data
+    // =============================================================================
+    // STEP 5: AI analysis of competitor data (EXISTING LOGIC - NO CHANGES)
+    // =============================================================================
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: analyzing competitor data with AI',
       competitorCrawlResults,
@@ -377,11 +585,11 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
         description: 'AI prompt for comprehensive competitor intelligence analysis'
       },
       logic: {
-        description: 'Final AI analysis of all competitor data from global search',
+        description: 'Final AI analysis of all competitor data from AI-selected competitors',
         sourceFile: 'controllers/competitorResearch.js',
         functionName: 'performCompetitorResearch() - final analysis',
         steps: [
-          'Combine all crawled competitor data from global search',
+          'Combine all crawled competitor data from AI-selected competitors',
           'Create comprehensive analysis prompt',
           'Send to AI for competitor intelligence generation',
           'Parse AI response to extract structured insights',
@@ -415,14 +623,14 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
       next: 'Parse AI response.'
     });
     
-    // Parse competitor analysis
+    // Parse competitor analysis (EXISTING LOGIC - NO CHANGES)
     let competitorAnalysis;
     try {
       const jsonMatch = competitorAnalysisResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         competitorAnalysis = JSON.parse(jsonMatch[0]);
         competitorAnalysis.discovery_queries_used = competitorQueries;
-        competitorAnalysis.competitors_found = competitorUrls.length;
+        competitorAnalysis.competitors_found = selectedCompetitors.length;
         competitorAnalysis.search_scope = 'Global (Country Neutral)';
         
         if (masterId) systemLogger.logStep(masterId, {
@@ -445,7 +653,7 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
       });
       return {
         discovery_queries_used: competitorQueries,
-        competitors_found: competitorUrls.length,
+        competitors_found: selectedCompetitors.length,
         competitors_selected: 0,
         search_scope: 'Global (Country Neutral)',
         competitor_analysis: [],
@@ -469,21 +677,24 @@ async function performCompetitorResearch(competitorQueries, businessContext, mas
     global.competitorDebugData.finalResult = competitorAnalysis;
     global.competitorDebugData.summary = {
       queriesExecuted: competitorQueries.length,
-      competitorsFound: competitorUrls.length,
+      candidatesFound: rawCompetitorCandidates.length,
+      uniqueUrls: uniqueCompetitors.length,
+      previewsGenerated: candidatesWithPreviews.length,
+      competitorsSelected: selectedCompetitors.length,
       competitorsCrawled: competitorCrawlResults.length,
       successfulCrawls: competitorCrawlResults.filter(c => !c.error).length,
       failedCrawls: competitorCrawlResults.filter(c => c.error).length,
       aiInteractions: global.competitorDebugData.aiInteractions.length,
       totalSearchResults: searchResults.length,
       searchScope: 'Global (Country Neutral)',
-      analysisMethod: 'sequential_search_and_crawl_global'
+      analysisMethod: 'enhanced_four_step_processing_with_ai_selection'
     };
     
     if (masterId) systemLogger.logStep(masterId, {
       step: 'Competitor research: complete',
       competitorAnalysis,
       searchScope: 'Global',
-      logic: 'Final competitor intelligence ready from global search.',
+      logic: 'Final competitor intelligence ready from enhanced four-step processing with AI selection.',
       next: 'Return to business profile flow.'
     });
     
