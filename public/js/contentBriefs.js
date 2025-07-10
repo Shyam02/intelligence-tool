@@ -1,5 +1,6 @@
-// Strategic content briefs generation and display - creates strategic planning documents
-// Generate content briefs from selected articles
+// public/js/contentBriefs.js - ENHANCED with better loading states for content fetching
+
+// Generate content briefs from selected articles - ENHANCED loading messages
 async function generateContentBriefs() {
     const selectedArticles = window.appState.searchResults.filter(article => article.selected);
     
@@ -10,15 +11,25 @@ async function generateContentBriefs() {
     
     const generateBtn = document.querySelector('.content-brief-btn');
     const originalText = generateBtn.textContent;
-    generateBtn.textContent = '⏳ Generating Content Briefs...';
+    
+    // ENHANCED: More specific loading messages
     generateBtn.disabled = true;
     
     try {
+        // Phase 1: Indicate content fetching
+        generateBtn.textContent = `🔍 Fetching full content for ${selectedArticles.length} articles...`;
+        console.log('Starting content briefs generation with full content fetching...');
+        
         // Prepare comprehensive business context from clean data sources
         const businessContext = createBusinessContext();
         
         console.log('Generating strategic content briefs for', selectedArticles.length, 'articles');
         console.log('Business context:', businessContext);
+
+        // Phase 2: Indicate AI processing (this will include content fetching in backend)
+        setTimeout(() => {
+            generateBtn.textContent = '🧠 Analyzing full content and generating strategic briefs...';
+        }, 2000);
 
         const strategicBriefs = await generateContentBriefsFromAPI(selectedArticles, businessContext);
         console.log('Strategic content briefs received:', strategicBriefs);
@@ -33,7 +44,7 @@ async function generateContentBriefs() {
         // Update empty states
         updateEmptyStates();
         
-        console.log('✅ Strategic content briefs generated and content briefs tab activated');
+        console.log('✅ Strategic content briefs generated with full article content');
         
     } catch (error) {
         console.error('Error generating content briefs:', error);
@@ -44,7 +55,7 @@ async function generateContentBriefs() {
     }
 }
 
-// Create comprehensive business context from clean data sources
+// Create comprehensive business context from clean data sources (UNCHANGED)
 function createBusinessContext() {
     const userInput = window.appState.userInput || {};
     const websiteIntelligence = window.appState.websiteIntelligence || {};
@@ -94,6 +105,7 @@ function createBusinessContext() {
     return businessContext;
 }
 
+// Display content briefs (UNCHANGED)
 function displayContentBriefs(briefsData) {
     let briefsContainer = document.getElementById('contentBriefs');
     if (!briefsContainer) {
@@ -124,11 +136,18 @@ function displayContentBriefs(briefsData) {
     markTabCompleted('contentBriefs');
 
     console.log('✅ Strategic content briefs displayed:', briefsData.total_briefs, 'briefs');
-}
     
+    // ENHANCEMENT: Log content fetching success if available
+    if (briefsData.content_analysis_summary) {
+        console.log('📊 Content Analysis Summary:', {
+            articlesWithFullContent: briefsData.content_analysis_summary.articles_with_full_content_used,
+            specificInsights: briefsData.content_analysis_summary.specific_insights_identified,
+            highQualityOpportunities: briefsData.content_analysis_summary.high_quality_opportunities
+        });
+    }
+}
 
-
-// Extract strategic briefs for content generation
+// Extract strategic briefs for content generation (UNCHANGED)
 function extractStrategicBriefsFromCurrentDisplay() {
     if (!window.appState.strategicBriefs) {
         console.error('No strategic briefs available in app state');
@@ -157,5 +176,5 @@ function extractStrategicBriefsFromCurrentDisplay() {
 // Explicitly make function available globally
 if (typeof window !== 'undefined') {
     window.generateContentBriefs = generateContentBriefs;
-    console.log('✅ generateContentBriefs function made available globally');
+    console.log('✅ generateContentBriefs function made available globally with enhanced content fetching');
 }

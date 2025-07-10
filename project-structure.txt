@@ -30,8 +30,6 @@
 │   └── reddit
 │       └── queryGeneration.js
 ├── public
-│   ├── assets
-│   │   └── instaphoto_ai
 │   ├── index.html
 │   ├── js
 │   │   ├── api.js
@@ -78,4 +76,4 @@
     ├── webSearch.js
     └── websiteCrawler.js
 
-15 directories, 64 files
+13 directories, 64 files
