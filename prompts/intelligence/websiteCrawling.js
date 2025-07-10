@@ -84,23 +84,12 @@ Respond with ONLY the JSON object, no additional text or explanation.`;
 };
 
 const multiPageAnalysisPrompt = (websiteUrl, combinedContent, crawlData, designAssets = null) => {
-  const designContext = designAssets ? `
 
-DESIGN ASSETS EXTRACTED:
-- Color Palette: ${designAssets.color_palette?.primary_colors?.length || 0} primary colors identified
-- Typography: ${designAssets.typography?.primary_font_family || 'Not extracted'}
-- Logo Assets: ${designAssets.logo_assets?.main_logo ? 'Main logo identified and stored' : 'No logo identified'}
-- Visual Elements: ${Object.keys(designAssets.visual_elements || {}).length} design patterns extracted
-
-Use this design information to inform the brand personality and visual identity analysis.` : '';
 
   return `Analyze the following comprehensive website content and extract detailed business information. This analysis includes the homepage plus ${crawlData.additionalPages.length} additional pages selected for maximum business intelligence value.
 
 Website URL: ${websiteUrl}
-Analysis Method: ${crawlData.analysisMethod}
-Pages Analyzed: ${1 + crawlData.additionalPages.length}
-Pages Selected by AI: ${crawlData.pagesSelected || 0}
-External Domains Included: ${crawlData.additionalPages.filter(p => p.isExternal && !p.error).length}${designContext}
+
 
 COMPREHENSIVE WEBSITE CONTENT:
 ${combinedContent}

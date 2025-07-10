@@ -269,7 +269,7 @@ function collectFormDebugData() {
     };
 }
 
-// Website Crawl Debug Functions
+// Website Crawl Debug Functions - DETAILED DEBUGGING VERSION
 function refreshWebsiteCrawlDebug() {
     const crawlData = collectWebsiteCrawlDebugData();
     const output = document.getElementById('websiteCrawlDebugOutput');
@@ -281,381 +281,573 @@ function refreshWebsiteCrawlDebug() {
     
     let html = '<div class="debug-detailed-section">';
     
-    // Basic info
-    html += `<h4>🌐 Website Crawl Debug - Complete Details</h4>`;
+    // Header with basic info
+    html += `<h4>🌐 Website Crawl Debug - Complete Detailed Logs</h4>`;
     html += `<p><strong>URL:</strong> ${crawlData.websiteUrl}</p>`;
-    html += `<p><strong>Crawl Started:</strong> ${crawlData.crawlTimestamp}</p>`;
+    html += `<p><strong>Started:</strong> ${crawlData.crawlTimestamp}</p>`;
     html += `<p><strong>Debug Generated:</strong> ${crawlData.timestamp}</p>`;
     
-    // Steps
-    if (crawlData.steps && crawlData.steps.length > 0) {
-        html += '<h5>📋 Crawling Steps:</h5>';
-        html += '<div class="debug-steps-detailed">';
-        crawlData.steps.forEach((step, index) => {
-            html += `<div class="debug-step-detailed">
-                <strong>${index + 1}. ${step.step}</strong>
-                <span class="timestamp">${step.timestamp}</span>`;
-            // Show all fields except step/timestamp/sourceFile/functionName inline
-            Object.keys(step).forEach(key => {
-                if (["step", "timestamp", "sourceFile", "functionName"].includes(key)) return;
-                const value = step[key];
-                if (value === undefined || value === null) return;
-                if (typeof value === "string" && value.length > 200) {
-                    html += `<details><summary>${key}</summary><pre class="step-data">${value}</pre></details>`;
-                } else if (typeof value === "object") {
-                    html += `<details><summary>${key}</summary><pre class="step-data">${JSON.stringify(value, null, 2)}</pre></details>`;
-                } else {
-                    html += `<div><strong>${key}:</strong> ${value}</div>`;
-                }
-            });
-            // Show logic/source info if present
-            if (step.logic) {
-                html += '<details><summary>Logic</summary>';
-                if (typeof step.logic === 'object') {
-                    if (step.logic.description) html += `<div><strong>Description:</strong> ${step.logic.description}</div>`;
-                    if (step.logic.sourceFile) html += `<div><strong>Source:</strong> <code>${step.logic.sourceFile}</code></div>`;
-                    if (step.logic.functionName) html += `<div><strong>Function:</strong> <code>${step.logic.functionName}</code></div>`;
-                    if (step.logic.steps && Array.isArray(step.logic.steps)) {
-                        html += '<div><strong>Steps:</strong><ul>';
-                        step.logic.steps.forEach(lstep => html += `<li>${lstep}</li>`);
-                        html += '</ul></div>';
-                    }
-                } else {
-                    html += `<pre>${JSON.stringify(step.logic, null, 2)}</pre>`;
-                }
-                html += '</details>';
-            }
-            if (step.sourceFile || step.functionName) {
-                html += '<div class="debug-step-source">';
-                if (step.sourceFile) html += `<span><strong>Source:</strong> <code>${step.sourceFile}</code></span> `;
-                if (step.functionName) html += `<span><strong>Function:</strong> <code>${step.functionName}</code></span>`;
-                html += '</div>';
-            }
-            html += '</div>';
-        });
-        html += '</div>';
+    // =================================================================
+    // PHASE 1: SETUP & INITIALIZATION
+    // =================================================================
+    html += '<div class="debug-steps-detailed">';
+    html += '<h5>🚀 PHASE 1: Setup & Initialization</h5>';
+    html += '<div class="debug-step-detailed">';
+    html += `<p><strong>Type:</strong> ❌ No AI Interaction</p>`;
+    
+    const setupStep = crawlData.steps?.find(s => s.step === 'crawl_started');
+    if (setupStep) {
+        html += `<p><strong>Timestamp:</strong> ${setupStep.timestamp}</p>`;
+        html += `<p><strong>Source:</strong> <code>services/websiteCrawler.js</code> → <code>crawlWebsite()</code></p>`;
     }
     
-    // Homepage Analysis - Link Extraction and Filtering
+    html += '<div class="debug-logic">';
+    html += '<p><strong>Setup Operations:</strong></p>';
+    html += '<ul>';
+    html += '<li><code>cleanupDesignAssets(companyIdentifier)</code> - Clean old assets</li>';
+    html += '<li><code>global.designAssetsCache[urlCacheKey] = null</code> - Reset cache</li>';
+    html += '<li><code>debugData = { timestamp, websiteUrl, steps: [], ... }</code> - Initialize debug collection</li>';
+    html += '</ul>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    // =================================================================
+    // PHASE 2: HOMEPAGE ANALYSIS & LINK EXTRACTION
+    // =================================================================
     if (crawlData.homepageAnalysis) {
-        html += '<h5>🏠 Homepage Analysis & Link Extraction:</h5>';
         html += '<div class="debug-homepage-detailed">';
-        html += `<p><strong>Step:</strong> ${crawlData.homepageAnalysis.step}</p>`;
+        html += '<h5>📄 PHASE 2: Homepage Analysis & Link Extraction</h5>';
+        html += '<div class="debug-step-detailed">';
+        html += `<p><strong>Type:</strong> ❌ No AI Interaction</p>`;
         html += `<p><strong>Timestamp:</strong> ${crawlData.homepageAnalysis.timestamp}</p>`;
+        html += `<p><strong>Source:</strong> <code>services/websiteCrawler.js</code> → <code>fetchMultiplePages()</code></p>`;
         
-        // Display the logic details first
-        if (crawlData.homepageAnalysis.logic) {
-            html += '<h6>🔧 Processing Logic:</h6>';
-            
-            // Text Cleaning Logic
-            if (crawlData.homepageAnalysis.logic.textCleaning) {
-                html += '<details><summary>📝 Text Cleaning Logic</summary>';
-                html += `<p><strong>Description:</strong> ${crawlData.homepageAnalysis.logic.textCleaning.description}</p>`;
-                html += `<p><strong>Source:</strong> <code>${crawlData.homepageAnalysis.logic.textCleaning.sourceFile}</code> - <code>${crawlData.homepageAnalysis.logic.textCleaning.functionName}</code></p>`;
-                html += '<p><strong>Steps:</strong></p><ul>';
-                crawlData.homepageAnalysis.logic.textCleaning.steps.forEach(step => {
-                    html += `<li>${step}</li>`;
-                });
-                html += '</ul>';
-                html += `<p><strong>Results:</strong> Original: ${crawlData.homepageAnalysis.logic.textCleaning.originalLength} chars → Clean: ${crawlData.homepageAnalysis.logic.textCleaning.cleanLength} chars (${crawlData.homepageAnalysis.logic.textCleaning.compressionRatio} compression)</p>`;
-                html += '</details>';
-            }
-            
-            // Link Extraction Logic
-            if (crawlData.homepageAnalysis.logic.linkExtraction) {
-                html += '<details><summary>🔗 Link Extraction Logic</summary>';
-                html += `<p><strong>Description:</strong> ${crawlData.homepageAnalysis.logic.linkExtraction.description}</p>`;
-                html += `<p><strong>Source:</strong> <code>${crawlData.homepageAnalysis.logic.linkExtraction.sourceFile}</code> - <code>${crawlData.homepageAnalysis.logic.linkExtraction.functionName}</code></p>`;
-                html += '<p><strong>Steps:</strong></p><ul>';
-                crawlData.homepageAnalysis.logic.linkExtraction.steps.forEach(step => {
-                    html += `<li>${step}</li>`;
-                });
-                html += '</ul>';
-                html += `<p><strong>Results:</strong> Total: ${crawlData.homepageAnalysis.logic.linkExtraction.totalLinksFound}, Unique: ${crawlData.homepageAnalysis.logic.linkExtraction.uniqueLinks}, External: ${crawlData.homepageAnalysis.logic.linkExtraction.externalDomains}, Internal: ${crawlData.homepageAnalysis.logic.linkExtraction.internalPages}</p>`;
-                html += '</details>';
-            }
-            
-            // Link Filtering Logic
-            if (crawlData.homepageAnalysis.logic.linkFiltering) {
-                html += '<details><summary>🎯 Link Filtering Logic</summary>';
-                html += `<p><strong>Description:</strong> ${crawlData.homepageAnalysis.logic.linkFiltering.description}</p>`;
-                html += `<p><strong>Source:</strong> <code>${crawlData.homepageAnalysis.logic.linkFiltering.sourceFile}</code> - <code>${crawlData.homepageAnalysis.logic.linkFiltering.functionName}</code></p>`;
-                html += '<p><strong>Steps:</strong></p><ul>';
-                crawlData.homepageAnalysis.logic.linkFiltering.steps.forEach(step => {
-                    html += `<li>${step}</li>`;
-                });
-                html += '</ul>';
-                html += `<p><strong>Result:</strong> ${crawlData.homepageAnalysis.logic.linkFiltering.linksPassedToAI} links passed to AI (${crawlData.homepageAnalysis.logic.linkFiltering.filteringLogic})</p>`;
-                html += '</details>';
-            }
-        }
-        
-        if (crawlData.homepageAnalysis.rawData) {
-            html += '<h6>Raw Data:</h6>';
-            html += `<pre class="debug-data">${JSON.stringify(crawlData.homepageAnalysis.rawData, null, 2)}</pre>`;
-        }
-        
-        if (crawlData.homepageAnalysis.processedData) {
-            html += '<h6>Link Extraction Results:</h6>';
-            html += `<p><strong>All Links Found:</strong> ${crawlData.homepageAnalysis.processedData.allLinks?.length || 0}</p>`;
-            html += `<p><strong>Relevant Links (Passed to AI):</strong> ${crawlData.homepageAnalysis.processedData.relevantLinks?.length || 0}</p>`;
-            
-            if (crawlData.homepageAnalysis.processedData.allLinks && crawlData.homepageAnalysis.processedData.allLinks.length > 0) {
-                html += '<details><summary>View All Extracted Links</summary>';
-                html += '<div class="debug-links-list">';
-                crawlData.homepageAnalysis.processedData.allLinks.forEach((link, index) => {
-                    html += `<div class="debug-link-item">
-                        <strong>${index + 1}.</strong> "${link.text}" → ${link.url} 
-                        <span class="link-type">[${link.isExternal ? 'EXTERNAL' : 'INTERNAL'}]</span>
-                    </div>`;
-                });
-                html += '</div></details>';
-            }
-            
-            if (crawlData.homepageAnalysis.processedData.relevantLinks && crawlData.homepageAnalysis.processedData.relevantLinks.length > 0) {
-                html += '<details><summary>View Links Passed to AI (Filtering Logic: NO FILTERING - All links passed)</summary>';
-                html += '<div class="debug-links-list">';
-                crawlData.homepageAnalysis.processedData.relevantLinks.forEach((link, index) => {
-                    html += `<div class="debug-link-item">
-                        <strong>${index + 1}.</strong> "${link.text}" → ${link.url} 
-                        <span class="link-type">[${link.isExternal ? 'EXTERNAL' : 'INTERNAL'}]</span>
-                    </div>`;
-                });
-                html += '</div></details>';
-            }
-        }
-        
-        if (crawlData.homepageAnalysis.processedData.cleanText) {
-            html += '<details><summary>View Full Homepage Content</summary>';
-            html += `<pre class="debug-content">${formatContentForDisplay(crawlData.homepageAnalysis.processedData.cleanText)}</pre>`;
-            html += '</details>';
-        }
+        // Step 2.1: Fetch Homepage HTML
+        html += '<div class="debug-logic">';
+        html += '<h6>Step 2.1: Fetch Homepage HTML</h6>';
+        html += `<p><strong>Function:</strong> <code>fetchWebsiteHTML(websiteUrl)</code></p>`;
+        html += `<p><strong>Input:</strong> ${crawlData.websiteUrl}</p>`;
+        html += `<p><strong>Output:</strong> ${crawlData.homepageAnalysis.rawData?.originalHtmlLength || 'N/A'} characters raw HTML</p>`;
         html += '</div>';
-    }
-    
-    // Link Selection - AI Decision Making (Note: Details shown in AI Interactions section below)
-    if (crawlData.linkSelection) {
-        html += '<h5>🔗 AI Link Selection:</h5>';
-        html += '<div class="debug-link-selection-detailed">';
-        html += `<p><strong>Step:</strong> ${crawlData.linkSelection.step}</p>`;
-        html += `<p><strong>Timestamp:</strong> ${crawlData.linkSelection.timestamp}</p>`;
-        html += `<p><strong>Relevant Links Count:</strong> ${crawlData.linkSelection.relevantLinksCount}</p>`;
-        html += `<p><strong>Company Name:</strong> ${crawlData.linkSelection.companyName}</p>`;
-        html += `<p><em>Note: Full prompt, response, and parsed data are shown in the "AI Interactions" section below</em></p>`;
-        html += '</div>';
-    }
-    
-    // Page Crawling
-    if (crawlData.pageCrawling) {
-        html += '<h5>📄 Page Crawling:</h5>';
-        html += '<div class="debug-page-crawling-detailed">';
-        html += `<p><strong>Step:</strong> ${crawlData.pageCrawling.step}</p>`;
-        html += `<p><strong>Timestamp:</strong> ${crawlData.pageCrawling.timestamp}</p>`;
         
-        // Display the crawling logic
-        if (crawlData.pageCrawling.logic) {
-            html += '<h6>🔧 Post-AI Crawling Logic:</h6>';
-            html += '<details><summary>📄 Crawling Process Details</summary>';
-            html += `<p><strong>Description:</strong> ${crawlData.pageCrawling.logic.description}</p>`;
-            html += `<p><strong>Source:</strong> <code>${crawlData.pageCrawling.logic.sourceFile}</code> - <code>${crawlData.pageCrawling.logic.functionName}</code></p>`;
-            html += '<p><strong>Steps:</strong></p><ul>';
-            crawlData.pageCrawling.logic.steps.forEach(step => {
+        // Step 2.2: Extract Clean Text
+        if (crawlData.homepageAnalysis.logic?.textCleaning) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Step 2.2: Extract Clean Text</h6>';
+            html += `<p><strong>Function:</strong> <code>${crawlData.homepageAnalysis.logic.textCleaning.sourceFile}</code> → <code>${crawlData.homepageAnalysis.logic.textCleaning.functionName}</code></p>`;
+            html += `<p><strong>Input:</strong> Raw HTML (${crawlData.homepageAnalysis.logic.textCleaning.originalLength} chars)</p>`;
+            html += `<p><strong>Output:</strong> Clean text (${crawlData.homepageAnalysis.logic.textCleaning.cleanLength} chars)</p>`;
+            html += `<p><strong>Compression Ratio:</strong> ${crawlData.homepageAnalysis.logic.textCleaning.compressionRatio}</p>`;
+            
+            html += '<details><summary>🔧 Text Cleaning Steps</summary>';
+            html += '<ul>';
+            crawlData.homepageAnalysis.logic.textCleaning.steps?.forEach(step => {
                 html += `<li>${step}</li>`;
             });
             html += '</ul>';
-            html += `<p><strong>Method:</strong> ${crawlData.pageCrawling.logic.crawlingMethod}</p>`;
-            html += `<p><strong>Error Handling:</strong> ${crawlData.pageCrawling.logic.errorHandling}</p>`;
-            html += `<p><strong>Content Processing:</strong> ${crawlData.pageCrawling.logic.contentProcessing}</p>`;
+            html += '</details>';
+            
+            // Show processed clean text
+            if (crawlData.homepageAnalysis.processedData?.cleanText) {
+                html += '<details><summary>📄 View Cleaned Text Output (' + crawlData.homepageAnalysis.logic.textCleaning.cleanLength + ' chars)</summary>';
+                html += `<pre class="debug-content">${formatContentForDisplay(crawlData.homepageAnalysis.processedData.cleanText.substring(0, 5000))}${crawlData.homepageAnalysis.processedData.cleanText.length > 5000 ? '\n\n... (truncated for display, full content available in data)' : ''}</pre>`;
+                html += '</details>';
+            }
+            html += '</div>';
+        }
+        
+        // Step 2.3: Extract All Links
+        if (crawlData.homepageAnalysis.logic?.linkExtraction) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Step 2.3: Extract All Links</h6>';
+            html += `<p><strong>Function:</strong> <code>${crawlData.homepageAnalysis.logic.linkExtraction.sourceFile}</code> → <code>${crawlData.homepageAnalysis.logic.linkExtraction.functionName}</code></p>`;
+            html += `<p><strong>Input:</strong> Raw HTML</p>`;
+            html += `<p><strong>Output:</strong> ${crawlData.homepageAnalysis.logic.linkExtraction.totalLinksFound} total links</p>`;
+            html += `<p><strong>Breakdown:</strong> ${crawlData.homepageAnalysis.logic.linkExtraction.externalDomains} external, ${crawlData.homepageAnalysis.logic.linkExtraction.internalPages} internal</p>`;
+            
+            html += '<details><summary>🔧 Link Extraction Steps</summary>';
+            html += '<ul>';
+            crawlData.homepageAnalysis.logic.linkExtraction.steps?.forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+            
+            // Show all extracted links
+            if (crawlData.homepageAnalysis.processedData?.allLinks?.length > 0) {
+                html += '<details><summary>🔗 View All Extracted Links (' + crawlData.homepageAnalysis.processedData.allLinks.length + ' links)</summary>';
+                html += '<div class="debug-links-list">';
+                crawlData.homepageAnalysis.processedData.allLinks.forEach((link, index) => {
+                    html += `<div class="debug-link-item">
+                        <strong>${index + 1}.</strong> "${link.text}" 
+                        <br><strong>URL:</strong> ${link.url}
+                        <br><strong>Type:</strong> ${link.type} <span class="link-type">[${link.isExternal ? 'EXTERNAL' : 'INTERNAL'}]</span>
+                        <br><strong>Domain:</strong> ${link.domain}
+                    </div>`;
+                });
+                html += '</div></details>';
+            }
+            html += '</div>';
+        }
+        
+        // Step 2.4: Filter Relevant Links
+        if (crawlData.homepageAnalysis.logic?.linkFiltering) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Step 2.4: Filter Relevant Links</h6>';
+            html += `<p><strong>Function:</strong> <code>${crawlData.homepageAnalysis.logic.linkFiltering.sourceFile}</code> → <code>${crawlData.homepageAnalysis.logic.linkFiltering.functionName}</code></p>`;
+            html += `<p><strong>Input:</strong> ${crawlData.homepageAnalysis.logic.linkExtraction?.totalLinksFound} total links</p>`;
+            html += `<p><strong>Output:</strong> ${crawlData.homepageAnalysis.logic.linkFiltering.linksPassedToAI} links passed to AI</p>`;
+            html += `<p><strong>Filtering Logic:</strong> ${crawlData.homepageAnalysis.logic.linkFiltering.filteringLogic}</p>`;
+            
+            html += '<details><summary>🔧 Link Filtering Steps</summary>';
+            html += '<ul>';
+            crawlData.homepageAnalysis.logic.linkFiltering.steps?.forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+            
+            // Show links passed to AI
+            if (crawlData.homepageAnalysis.processedData?.relevantLinks?.length > 0) {
+                html += '<details><summary>🎯 View Links Passed to AI (' + crawlData.homepageAnalysis.processedData.relevantLinks.length + ' links)</summary>';
+                html += '<div class="debug-links-list">';
+                crawlData.homepageAnalysis.processedData.relevantLinks.forEach((link, index) => {
+                    html += `<div class="debug-link-item">
+                        <strong>${index + 1}.</strong> "${link.text}"
+                        <br><strong>URL:</strong> ${link.url}
+                        <br><strong>Type:</strong> ${link.type} <span class="link-type">[${link.isExternal ? 'EXTERNAL' : 'INTERNAL'}]</span>
+                        <br><strong>Domain:</strong> ${link.domain}
+                    </div>`;
+                });
+                html += '</div></details>';
+            }
+            html += '</div>';
+        }
+        
+        // Show raw data
+        if (crawlData.homepageAnalysis.rawData) {
+            html += '<details><summary>📊 View Raw Homepage Analysis Data</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(crawlData.homepageAnalysis.rawData, null, 2)}</pre>`;
             html += '</details>';
         }
         
-        if (crawlData.pageCrawling.selectedLinks) {
-            html += '<h6>Selected Links to Crawl:</h6>';
-            html += `<pre class="debug-data">${JSON.stringify(crawlData.pageCrawling.selectedLinks, null, 2)}</pre>`;
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    // =================================================================
+    // PHASE 3: AI LINK SELECTION (FIRST AI INTERACTION)
+    // =================================================================
+    const linkSelectionAI = crawlData.aiInteractions?.find(ai => ai.step === 'ai_link_selection');
+    if (linkSelectionAI || crawlData.linkSelection) {
+        html += '<div class="debug-ai-interactions-detailed">';
+        html += '<h5>🤖 PHASE 3: AI Link Selection (FIRST AI INTERACTION)</h5>';
+        html += '<div class="debug-ai-interaction-detailed">';
+        html += `<p><strong>Type:</strong> ✅ AI Interaction</p>`;
+        html += `<p><strong>Timestamp:</strong> ${crawlData.linkSelection?.timestamp || linkSelectionAI?.timestamp}</p>`;
+        html += `<p><strong>Source:</strong> <code>services/websiteCrawler.js</code> → <code>fetchMultiplePages()</code></p>`;
+        
+        // AI Call Details
+        html += '<div class="debug-logic">';
+        html += '<h6>AI Call Configuration</h6>';
+        html += `<p><strong>Prompt File:</strong> <code>prompts/intelligence/linkSelection.js</code> → <code>linkSelectionPrompt()</code></p>`;
+        html += `<p><strong>API Function:</strong> <code>services/ai.js</code> → <code>callClaudeAPI(linkSelectionPrompt, false)</code></p>`;
+        html += `<p><strong>Model:</strong> Claude (via Anthropic API)</p>`;
+        html += '</div>';
+        
+        // Input Data
+        html += '<div class="debug-logic">';
+        html += '<h6>Input Data to AI</h6>';
+        html += `<p><strong>Total Links Available:</strong> ${crawlData.linkSelection?.inputData?.totalLinksAvailable || 0}</p>`;
+        html += `<p><strong>Company Name:</strong> ${crawlData.linkSelection?.companyName || 'Extracted from URL'}</p>`;
+        html += `<p><strong>Base URL:</strong> ${crawlData.websiteUrl}</p>`;
+        
+        if (crawlData.linkSelection?.inputData?.linksToAnalyze) {
+            html += '<details><summary>📋 View Complete Input Links Data</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(crawlData.linkSelection.inputData.linksToAnalyze, null, 2)}</pre>`;
+            html += '</details>';
+        }
+        html += '</div>';
+        
+        // Full AI Prompt
+        if (linkSelectionAI?.fullPrompt) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Complete AI Prompt Sent</h6>';
+            html += `<details><summary>📝 View Full AI Prompt (${linkSelectionAI.fullPrompt.length} characters)</summary>`;
+            html += `<pre class="debug-prompt">${formatContentForDisplay(linkSelectionAI.fullPrompt)}</pre>`;
+            html += '</details>';
+            html += '</div>';
         }
         
-        if (crawlData.pageCrawling.crawledPages && crawlData.pageCrawling.crawledPages.length > 0) {
-            html += '<h6>Crawled Pages:</h6>';
+        // Full AI Response
+        if (linkSelectionAI?.fullResponse) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Complete AI Response Received</h6>';
+            html += `<details><summary>🤖 View Full AI Response (${linkSelectionAI.fullResponse.length} characters)</summary>`;
+            html += `<pre class="debug-response">${formatContentForDisplay(linkSelectionAI.fullResponse)}</pre>`;
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        // Parsed Output
+        if (crawlData.linkSelection?.outputData || linkSelectionAI?.parsedData) {
+            const outputData = crawlData.linkSelection?.outputData || linkSelectionAI?.parsedData;
+            html += '<div class="debug-logic">';
+            html += '<h6>Parsed AI Output</h6>';
+            html += `<p><strong>Links Selected:</strong> ${outputData.totalSelected || outputData.total_selected || 0}</p>`;
+            html += `<p><strong>Selection Strategy:</strong> ${outputData.selectionStrategy || outputData.selection_strategy || 'Not specified'}</p>`;
+            
+            html += '<details><summary>📊 View Complete Parsed Output</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(outputData, null, 2)}</pre>`;
+            html += '</details>';
+            
+            // Show selected links in detail
+            const selectedLinks = outputData.selectedLinks || outputData.selected_links || [];
+            if (selectedLinks.length > 0) {
+                html += '<details><summary>🎯 View Selected Links Details</summary>';
+                html += '<div class="debug-links-list">';
+                selectedLinks.forEach((link, index) => {
+                    html += `<div class="debug-link-item">
+                        <strong>${index + 1}.</strong> "${link.text}"
+                        <br><strong>URL:</strong> ${link.url}
+                        <br><strong>Reasoning:</strong> ${link.reasoning || 'Not provided'}
+                    </div>`;
+                });
+                html += '</div></details>';
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    // =================================================================
+    // PHASE 4: MULTI-PAGE CRAWLING
+    // =================================================================
+    if (crawlData.pageCrawling) {
+        html += '<div class="debug-page-crawling-detailed">';
+        html += '<h5>📊 PHASE 4: Multi-Page Crawling</h5>';
+        html += '<div class="debug-step-detailed">';
+        html += `<p><strong>Type:</strong> ❌ No AI Interaction</p>`;
+        html += `<p><strong>Timestamp:</strong> ${crawlData.pageCrawling.timestamp}</p>`;
+        html += `<p><strong>Source:</strong> <code>${crawlData.pageCrawling.logic?.sourceFile}</code> → <code>${crawlData.pageCrawling.logic?.functionName}</code></p>`;
+        
+        // Processing Logic
+        if (crawlData.pageCrawling.logic) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Multi-Page Crawling Configuration</h6>';
+            html += `<p><strong>Description:</strong> ${crawlData.pageCrawling.logic.description}</p>`;
+            html += `<p><strong>Method:</strong> ${crawlData.pageCrawling.logic.crawlingMethod}</p>`;
+            html += `<p><strong>Error Handling:</strong> ${crawlData.pageCrawling.logic.errorHandling}</p>`;
+            html += `<p><strong>Content Processing:</strong> ${crawlData.pageCrawling.logic.contentProcessing}</p>`;
+            
+            html += '<details><summary>🔧 Crawling Process Steps</summary>';
+            html += '<ul>';
+            crawlData.pageCrawling.logic.steps?.forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        // Selected Links Input
+        if (crawlData.pageCrawling.selectedLinks) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Input: Selected Links to Crawl</h6>';
+            html += `<p><strong>Total Pages to Crawl:</strong> ${crawlData.pageCrawling.selectedLinks.length}</p>`;
+            html += '<details><summary>📋 View Complete Selected Links Input</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(crawlData.pageCrawling.selectedLinks, null, 2)}</pre>`;
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        // Detailed Page-by-Page Results
+        if (crawlData.pageCrawling.crawledPages?.length > 0) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Page-by-Page Crawling Results</h6>';
             crawlData.pageCrawling.crawledPages.forEach((page, index) => {
                 html += `<div class="debug-page-detailed">
                     <h7>Page ${index + 1}: ${page.title}</h7>
                     <p><strong>URL:</strong> ${page.url}</p>
-                    <p><strong>Original HTML Length:</strong> ${page.originalHtmlLength}</p>
-                    <p><strong>Clean Text Length:</strong> ${page.cleanTextLength}</p>
-                    <p><strong>External:</strong> ${page.isExternal ? 'Yes' : 'No'}</p>
-                    <p><strong>Domain:</strong> ${page.domain}</p>
-                    <p><strong>Success:</strong> ${page.success ? 'Yes' : 'No'}</p>
-                    ${page.error ? `<p><strong>Error:</strong> ${page.errorMessage}</p>` : ''}
-                    ${page.content ? `<details><summary>View Content</summary><pre class="debug-content">${formatContentForDisplay(page.content)}</pre></details>` : ''}
-                </div>`;
-            });
-        }
-        html += '</div>';
-    }
-    
-    // Raw Data
-    if (crawlData.rawData) {
-        html += '<h5>📊 Raw Crawling Data:</h5>';
-        html += '<div class="debug-raw-data-detailed">';
-        
-        if (crawlData.rawData.homepageContent) {
-            html += '<h6>Homepage Content:</h6>';
-            html += `<p><strong>Length:</strong> ${crawlData.rawData.homepageContent.length} characters</p>`;
-            html += `<p><em>Note: Full homepage content is already shown in the "Homepage Analysis & Link Extraction" section above</em></p>`;
-        }
-        
-        if (crawlData.rawData.additionalPages && crawlData.rawData.additionalPages.length > 0) {
-            html += '<h6>Additional Pages:</h6>';
-            html += `<p><em>Note: Full page content is shown in the "Page Crawling" section above. Here we show metadata only.</em></p>`;
-            crawlData.rawData.additionalPages.forEach((page, index) => {
-                html += `<div class="debug-page-raw-detailed">
-                    <h7>Page ${index + 1}: ${page.title}</h7>
-                    <p><strong>URL:</strong> ${page.url}</p>
-                    <p><strong>Content Length:</strong> ${page.contentLength} characters</p>
-                    <p><strong>External:</strong> ${page.isExternal ? 'Yes' : 'No'}</p>
-                    <p><strong>Domain:</strong> ${page.domain}</p>
-                    ${page.error ? `<p><strong>Error:</strong> ${page.error}</p>` : ''}
-                    ${page.reasoning ? `<p><strong>Reasoning:</strong> ${page.reasoning}</p>` : ''}
-                </div>`;
-            });
-        }
-        
-        html += `<p><strong>Analysis Method:</strong> ${crawlData.rawData.analysisMethod}</p>`;
-        html += '</div>';
-    }
-    
-    // AI Interactions - Show all AI calls (link selection + final analysis)
-    if (crawlData.aiInteractions && crawlData.aiInteractions.length > 0) {
-        html += '<h5>🤖 AI Interactions:</h5>';
-        html += '<div class="debug-ai-interactions-detailed">';
-        crawlData.aiInteractions.forEach((interaction, index) => {
-            html += `<div class="debug-ai-interaction-detailed">
-                <h6>${index + 1}. ${interaction.step}</h6>
-                <p><strong>Timestamp:</strong> ${interaction.timestamp}</p>`;
-            
-            // Add prompt source information if available
-            if (interaction.promptSource) {
-                html += `<p><strong>Prompt Source:</strong> <code>${interaction.promptSource.sourceFile}</code> - <code>${interaction.promptSource.functionName}</code></p>`;
-                html += `<p><strong>Description:</strong> ${interaction.promptSource.description}</p>`;
-            }
-            
-            // Add logic information if available (for final analysis)
-            if (interaction.logic) {
-                html += '<details><summary>🔧 Processing Logic</summary>';
-                html += `<p><strong>Description:</strong> ${interaction.logic.description}</p>`;
-                html += `<p><strong>Source:</strong> <code>${interaction.logic.sourceFile}</code> - <code>${interaction.logic.functionName}</code></p>`;
-                html += '<p><strong>Steps:</strong></p><ul>';
-                interaction.logic.steps.forEach(step => {
-                    html += `<li>${step}</li>`;
-                });
-                html += '</ul>';
+                    <p><strong>Domain:</strong> ${page.domain} <span class="link-type">[${page.isExternal ? 'EXTERNAL' : 'INTERNAL'}]</span></p>
+                    <p><strong>Success:</strong> ${page.success ? '✅ Success' : '❌ Failed'}</p>`;
                 
-                // Add data usage information for final analysis
-                if (interaction.logic.dataUsage) {
-                    html += '<h6>📊 Data Usage in Business Profile:</h6>';
-                    html += '<div class="data-usage-sections">';
+                if (page.success) {
+                    html += `<p><strong>Original HTML Length:</strong> ${page.originalHtmlLength} characters</p>`;
+                    html += `<p><strong>Clean Text Length:</strong> ${page.cleanTextLength} characters</p>`;
                     
-                    if (interaction.logic.dataUsage.businessSetupSection) {
-                        html += '<div class="usage-section">';
-                        html += '<h7>🏢 Business Setup Section:</h7>';
-                        html += '<ul>';
-                        interaction.logic.dataUsage.businessSetupSection.forEach(field => {
-                            html += `<li>${field}</li>`;
-                        });
-                        html += '</ul>';
-                        html += '</div>';
+                    if (page.content) {
+                        html += `<details><summary>📄 View Extracted Content (${page.cleanTextLength} chars)</summary>`;
+                        html += `<pre class="debug-content">${formatContentForDisplay(page.content.substring(0, 3000))}${page.content.length > 3000 ? '\n\n... (truncated for display)' : ''}</pre>`;
+                        html += '</details>';
                     }
-                    
-                    if (interaction.logic.dataUsage.strategicIntelligenceSection) {
-                        html += '<div class="usage-section">';
-                        html += '<h7>🎯 Strategic Intelligence Section:</h7>';
-                        html += '<ul>';
-                        interaction.logic.dataUsage.strategicIntelligenceSection.forEach(field => {
-                            html += `<li>${field}</li>`;
-                        });
-                        html += '</ul>';
-                        html += '</div>';
-                    }
-                    
-                    html += '</div>';
+                } else {
+                    html += `<p><strong>Error:</strong> ${page.errorMessage}</p>`;
+                    html += `<p><strong>Functions Used:</strong> <code>fetchWebsiteHTML()</code> → <code>extractCleanText()</code></p>`;
                 }
-                
+                html += `</div>`;
+            });
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    // =================================================================
+    // PHASE 5: AI BUSINESS ANALYSIS (SECOND AI INTERACTION)
+    // =================================================================
+    const businessAnalysisAI = crawlData.aiInteractions?.find(ai => ai.step === 'ai_response_received' || ai.step === 'ai_business_analysis');
+    if (businessAnalysisAI) {
+        html += '<div class="debug-ai-interactions-detailed">';
+        html += '<h5>🧠 PHASE 5: AI Business Analysis (SECOND AI INTERACTION)</h5>';
+        html += '<div class="debug-ai-interaction-detailed">';
+        html += `<p><strong>Type:</strong> ✅ AI Interaction</p>`;
+        html += `<p><strong>Timestamp:</strong> ${businessAnalysisAI.timestamp}</p>`;
+        html += `<p><strong>Source:</strong> <code>services/websiteCrawler.js</code> → <code>crawlWebsite()</code></p>`;
+        
+        // AI Call Details
+        html += '<div class="debug-logic">';
+        html += '<h6>AI Call Configuration</h6>';
+        html += `<p><strong>Prompt File:</strong> <code>prompts/intelligence/websiteCrawling.js</code> → <code>multiPageAnalysisPrompt()</code></p>`;
+        html += `<p><strong>API Function:</strong> <code>services/ai.js</code> → <code>callClaudeAPI(enhancedCrawlPrompt, false, masterId, 'AI: Multi-Page Analysis')</code></p>`;
+        html += `<p><strong>Model:</strong> Claude (via Anthropic API)</p>`;
+        html += '</div>';
+        
+        // Input Data Summary
+        html += '<div class="debug-logic">';
+        html += '<h6>Input Data Summary</h6>';
+        html += `<p><strong>Homepage Content:</strong> ${crawlData.rawData?.homepageContent?.length || 0} characters</p>`;
+        html += `<p><strong>Additional Pages:</strong> ${crawlData.rawData?.additionalPages?.length || 0} pages</p>`;
+        html += `<p><strong>Total Content Length:</strong> ${(crawlData.rawData?.homepageContent?.length || 0) + (crawlData.rawData?.additionalPages?.reduce((sum, page) => sum + (page.contentLength || 0), 0) || 0)} characters</p>`;
+        html += `<p><strong>Analysis Method:</strong> ${crawlData.rawData?.analysisMethod || 'Unknown'}</p>`;
+        html += '</div>';
+        
+        // Combined Content Sent to AI
+        if (crawlData.rawData) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Combined Content Input to AI</h6>';
+            html += '<details><summary>📄 View Homepage Content Input</summary>';
+            if (crawlData.rawData.homepageContent) {
+                html += `<pre class="debug-content">${formatContentForDisplay(crawlData.rawData.homepageContent.fullContent?.substring(0, 4000) || 'Content not available')}${(crawlData.rawData.homepageContent.fullContent?.length || 0) > 4000 ? '\n\n... (truncated for display)' : ''}</pre>`;
+            } else {
+                html += '<p>Homepage content not available in debug data</p>';
+            }
+            html += '</details>';
+            
+            if (crawlData.rawData.additionalPages?.length > 0) {
+                html += '<details><summary>📚 View Additional Pages Content Input</summary>';
+                crawlData.rawData.additionalPages.forEach((page, index) => {
+                    html += `<div class="debug-page-raw-detailed">
+                        <h7>Page ${index + 1}: ${page.title}</h7>
+                        <p><strong>URL:</strong> ${page.url}</p>
+                        <p><strong>Domain:</strong> ${page.domain} <span class="link-type">[${page.isExternal ? 'EXTERNAL' : 'INTERNAL'}]</span></p>
+                        <p><strong>Content Length:</strong> ${page.contentLength} characters</p>
+                        ${page.error ? `<p><strong>Error:</strong> ${page.error}</p>` : ''}
+                        ${page.fullContent ? `<details><summary>View Content</summary><pre class="debug-content">${formatContentForDisplay(page.fullContent.substring(0, 2000))}${page.fullContent.length > 2000 ? '\n\n... (truncated)' : ''}</pre></details>` : '<p>Content not available</p>'}
+                    </div>`;
+                });
                 html += '</details>';
             }
-            
-            if (interaction.fullPrompt) {
-                html += `<details><summary>View Full Prompt</summary><pre class="debug-prompt">${formatContentForDisplay(interaction.fullPrompt)}</pre></details>`;
-            }
-            
-            if (interaction.fullResponse) {
-                html += `<details><summary>View Full Response</summary><pre class="debug-response">${formatContentForDisplay(interaction.fullResponse)}</pre></details>`;
-            }
-            
-            if (interaction.parsedData) {
-                html += `<details><summary>View Parsed Data</summary><pre class="debug-data">${JSON.stringify(interaction.parsedData, null, 2)}</pre></details>`;
-            }
-            
             html += '</div>';
-        });
+        }
+        
+        // Full AI Prompt
+        if (businessAnalysisAI.fullPrompt) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Complete AI Prompt Sent</h6>';
+            html += `<details><summary>📝 View Full Business Analysis Prompt (${businessAnalysisAI.fullPrompt.length} characters)</summary>`;
+            html += `<pre class="debug-prompt">${formatContentForDisplay(businessAnalysisAI.fullPrompt)}</pre>`;
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        // Full AI Response
+        if (businessAnalysisAI.fullResponse) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Complete AI Response Received</h6>';
+            html += `<details><summary>🤖 View Full Business Analysis Response (${businessAnalysisAI.fullResponse.length} characters)</summary>`;
+            html += `<pre class="debug-response">${formatContentForDisplay(businessAnalysisAI.fullResponse)}</pre>`;
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        // Parsed Business Data
+        if (businessAnalysisAI.parsedData || crawlData.finalResult) {
+            const parsedData = businessAnalysisAI.parsedData || crawlData.finalResult;
+            html += '<div class="debug-logic">';
+            html += '<h6>Parsed Business Intelligence Output</h6>';
+            html += `<p><strong>Company Name:</strong> ${parsedData.company_name || 'Not found'}</p>`;
+            html += `<p><strong>Business Stage:</strong> ${parsedData.business_stage || 'Not found'}</p>`;
+            html += `<p><strong>Industry Category:</strong> ${parsedData.industry_category || 'Not found'}</p>`;
+            html += `<p><strong>Target Customer:</strong> ${parsedData.target_customer || 'Not found'}</p>`;
+            
+            html += '<details><summary>📊 View Complete Parsed Business Data</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(parsedData, null, 2)}</pre>`;
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        html += '</div>';
         html += '</div>';
     }
     
-    // Final Result
-    if (crawlData.finalResult) {
-        html += '<h5>🎯 Final Result:</h5>';
-        html += '<div class="debug-final-result-detailed">';
-        html += `<pre class="debug-final-result">${JSON.stringify(crawlData.finalResult, null, 2)}</pre>`;
+    // =================================================================
+    // PHASE 6: DESIGN ASSET EXTRACTION
+    // =================================================================
+    const designStartStep = crawlData.steps?.find(s => s.step === 'design_extraction_started');
+    const designCompleteStep = crawlData.steps?.find(s => s.step === 'design_extraction_completed');
+    
+    if (designStartStep || designCompleteStep || crawlData.finalResult?.design_assets) {
+        html += '<div class="debug-steps-detailed">';
+        html += '<h5>🎨 PHASE 6: Design Asset Extraction</h5>';
+        html += '<div class="debug-step-detailed">';
+        html += `<p><strong>Type:</strong> ❌ No AI Interaction</p>`;
+        html += `<p><strong>Timestamp:</strong> ${designCompleteStep?.timestamp || designStartStep?.timestamp || 'N/A'}</p>`;
+        html += `<p><strong>Source:</strong> <code>services/designExtractor.js</code> → <code>extractDesignAssets()</code></p>`;
         
-        // Add clear usage information
+        // Process Details
+        if (designStartStep?.logic) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Design Extraction Process</h6>';
+            html += `<p><strong>Description:</strong> ${designStartStep.logic.description}</p>`;
+            html += '<details><summary>🔧 Design Extraction Steps</summary>';
+            html += '<ul>';
+            designStartStep.logic.steps?.forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            html += '</ul>';
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        // Results
+        if (crawlData.finalResult?.design_assets) {
+            html += '<div class="debug-logic">';
+            html += '<h6>Design Extraction Results</h6>';
+            html += `<p><strong>Colors Extracted:</strong> ${crawlData.finalResult.design_assets.color_palette?.primary_colors?.length || 0}</p>`;
+            html += `<p><strong>Fonts Found:</strong> ${crawlData.finalResult.design_assets.typography?.font_families_found?.length || 0}</p>`;
+            html += `<p><strong>Logo Status:</strong> ${crawlData.finalResult.design_assets.logo_assets?.main_logo?.status || 'Not found'}</p>`;
+            html += `<p><strong>Extraction Method:</strong> ${crawlData.finalResult.design_assets.extraction_metadata?.extraction_method || 'Unknown'}</p>`;
+            
+            html += '<details><summary>🎨 View Complete Design Assets Data</summary>';
+            html += `<pre class="debug-data">${JSON.stringify(crawlData.finalResult.design_assets, null, 2)}</pre>`;
+            html += '</details>';
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    // =================================================================
+    // PHASE 7: FINAL ASSEMBLY & RESULTS
+    // =================================================================
+    if (crawlData.finalResult) {
+        html += '<div class="debug-final-result-detailed">';
+        html += '<h5>📦 PHASE 7: Final Assembly & Results</h5>';
+        html += '<div class="debug-step-detailed">';
+        html += `<p><strong>Type:</strong> ❌ No AI Interaction</p>`;
+        html += `<p><strong>Source:</strong> <code>services/websiteCrawler.js</code> → <code>crawlWebsite()</code></p>`;
+        
+        // Assembly Process
+        html += '<div class="debug-logic">';
+        html += '<h6>Final Data Assembly</h6>';
+        html += '<p><strong>Assembly Steps:</strong></p>';
+        html += '<ul>';
+        html += '<li><code>JSON.parse(crawlResult)</code> - Parse AI response to structured data</li>';
+        html += '<li><code>extractedData.design_assets = designAssets</code> - Add design assets</li>';
+        html += '<li><code>extractedData.pages_analyzed = ...</code> - Add crawling metadata</li>';
+        html += '<li><code>extractedData.extraction_metadata = ...</code> - Add processing metadata</li>';
+        html += '<li><code>global.crawlDebugData = debugData</code> - Store debug information</li>';
+        html += '</ul>';
+        html += '</div>';
+        
+        // Metadata
+        html += '<div class="debug-logic">';
+        html += '<h6>Final Metadata</h6>';
+        html += `<p><strong>Pages Analyzed:</strong> ${crawlData.finalResult.pages_analyzed || 0}</p>`;
+        html += `<p><strong>External Pages:</strong> ${crawlData.finalResult.external_pages_analyzed || 0}</p>`;
+        html += `<p><strong>Total Content Length:</strong> ${crawlData.finalResult.total_content_length || 0} characters</p>`;
+        html += `<p><strong>Analysis Method:</strong> ${crawlData.finalResult.analysis_method || 'Unknown'}</p>`;
+        html += `<p><strong>Design Extraction Status:</strong> ${crawlData.finalResult.design_extraction_status || 'Unknown'}</p>`;
+        html += '</div>';
+        
+        // Complete Final Result
+        html += '<div class="debug-logic">';
+        html += '<h6>Complete Final Result Data</h6>';
+        html += '<details><summary>📋 View Complete Final Result JSON</summary>';
+        html += `<pre class="debug-final-result">${JSON.stringify(crawlData.finalResult, null, 2)}</pre>`;
+        html += '</details>';
+        html += '</div>';
+        
+        // Usage Information
         html += '<div class="final-result-usage">';
-        html += '<h6>🚀 How This Data is Used:</h6>';
+        html += '<h6>🚀 How This Data Gets Used</h6>';
         html += '<div class="usage-highlight">';
-        html += '<p><strong>This final result is automatically populated into the Business Profile form in two main sections:</strong></p>';
+        html += '<p><strong>This final result populates the Business Profile form automatically:</strong></p>';
         
         html += '<div class="usage-sections">';
         html += '<div class="usage-section-primary">';
         html += '<h7>🏢 Business Setup Section (Auto-filled):</h7>';
         html += '<ul>';
-        html += '<li><strong>Company Name:</strong> Extracted from website analysis</li>';
-        html += '<li><strong>Business Description:</strong> AI-generated comprehensive description</li>';
-        html += '<li><strong>Value Proposition:</strong> Key value points identified</li>';
-        html += '<li><strong>Main Product/Service:</strong> Primary offerings extracted</li>';
-        html += '<li><strong>Pricing Information:</strong> Pricing details found on website</li>';
-        html += '<li><strong>Business Stage:</strong> Company maturity level assessed</li>';
-        html += '<li><strong>Industry Category:</strong> Business sector classification</li>';
-        html += '<li><strong>Team Size:</strong> Company size information</li>';
-        html += '<li><strong>Funding Information:</strong> Investment/funding details</li>';
-        html += '<li><strong>Company Mission:</strong> Mission statement extracted</li>';
-        html += '<li><strong>Team Background:</strong> Team information found</li>';
+        html += '<li><strong>company_name</strong> → Company Name field</li>';
+        html += '<li><strong>business_description</strong> → Business Description field</li>';
+        html += '<li><strong>value_proposition</strong> → Value Proposition field</li>';
+        html += '<li><strong>main_product_service</strong> → Main Product/Service field</li>';
+        html += '<li><strong>pricing_info</strong> → Pricing Information field</li>';
+        html += '<li><strong>business_stage</strong> → Business Stage field</li>';
         html += '</ul>';
         html += '</div>';
         
         html += '<div class="usage-section-primary">';
         html += '<h7>🎯 Strategic Intelligence Section (Auto-filled):</h7>';
         html += '<ul>';
-        html += '<li><strong>Target Customer:</strong> Customer segments identified</li>';
-        html += '<li><strong>Key Features:</strong> Main product features extracted</li>';
-        html += '<li><strong>Unique Selling Points:</strong> Competitive advantages found</li>';
-        html += '<li><strong>Competitors Mentioned:</strong> Competitor references</li>';
-        html += '<li><strong>Recent Updates:</strong> Latest company news/changes</li>';
-        html += '<li><strong>Social Media Presence:</strong> Social media links found</li>';
-        html += '<li><strong>Additional Notes:</strong> Other relevant insights</li>';
+        html += '<li><strong>target_customer</strong> → Target Customer field</li>';
+        html += '<li><strong>key_features</strong> → Key Features list</li>';
+        html += '<li><strong>unique_selling_points</strong> → USP list</li>';
+        html += '<li><strong>competitors_mentioned</strong> → Competitors list</li>';
+        html += '<li><strong>social_media</strong> → Social Media links</li>';
         html += '</ul>';
         html += '</div>';
         html += '</div>';
         
         html += '<div class="usage-note">';
-        html += '<p><strong>💡 Note:</strong> All fields are automatically populated when you submit the Business Profile form. You can review and edit any field before final submission.</p>';
+        html += '<p><strong>Data Flow:</strong> <code>crawlWebsite()</code> → <code>window.appState.websiteIntelligence</code> → <code>displayBusinessSetupResults()</code> → Form auto-population</p>';
         html += '</div>';
         html += '</div>';
+        
         html += '</div>';
         html += '</div>';
     }
     
-    // Summary
+    // =================================================================
+    // DEBUG DATA SUMMARY
+    // =================================================================
     if (crawlData.summary) {
-        html += '<h5>📈 Summary:</h5>';
+        html += '<div class="debug-steps-detailed">';
+        html += '<h5>📈 DEBUG DATA SUMMARY</h5>';
+        html += '<div class="debug-step-detailed">';
+        html += '<div class="debug-logic">';
+        html += '<h6>Processing Statistics</h6>';
+        html += `<div class="debug-link-item"><strong>Total AI Interactions:</strong> ${crawlData.aiInteractions?.length || 0}</div>`;
+        html += `<div class="debug-link-item"><strong>Total Processing Steps:</strong> ${crawlData.steps?.length || 0}</div>`;
+        html += `<div class="debug-link-item"><strong>Homepage Content:</strong> ${crawlData.summary.homepageContentLength || 0} characters</div>`;
+        html += `<div class="debug-link-item"><strong>Additional Pages:</strong> ${crawlData.summary.additionalPagesCount || 0} pages</div>`;
+        html += `<div class="debug-link-item"><strong>Successful Pages:</strong> ${crawlData.summary.successfulPages || 0}</div>`;
+        html += `<div class="debug-link-item"><strong>Failed Pages:</strong> ${crawlData.summary.failedPages || 0}</div>`;
+        html += `<div class="debug-link-item"><strong>External Pages:</strong> ${crawlData.summary.externalPages || 0}</div>`;
+        html += `<div class="debug-link-item"><strong>Analysis Method:</strong> ${crawlData.summary.analysisMethod || 'Unknown'}</div>`;
+        html += '</div>';
+        
+        html += '<details><summary>📊 View Complete Debug Summary Data</summary>';
         html += `<pre class="debug-summary">${JSON.stringify(crawlData.summary, null, 2)}</pre>`;
+        html += '</details>';
+        html += '</div>';
+        html += '</div>';
     }
     
     html += '</div>';
