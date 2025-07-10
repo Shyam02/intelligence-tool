@@ -519,3 +519,92 @@
         text-align: left;
     }
 }
+
+/* Multi-Channel Content Styles */
+.content-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.channel-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.channel-twitter {
+    background: #1da1f2;
+    color: white;
+}
+
+.channel-linkedin {
+    background: #0077b5;
+    color: white;
+}
+
+.channel-instagram {
+    background: #e4405f;
+    color: white;
+}
+
+.post-badge {
+    background: #28a745;
+    color: white;
+}
+
+/* Visual Component Styles */
+.visual-component-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.visual-component-section h5 {
+    margin: 0 0 12px 0;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.visual-specs-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.visual-specs-card div {
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.visual-specs-card strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Strategic Brief Reference */
+.strategic-brief-reference {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.strategic-brief-reference h6 {
+    margin: 0 0 8px 0;
+    color: #0056b3;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.strategic-brief-reference p {
+    margin: 0;
+    font-size: 12px;
+    color: #0056b3;
+}

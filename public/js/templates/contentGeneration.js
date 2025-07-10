@@ -1,24 +1,25 @@
 // Content Generation Template Functions
 // File path: /public/js/templates/contentGeneration.js
 
-// Template for displaying all generated content
+// Template for displaying all generated content from strategic briefs
 function createGeneratedContentTemplate(generatedContent) {
     if (!generatedContent || !generatedContent.generated_content) {
         return `
             <div class="no-generated-content">
-                <p>No content was generated. Please try again or check your briefs.</p>
+                <p>No content was generated. Please try again or check your strategic briefs.</p>
             </div>
         `;
     }
     
     let contentHTML = `
         <div class="generated-content-container">
-            <h3>🎨 Generated Content</h3>
+            <h3>🎨 Final Generated Content</h3>
             <div class="generation-summary">
                 <div class="summary-stats">
                     <span><strong>Total Generated:</strong> ${generatedContent.generation_summary?.total_generated || 0}</span>
-                    <span><strong>Single Tweets:</strong> ${generatedContent.generation_summary?.single_tweets || 0}</span>
-                    <span><strong>Threads:</strong> ${generatedContent.generation_summary?.threads || 0}</span>
+                    <span><strong>Twitter Content:</strong> ${generatedContent.generation_summary?.twitter_content || 0}</span>
+                    <span><strong>LinkedIn Content:</strong> ${generatedContent.generation_summary?.linkedin_content || 0}</span>
+                    <span><strong>Visual Components:</strong> ${generatedContent.generation_summary?.visual_components || 0}</span>
                     <span><strong>Generated:</strong> ${new Date().toLocaleString()}</span>
                 </div>
             </div>
@@ -40,15 +41,29 @@ function createGeneratedContentTemplate(generatedContent) {
 // Template for single piece of generated content
 function createSingleContentTemplate(content, contentId) {
     const isThread = content.content_type === 'thread';
+    const isMultiChannel = content.channel && content.channel !== 'twitter';
     const statusClass = content.status === 'generation_failed' ? 'status-failed' : 'status-pending';
+    
+    // Determine content type display
+    let contentTypeDisplay = 'Single Tweet';
+    if (isThread) {
+        contentTypeDisplay = 'Thread';
+    } else if (content.channel === 'linkedin') {
+        contentTypeDisplay = 'LinkedIn Post';
+    } else if (content.channel === 'instagram') {
+        contentTypeDisplay = 'Instagram Post';
+    }
     
     let contentHTML = `
         <div class="generated-content-item" data-content-id="${contentId}" data-brief-data='${JSON.stringify(content)}'>
             <div class="content-header">
                 <div class="content-info">
                     <h4>${content.brief_angle || 'Content Piece'}</h4>
-                    <span class="content-type-badge ${isThread ? 'thread-badge' : 'tweet-badge'}">${isThread ? 'Thread' : 'Single Tweet'}</span>
-                    <span class="content-status ${statusClass}">${content.status === 'generation_failed' ? 'Failed' : 'Generated'}</span>
+                    <div class="content-badges">
+                        <span class="content-type-badge ${isThread ? 'thread-badge' : 'post-badge'}">${contentTypeDisplay}</span>
+                        ${content.channel ? `<span class="channel-badge channel-${content.channel}">${content.channel.toUpperCase()}</span>` : ''}
+                        <span class="content-status ${statusClass}">${content.status === 'generation_failed' ? 'Failed' : 'Generated'}</span>
+                    </div>
                 </div>
                 <div class="content-actions">
                     <button class="copy-content-btn" onclick="${isThread ? `copyThreadContent('${contentId}')` : `copyGeneratedContent('${contentId}')`}">📋 Copy</button>
@@ -57,6 +72,7 @@ function createSingleContentTemplate(content, contentId) {
                     <button class="reject-btn" onclick="rejectContent('${contentId}')">❌ Reject</button>
                 </div>
             </div>
+             ${content.visual_component_specs ? createVisualComponentTemplate(content.visual_component_specs) : ''}
     `;
     
     if (content.status === 'generation_failed') {
@@ -76,6 +92,28 @@ function createSingleContentTemplate(content, contentId) {
     `;
     
     return contentHTML;
+}
+
+// Template for visual component specifications
+function createVisualComponentTemplate(visualSpecs) {
+    return `
+        <div class="visual-component-section">
+            <h5>🎨 Visual Component Specifications</h5>
+            <div class="visual-specs-card">
+                <div class="visual-type">
+                    <strong>Type:</strong> ${visualSpecs.type}
+                </div>
+                <div class="visual-description">
+                    <strong>Description:</strong> ${visualSpecs.description}
+                </div>
+                ${visualSpecs.coordination_notes ? `
+                    <div class="visual-coordination">
+                        <strong>Coordination Notes:</strong> ${visualSpecs.coordination_notes}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
 }
 
 // Template for single tweet display

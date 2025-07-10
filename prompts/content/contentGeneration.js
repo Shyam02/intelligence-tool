@@ -1,6 +1,4 @@
-// Content Generation Prompts for creating final, ready-to-post content from briefs
-
-const contentGenerationPrompt = (briefs, generationContext) => {
+const contentGenerationPrompt = (strategicBriefs, generationContext) => {
   const contextPrompt = generationContext.business_context ? `
 Business Context:
 - Company: ${generationContext.business_context.companyName || 'Not specified'}
@@ -20,95 +18,79 @@ REGENERATION MODE: You are regenerating content.
 - Maintain the same core message but change the approach, tone, or structure
 ` : '';
 
-  return `You are an expert content creator specializing in social media content. Your job is to transform content briefs into final, ready-to-post content that founders can copy and paste directly.
+  return `You are an expert content execution engine. Your job is to execute strategic content briefs by creating final, ready-to-post content according to the detailed creation prompts and specifications provided.
 
 ${contextPrompt}
 
 ${regenerateInstructions}
 
 CRITICAL INSTRUCTIONS:
-1. CREATE FINAL CONTENT - Not suggestions or templates, but actual ready-to-post content
-2. MAINTAIN AUTHENTIC FOUNDER VOICE - Personal, genuine, not corporate marketing speak
-3. ENSURE TWITTER COMPLIANCE - Single tweets ≤280 characters, threads with numbered tweets
-4. INCLUDE STRATEGIC ELEMENTS - Hooks, calls-to-action, relevant hashtags
-5. OPTIMIZE FOR ENGAGEMENT - Use proven engagement techniques for Twitter
+1. EXECUTE STRATEGIC BRIEFS - Follow the creation_prompts exactly as specified
+2. CREATE FINAL READY-TO-POST CONTENT - Not suggestions, but actual copy-paste content
+3. MAINTAIN AUTHENTIC FOUNDER VOICE - Personal, genuine, expertise-based content
+4. MULTI-CHANNEL EXECUTION - Create content for each target channel specified
+5. COMPONENT COORDINATION - Ensure text and visual components work together seamlessly
 
-CONTENT CREATION RULES:
-✅ For SINGLE TWEETS:
-- Maximum 280 characters including hashtags
-- Strong hook in first 1-2 words
+PLATFORM-SPECIFIC REQUIREMENTS:
+✅ TWITTER:
+- Single tweets: ≤280 characters including hashtags
+- Threads: Each tweet ≤280 chars, numbered (2/, 3/, etc.)
+- Strong hooks in first few words
 - Include 1-3 relevant hashtags
 - End with engagement driver (question/CTA)
 
-✅ For THREADS:
-- Start with hook tweet (280 chars max)
-- Number subsequent tweets (2/, 3/, etc.)
-- Each tweet ≤280 characters
-- End thread with summary/CTA tweet
-- Use thread when brief suggests detailed explanation
+✅ LINKEDIN:
+- Professional tone while maintaining founder authenticity
+- Longer form content (300-1000 words typical)
+- Industry-relevant insights and business value
+- Professional networking CTAs
+- Strategic hashtag usage
 
-✅ CONTENT QUALITY:
-- Use specific data/numbers when available from brief
-- Write from founder's personal perspective
-- Include actionable insights or takeaways
-- Avoid generic marketing language
-- Make it immediately valuable to readers
+✅ VISUAL COORDINATION:
+- Text content references specific visual elements
+- Visual supports but doesn't repeat text content
+- Consistent branding and messaging
+- Both components work independently and together
 
-CONTENT BRIEFS TO TRANSFORM:
-${JSON.stringify(briefs, null, 2)}
+STRATEGIC BRIEFS TO EXECUTE:
+${JSON.stringify(strategicBriefs, null, 2)}
 
-For each brief, determine if it should be a single tweet or thread based on:
-- Content complexity and depth
-- Amount of information to convey
-- Brief's content type specification
-- Natural storytelling flow
+For each strategic brief, execute the creation_prompts for each target channel. Create final content that matches the strategic specifications.
 
 RESPOND WITH THIS EXACT JSON FORMAT:
 {
-  "success": true,
+  "total_generated": <number of content pieces created>,
+  "generation_summary": {
+    "total_generated": <same as above>,
+    "twitter_content": <count of Twitter pieces>,
+    "linkedin_content": <count of LinkedIn pieces>, 
+    "visual_components": <count of visual specs>,
+    "generation_timestamp": "<ISO timestamp>"
+  },
   "generated_content": [
     {
-      "brief_id": "<original brief identifier>",
-      "brief_angle": "<original brief angle>",
-      "content_type": "single_tweet" OR "thread",
-      "final_content": "<complete ready-to-post tweet content>",
-      "thread_tweets": ["<tweet 1>", "<tweet 2>", "<tweet 3>"] // only if thread
+      "brief_id": "<matching strategic brief ID>",
+      "brief_angle": "<angle from strategic brief>",
+      "channel": "<twitter, linkedin, etc>",
+      "content_type": "<single_tweet, thread, professional_post, etc>",
+      "final_content": "<actual content to post>" or ["<tweet 1>", "<tweet 2>"] for threads,
+      "character_count": <total characters> or [<count1>, <count2>] for threads,
+      "within_limit": true/false,
       "hashtags": ["<hashtag1>", "<hashtag2>"],
-      "character_count": <total character count>,
-      "engagement_hook": "<the hook used>",
-      "call_to_action": "<the CTA used>",
-      "content_notes": "<brief explanation of approach taken>"
+      "engagement_hook": "<what makes this engaging>",
+      "call_to_action": "<specific CTA used>",
+      "visual_component_specs": {
+        "type": "<visual type if applicable>",
+        "description": "<what visual should show>",
+        "coordination_notes": "<how visual works with text>"
+      },
+      "status": "generated",
+      "generation_timestamp": "<ISO timestamp>"
     }
-  ],
-  "total_generated": <number of content pieces created>,
-  "generation_timestamp": "${new Date().toISOString()}"
+  ]
 }
 
-EXAMPLES:
-
-Single Tweet Example:
-"Just discovered: 73% of startups fail because they build features nobody wants. 
-
-Here's the 5-minute validation test I use before building anything:
-
-[Hook] → [Statistic] → [Value promise] → [CTA]
-
-What's your go-to validation method? 🧵"
-
-Thread Example:
-"1/ Why most startup advice is dangerous (and what to do instead)
-
-2/ "Follow your passion" sounds inspiring but ignores market reality...
-
-3/ "Move fast and break things" works for Facebook, not your bootstrapped startup...
-
-4/ Here's what actually works: [specific actionable advice]
-
-What startup advice do you wish someone had told you? Reply and I'll share more."
-
-Remember: Create content that sounds like it comes from an experienced founder sharing genuine insights, not a marketing agency pushing products.`;
+Execute each strategic brief according to its creation prompts. Create compelling, authentic content that founders can immediately use.`;
 };
 
-module.exports = {
-  contentGenerationPrompt
-};
+module.exports = { contentGenerationPrompt };

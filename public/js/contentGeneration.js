@@ -1,12 +1,12 @@
 // Content Generation Frontend - Handle content generation UI and interactions with proper routing
 
-// Generate content from content briefs
+// Generate content from strategic briefs
 async function generateContentFromBriefs() {
-    // Get all briefs from the current content briefs display
-    const briefsData = extractBriefsFromCurrentDisplay();
+    // Get all strategic briefs from the current display
+    const strategicBriefs = extractStrategicBriefsFromCurrentDisplay();
     
-    if (!briefsData || briefsData.length === 0) {
-        alert('No content briefs found. Please generate content briefs first.');
+    if (!strategicBriefs || strategicBriefs.length === 0) {
+        alert('No strategic briefs found. Please generate strategic content briefs first.');
         return;
     }
     
@@ -21,12 +21,12 @@ async function generateContentFromBriefs() {
     generateBtn.disabled = true;
     
     try {
-        console.log('🎨 Starting content generation for', briefsData.length, 'briefs');
-        
-        // Get business context from app state
-        const businessContext = createBusinessContextForGeneration();
-        
-        const generatedContent = await generateTwitterContentAPI(briefsData, businessContext);
+        console.log('🎨 Starting content generation for', strategicBriefs.length, 'strategic briefs');
+
+    // Get business context from app state
+    const businessContext = createBusinessContextForGeneration();
+
+    const generatedContent = await generateTwitterContentAPI(strategicBriefs, businessContext);
         
         // FIXED: Store generated content in app state for Twitter sub-tab
         window.appState.generatedTwitterContent = generatedContent;
@@ -99,40 +99,30 @@ function displayGeneratedContentInTwitterTab(generatedContent) {
     console.log('✅ Generated content displayed in Twitter sub-tab');
 }
 
-// Generate content for a specific brief
-async function generateContentForBrief(briefIndex) {
-    const briefsData = extractBriefsFromCurrentDisplay();
-    
-    if (!briefsData || !briefsData[briefIndex]) {
-        alert('Brief not found');
-        return;
+// Extract strategic briefs for content generation (moved from contentBriefs.js)
+function extractStrategicBriefsFromCurrentDisplay() {
+    if (!window.appState.strategicBriefs) {
+        console.error('No strategic briefs available in app state');
+        return [];
     }
     
-    const brief = briefsData[briefIndex];
-    const generateBtn = document.querySelector(`#generateBrief${briefIndex}`);
+    // Extract all viable briefs from stored strategic briefs
+    const allBriefs = [];
     
-    if (!generateBtn) return;
+    window.appState.strategicBriefs.results.forEach(result => {
+        if (result.viable && result.briefs) {
+            result.briefs.forEach(brief => {
+                allBriefs.push({
+                    ...brief,
+                    source_article_title: result.article_title,
+                    source_article_id: result.article_id
+                });
+            });
+        }
+    });
     
-    const originalText = generateBtn.textContent;
-    generateBtn.textContent = '⏳ Generating...';
-    generateBtn.disabled = true;
-    
-    try {
-        const businessContext = createBusinessContextForGeneration();
-        const generatedContent = await generateTwitterContentAPI([brief], businessContext);
-        
-        // Display content for this specific brief
-        displayBriefSpecificContent(briefIndex, generatedContent.generated_content[0]);
-        
-        console.log('✅ Content generated for brief:', brief.angle);
-        
-    } catch (error) {
-        console.error('Brief-specific content generation failed:', error);
-        alert('Content generation failed: ' + error.message);
-    } finally {
-        generateBtn.textContent = originalText;
-        generateBtn.disabled = false;
-    }
+    console.log('📋 Extracted strategic briefs for generation:', allBriefs.length);
+    return allBriefs;
 }
 
 // Regenerate specific content piece
@@ -359,7 +349,6 @@ function rejectContent(contentId) {
 
 // Global function exports for HTML onclick handlers
 window.generateContentFromBriefs = generateContentFromBriefs;
-window.generateContentForBrief = generateContentForBrief;
 window.regenerateContent = regenerateContent;
 window.copyGeneratedContent = copyGeneratedContent;
 window.copyThreadContent = copyThreadContent;

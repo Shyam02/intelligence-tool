@@ -440,7 +440,7 @@ window.copySelectedArticles = copySelectedArticles;
 window.copyTweet = copyTweet;
 
 // UPDATED: Reddit function wrappers - added new functions
-window.discoverSubreddits = discoverRelevantSubreddits;
+window.discoverSubreddits = discoverSubreddits;
 window.generateRedditQueries = generateRedditQueries;
 window.executeTestRedditSearch = executeTestRedditSearch;
 
@@ -452,7 +452,8 @@ window.markSubTabCompleted = markSubTabCompleted;
 window.updateEmptyStates = updateEmptyStates;
 window.updateSubTabAvailability = updateSubTabAvailability;
 window.updateHeaderContent = updateHeaderContent;
+window.generateContentBriefs = generateContentBriefs;
 
 // At the end of forms.js (or wherever displayContentStrategy and showContentStrategyEmptyState are defined):
 window.displayContentStrategy = displayContentStrategy;
-window.showContentStrategyEmptyState = showContentStrategyEmptyState;
+//window.showContentStrategyEmptyState = showContentStrategyEmptyState;

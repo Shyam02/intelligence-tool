@@ -54,48 +54,57 @@ async function generateContentBriefs(req, res) {
       }
     });
     
-    // Parse the response
-    let briefs;
-    try {
-      const jsonMatch = briefsResponse.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        briefs = JSON.parse(jsonMatch[0]);
-        global.contentBriefsDebugData.steps.push({
-          step: 'parse_success',
-          timestamp: new Date().toISOString(),
-          parsedBriefs: briefs,
-          logic: {
-            description: 'Parse AI response for content briefs',
-            sourceFile: 'controllers/contentBriefs.js',
-            functionName: 'generateContentBriefs()'
-          }
-        });
-        global.contentBriefsDebugData.summary = {
-          viableCount: briefs.viable_count,
-          totalBriefs: briefs.total_briefs,
-          evaluatedCount: briefs.evaluated_count
-        };
-        console.log(`✅ Generated briefs: ${briefs.viable_count} viable articles, ${briefs.total_briefs} total briefs`);
-      } else {
-        throw new Error('No JSON found in response');
-      }
-    } catch (parseError) {
-      global.contentBriefsDebugData.error = 'Failed to parse content briefs';
-      global.contentBriefsDebugData.steps.push({
-        step: 'parse_error',
-        timestamp: new Date().toISOString(),
-        error: parseError.message,
-        logic: {
-          description: 'Error parsing AI response',
-          sourceFile: 'controllers/contentBriefs.js',
-          functionName: 'generateContentBriefs()'
-        }
-      });
-      console.error('Failed to parse briefs:', parseError);
-      return res.status(500).json({ error: 'Failed to parse content briefs' });
+    // Parse the strategic briefs response
+let strategicBriefs;
+try {
+  const jsonMatch = briefsResponse.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    strategicBriefs = JSON.parse(jsonMatch[0]);
+    
+    // Validate strategic brief structure
+    const isValidStructure = validateStrategicBriefsStructure(strategicBriefs);
+    if (!isValidStructure) {
+      throw new Error('Invalid strategic briefs structure received from AI');
     }
     
-    res.json(briefs);
+    global.contentBriefsDebugData.steps.push({
+      step: 'parse_success',
+      timestamp: new Date().toISOString(),
+      parsedBriefs: strategicBriefs,
+      logic: {
+        description: 'Parse AI response for strategic content briefs',
+        sourceFile: 'controllers/contentBriefs.js',
+        functionName: 'generateContentBriefs()'
+      }
+    });
+    global.contentBriefsDebugData.summary = {
+      viableCount: strategicBriefs.viable_count,
+      totalBriefs: strategicBriefs.total_briefs,
+      evaluatedCount: strategicBriefs.evaluated_count
+    };
+    console.log(`✅ Generated strategic briefs: ${strategicBriefs.viable_count} viable articles, ${strategicBriefs.total_briefs} total strategic briefs`);
+  } else {
+    throw new Error('No JSON found in response');
+  }
+} catch (parseError) {
+  global.contentBriefsDebugData.error = 'Failed to parse strategic content briefs';
+  global.contentBriefsDebugData.steps.push({
+    step: 'parse_error',
+    timestamp: new Date().toISOString(),
+    error: parseError.message,
+    logic: {
+      description: 'Error parsing AI response for strategic briefs',
+      sourceFile: 'controllers/contentBriefs.js',
+      functionName: 'generateContentBriefs()'
+    }
+  });
+  console.error('Failed to parse strategic briefs:', parseError);
+  return res.status(500).json({ error: 'Failed to parse strategic content briefs' });
+}
+
+res.json(strategicBriefs);
+    
+  
     
   } catch (error) {
     global.contentBriefsDebugData.error = error.message;
@@ -111,6 +120,45 @@ async function generateContentBriefs(req, res) {
     });
     console.error('Content brief generation error:', error);
     res.status(500).json({ error: error.message });
+  }
+}
+
+// Validate strategic briefs structure
+function validateStrategicBriefsStructure(briefs) {
+  try {
+    // Check required top-level fields
+    if (!briefs.hasOwnProperty('evaluated_count') || 
+        !briefs.hasOwnProperty('viable_count') || 
+        !briefs.hasOwnProperty('total_briefs') || 
+        !Array.isArray(briefs.results)) {
+      return false;
+    }
+    
+    // Check each result has required structure
+    for (const result of briefs.results) {
+      if (!result.hasOwnProperty('article_id') || 
+          !result.hasOwnProperty('article_title') || 
+          !result.hasOwnProperty('viable')) {
+        return false;
+      }
+      
+      // If viable, check briefs structure
+      if (result.viable && Array.isArray(result.briefs)) {
+        for (const brief of result.briefs) {
+          if (!brief.hasOwnProperty('brief_id') || 
+              !brief.hasOwnProperty('content_angle') || 
+              !brief.hasOwnProperty('target_channels') || 
+              !brief.hasOwnProperty('creation_prompts')) {
+            return false;
+          }
+        }
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Strategic briefs validation error:', error);
+    return false;
   }
 }
 

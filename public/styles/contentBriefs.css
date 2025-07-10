@@ -1,183 +1,389 @@
-/* Content briefs styles */
-
-.content-generation-section {
-    margin-top: 20px;
-    text-align: center;
-    padding-top: 20px;
-    border-top: 2px solid #e2e8f0;
+/* Strategic Content Briefs Styles */
+.strategic-briefs-container {
+    max-width: 100%;
+    margin: 0 auto;
 }
 
-.content-brief-btn {
-    background: linear-gradient(135deg, #1DA1F2 0%, #0d8bd9 100%);
+.briefs-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    text-align: center;
+}
+
+.summary-stats span {
+    display: block;
+    font-size: 14px;
+}
+
+.content-generation-trigger {
+    background: #f8f9fa;
+    border: 2px dashed #28a745;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.generate-content-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 16px 32px;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-.content-brief-btn:hover {
+.generate-content-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(29, 161, 242, 0.3);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
 
-.content-brief-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.content-briefs-container {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    margin-top: 30px;
-}
-
-.content-briefs-container h3 {
-    color: #1DA1F2;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.briefs-summary {
-    background: #f7fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}
-
-.briefs-summary p {
-    margin: 5px 10px;
-    color: #4a5568;
-}
-
-.article-brief-section {
-    margin-bottom: 30px;
-    padding-bottom: 30px;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.article-brief-section:last-child {
-    border-bottom: none;
-}
-
-.article-brief-title {
-    color: #2d3748;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-}
-
-.content-brief-card {
-    background: #f8f9fa;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 15px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.content-brief-card:hover {
-    border-color: #1DA1F2;
-    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.1);
-}
-
-.brief-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.brief-angle {
-    color: #1DA1F2;
-    font-weight: 600;
+.generation-help {
+    margin-top: 12px;
+    color: #6c757d;
     font-size: 14px;
 }
 
-.brief-type {
-    background: #e2e8f0;
-    color: #4a5568;
-    padding: 4px 8px;
-    border-radius: 4px;
+/* Strategic Brief Cards */
+.strategic-brief-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.strategic-brief-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.brief-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brief-title-section h5 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.brief-metadata {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.content-type-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
 }
 
-.brief-content {
-    margin-bottom: 15px;
+.channel-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
 }
 
-.brief-hook {
-    color: #2d3748;
-    margin-bottom: 10px;
-    font-style: italic;
+.channel-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
-.tweet-preview {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 10px 0;
+.channel-twitter {
+    background: #1da1f2;
+    color: white;
 }
 
-.tweet-preview p {
-    color: #1a202c;
-    line-height: 1.5;
-    font-size: 15px;
-    margin-bottom: 5px;
+.channel-linkedin {
+    background: #0077b5;
+    color: white;
 }
 
-.tweet-length {
-    text-align: right;
-    font-size: 12px;
-    color: #718096;
-    margin-top: 10px;
+.channel-instagram {
+    background: #e4405f;
+    color: white;
 }
 
-.brief-metadata {
-    font-size: 14px;
-    color: #4a5568;
-    margin-top: 10px;
+.channel-blog {
+    background: #ff6900;
+    color: white;
 }
 
-.brief-metadata p {
-    margin: 5px 0;
-}
-
-.rejection-notice {
-    background: #fff5f5;
-    border: 2px solid #feb2b2;
-    border-radius: 8px;
-    padding: 15px;
-    margin: 10px 0;
-}
-
-.rejection-notice p {
-    color: #c53030;
-    margin: 0;
-}
-
-.copy-tweet-btn {
-    background: #4299e1;
+.brief-expand-btn {
+    background: rgba(255, 255, 255, 0.2);
     color: white;
     border: none;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 20px;
     font-size: 12px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
 }
 
-.copy-tweet-btn:hover {
-    background: #3182ce;
+.brief-expand-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.expand-icon {
+    margin-right: 6px;
+}
+
+/* Brief Summary */
+.brief-summary {
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.brief-value, .brief-message, .business-connection {
+    margin-bottom: 12px;
+}
+
+.brief-value p, .brief-message p, .business-connection p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.brief-value strong, .brief-message strong, .business-connection strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Brief Details */
+.brief-details {
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+    background: white;
+}
+
+.brief-details-content h6 {
+    color: var(--primary-color);
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.content-components-section {
+    margin-bottom: 24px;
+}
+
+.primary-component, .supporting-visual {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.primary-component p, .supporting-visual p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+}
+
+.primary-component strong, .supporting-visual strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Channel Strategies */
+.channel-strategies-section {
+    margin-bottom: 24px;
+}
+
+.channel-strategies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.channel-strategy-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.channel-strategy-card h7 {
+    display: block;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.channel-strategy-card p {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.channel-strategy-card strong {
+    color: #495057;
+    font-weight: 600;
+}
+
+/* Creation Prompts */
+.creation-prompts-section {
+    margin-bottom: 20px;
+}
+
+.creation-prompts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.creation-prompt-card {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.creation-prompt-card h7 {
+    display: block;
+    color: var(--primary-color);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.prompt-content {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.prompt-content p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #495057;
+}
+
+.coordination-notes {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.coordination-notes h7 {
+    display: block;
+    color: #0056b3;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.coordination-notes p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #0056b3;
+}
+
+/* Rejection Notice */
+.rejection-notice {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.rejection-content {
+    padding: 20px;
+}
+
+.rejection-content h5 {
+    margin: 0 0 12px 0;
+    color: #856404;
+    font-size: 16px;
+}
+
+.rejection-content p {
+    margin: 0 0 8px 0;
+    color: #856404;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.rejection-note {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .summary-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .brief-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .brief-metadata {
+        justify-content: flex-start;
+    }
+    
+    .channel-strategies-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .generate-content-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+}
+
+/* Article Brief Section */
+.article-brief-section {
+    margin-bottom: 32px;
+}
+
+.article-brief-title {
+    color: var(--primary-color);
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 6px 6px 0;
 }

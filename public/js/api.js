@@ -200,9 +200,9 @@ async function generateContentStrategyAPI(businessContext, availableData) {
     }
 }
 
-// NEW: Generate Twitter content from briefs
-async function generateTwitterContentAPI(briefs, businessContext, regenerateOptions = null) {
-    console.log('API: generateTwitterContentAPI called with', briefs.length, 'briefs');
+// Generate final content from strategic briefs
+async function generateTwitterContentAPI(strategicBriefs, businessContext, regenerateOptions = null) {
+    console.log('API: generateTwitterContentAPI called with', strategicBriefs.length, 'strategic briefs');
     try {
         const response = await fetch('/api/generateTwitterContent', {
             method: 'POST',
@@ -210,7 +210,7 @@ async function generateTwitterContentAPI(briefs, businessContext, regenerateOpti
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ 
-                briefs: briefs,
+                strategicBriefs: strategicBriefs,
                 businessContext: businessContext,
                 regenerateOptions: regenerateOptions
             })
@@ -227,7 +227,7 @@ async function generateTwitterContentAPI(briefs, businessContext, regenerateOpti
         
     } catch (error) {
         console.error('Error generating Twitter content:', error);
-        throw new Error('Failed to generate Twitter content: ' + error.message);
+        throw new Error('Failed to generate content from strategic briefs: ' + error.message);
     }
 }
 

@@ -1,76 +1,110 @@
-// Content Briefs Prompt for generating platform-agnostic content from search results
-
 const contentBriefsPrompt = (articles, businessContext) => {
-    const contextPrompt = businessContext ? `
-  Business Context:
-  - Company: ${businessContext.companyName || 'Not specified'}
-  - Launch Date: ${businessContext.launchDate || 'Not specified'}
-  - Target Market: ${businessContext.targetGeography || 'Not specified'}
-  - Business Details: ${businessContext.businessSpecifics || 'Not specified'}
-  - Category: ${businessContext.category || 'Not specified'}
-  - Additional Info: ${JSON.stringify(businessContext)}
-  ` : 'No business context provided.';
-  
-    return `You are an expert content strategist creating platform-agnostic content briefs. Your job is to evaluate search results and create HIGH-QUALITY content briefs ONLY for ideas with real value.
-  
-  ${contextPrompt}
-  
-  CRITICAL INSTRUCTIONS:
-  1. FILTER AGGRESSIVELY - Reject ideas that are too generic, lack concrete value, or don't align with business goals
-  2. NO FABRICATION - Use only information directly from the article. Never invent details.
-  3. AUTHENTIC VOICE - Write from the founder's perspective, not generic marketing
-  4. MULTIPLE ANGLES - For viable ideas, create 2-3 different tweet angles
-  5. BUSINESS VALUE - Every tweet must demonstrate expertise or advance business goals
-  
-  VIABILITY CRITERIA:
-  ✅ APPROVE ideas with:
-  - Specific data, metrics, or insights
-  - Real examples or case studies
-  - Unique perspectives or surprising information
-  - Clear value for the target audience
-  - Connection to business expertise
-  
-  ❌ REJECT ideas that are:
-  - Too generic or obvious
-  - Lacking concrete details
-  - Not relevant to business goals
-  - Requiring fabricated information
-  - Poor fit for content creation
-  
-  ARTICLES TO EVALUATE:
-  ${JSON.stringify(articles, null, 2)}
-  
-  For each article, determine if it's viable for content creation. For viable articles, create 2-3 different content briefs.
-  
-  RESPOND WITH THIS EXACT JSON FORMAT:
-  {
-    "evaluated_count": <number of articles evaluated>,
-    "viable_count": <number of viable articles>,
-    "total_briefs": <total number of briefs generated>,
-    "results": [
-      {
-        "article_id": <article id>,
-        "article_title": "<original article title>",
-        "viable": true/false,
-        "rejection_reason": "<if not viable, explain why>",
-        "briefs": [
-          {
-            "angle": "<specific angle/perspective for this tweet>",
-            "hook": "<attention-grabbing first line>",
-            "content": "<complete tweet text, 280 chars max>",
-            "content_type": "single_tweet",
-            "engagement_strategy": "<question/statement/statistic>",
-            "hashtags": ["<relevant hashtag>"],
-            "metrics_to_track": ["replies", "retweets", "clicks"]
+  const contextPrompt = businessContext ? `
+Business Context:
+- Company: ${businessContext.companyName || 'Not specified'}
+- Launch Date: ${businessContext.launchDate || 'Not specified'}
+- Target Market: ${businessContext.targetGeography || 'Not specified'}
+- Business Details: ${businessContext.businessSpecifics || 'Not specified'}
+- Value Proposition: ${businessContext.valueProposition || 'Not specified'}
+- Target Customer: ${businessContext.targetCustomer || 'Not specified'}
+- Industry: ${businessContext.industryCategory || 'Not specified'}
+- Key Features: ${businessContext.keyFeatures || 'Not specified'}
+- Business Stage: ${businessContext.businessStage || 'Not specified'}
+` : 'No business context provided.';
+
+  return `You are an expert content strategist creating strategic content briefs. Your job is to evaluate search results and create STRATEGIC PLANNING DOCUMENTS for viable content opportunities.
+
+${contextPrompt}
+
+CRITICAL INSTRUCTIONS:
+1. CREATE STRATEGIC BRIEFS - Not final content, but detailed plans for content creation
+2. FILTER AGGRESSIVELY - Only approve ideas with genuine business value
+3. MULTI-CHANNEL THINKING - Identify which platforms each idea works best for
+4. COMPONENT PLANNING - Specify if content needs text, visuals, or both
+5. AUTHENTIC BUSINESS VOICE - Everything must connect to real business expertise
+
+VIABILITY CRITERIA:
+✅ APPROVE ideas with:
+- Specific data, metrics, or concrete insights
+- Real customer examples or case studies  
+- Unique business perspectives or surprising information
+- Clear value demonstration for target audience
+- Strong connection to founder expertise areas
+
+❌ REJECT ideas that are:
+- Too generic or obvious
+- Lacking concrete supporting details
+- Not relevant to business goals or expertise
+- Requiring fabricated information to work
+- Poor strategic fit for content marketing
+
+ARTICLES TO EVALUATE:
+${JSON.stringify(articles, null, 2)}
+
+For each viable article, create 1-3 strategic content briefs with different angles or channel approaches.
+
+RESPOND WITH THIS EXACT JSON FORMAT:
+{
+  "evaluated_count": <number of articles evaluated>,
+  "viable_count": <number of viable articles>,
+  "total_briefs": <total number of strategic briefs generated>,
+  "results": [
+    {
+      "article_id": <article id>,
+      "article_title": "<original article title>",
+      "viable": true/false,
+      "rejection_reason": "<if not viable, detailed explanation why>",
+      "briefs": [
+        {
+          "brief_id": "<unique_brief_id>",
+          "content_angle": "<specific strategic perspective or approach>",
+          "strategic_value": "<why this content advances business goals>",
+          "target_channels": ["<optimal platforms for this content>"],
+          "content_type": "<single_modal or multi_modal>",
+          "key_message": "<core takeaway for audience>",
+          "business_connection": "<how this demonstrates founder expertise>",
+          "content_components": {
+            "primary_component": {
+              "type": "<narrative_type: case_study, insight_share, process_explanation, etc>",
+              "focus": "<main content focus>",
+              "founder_voice": "<voice characteristics for this content>",
+              "authenticity_boundaries": "<what real information is available>"
+            },
+            "supporting_visual": {
+              "type": "<visual_type: infographic, chart, before_after, process_diagram, etc>",
+              "required_data": ["<specific data points to visualize>"],
+              "brand_consistency": "<visual brand requirements>"
+            }
+          },
+          "channel_strategies": {
+            "twitter": {
+              "format": "<thread or single_post>",
+              "hook_strategy": "<engagement approach>",
+              "content_length": "<estimated length>",
+              "engagement_goal": "<what response we want>",
+              "hashtag_strategy": "<hashtag approach>"
+            },
+            "linkedin": {
+              "format": "<professional_post, article, or carousel>",
+              "hook_strategy": "<professional engagement approach>",
+              "content_length": "<estimated word count>",
+              "engagement_goal": "<professional networking goal>",
+              "cta_strategy": "<call to action approach>"
+            }
+          },
+          "creation_prompts": {
+            "twitter_creation_prompt": "<exact detailed instructions for AI to create Twitter content>",
+            "linkedin_creation_prompt": "<exact detailed instructions for AI to create LinkedIn content>",
+            "visual_creation_prompt": "<exact instructions for visual creation>",
+            "coordination_notes": "<how components should work together>"
           }
-        ]
-      }
-    ]
-  }
-  
-  Remember: Quality over quantity. It's better to have fewer excellent tweets than many mediocre ones.`;
-  };
-  
-  module.exports = {
-    contentBriefsPrompt
-  };
+        }
+      ]
+    }
+  ]
+}
+
+Remember: Create strategic plans, not final content. These briefs will be used by content generators to create actual posts.`;
+};
+
+module.exports = { contentBriefsPrompt };
