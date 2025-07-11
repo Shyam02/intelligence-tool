@@ -16,7 +16,7 @@ Business Context:
 
   // ENHANCEMENT: Prepare articles with full content when available
   const enrichedArticlesForPrompt = articles.map(article => {
-    const hasFullContent = article.contentFetched && article.fullContent;
+    const hasFullContent = !!(article.contentFetched && article.fullContent);
     
     return {
       id: article.id,
